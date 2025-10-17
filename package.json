@@ -9,12 +9,12 @@
     "contracts/*"
   ],
   "scripts": {
-    "setup": "yarn install",
-    "dev": "concurrently \"yarn --cwd apps/verifier-api dev\" \"yarn --cwd apps/web dev\"",
-    "build": "yarn --cwd apps/web build && yarn --cwd apps/verifier-api build",
-    "test": "yarn workspaces foreach run test",
-    "lint": "yarn workspaces foreach run lint",
-    "clean": "yarn workspaces foreach run clean && rm -rf node_modules"
+    "setup": "npm install",
+    "dev": "concurrently \"npm --prefix apps/verifier-api run dev\" \"npm --prefix apps/web run dev\"",
+    "build": "npm --prefix apps/web run build && npm --prefix apps/verifier-api run build",
+    "test": "npm run test --workspaces",
+    "lint": "npm run lint --workspaces",
+    "clean": "npm run clean --workspaces && rm -rf node_modules"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",

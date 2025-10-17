@@ -26,8 +26,8 @@ export function generateRandomPID(): string {
  * Generate an ES256 key pair for agent signing
  */
 export async function generateKeyPair(): Promise<{
-  privateKey: CryptoKey;
-  publicKey: CryptoKey;
+  privateKey: crypto.webcrypto.CryptoKey;
+  publicKey: crypto.webcrypto.CryptoKey;
   publicKeyJWK: any;
 }> {
   const { privateKey, publicKey } = await crypto.subtle.generateKey(

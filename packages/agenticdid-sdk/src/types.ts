@@ -3,6 +3,8 @@
  * Privacy-preserving identity protocol for AI agents
  */
 
+import * as crypto from 'crypto';
+
 /** Challenge from verifier */
 export type Challenge = {
   nonce: string;
@@ -46,8 +48,8 @@ export type AgentCredential = {
   pid: string;
   role: Disclosed['role'];
   scopes: string[];
-  privateKey: CryptoKey;
-  publicKey: CryptoKey;
+  privateKey: crypto.webcrypto.CryptoKey;
+  publicKey: crypto.webcrypto.CryptoKey;
   cred_hash: string;
   issued_at: number;
   expires_at: number;

@@ -10,7 +10,7 @@ import { computeJWKThumbprint } from './crypto.js';
  * Sign a challenge (nonce|aud|exp)
  */
 export async function signChallenge(
-  privateKey: CryptoKey,
+  privateKey: crypto.webcrypto.CryptoKey,
   challenge: Challenge
 ): Promise<string> {
   const payload = `${challenge.nonce}|${challenge.aud}|${challenge.exp}`;
@@ -92,7 +92,7 @@ export async function buildVP(args: {
 export async function verifyVPSignature(
   vp: VP,
   challenge: Challenge,
-  publicKey: CryptoKey
+  publicKey: crypto.webcrypto.CryptoKey
 ): Promise<boolean> {
   try {
     const payload = `${challenge.nonce}|${challenge.aud}|${challenge.exp}`;
