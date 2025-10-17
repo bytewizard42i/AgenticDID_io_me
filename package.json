@@ -1,0 +1,39 @@
+{
+  "name": "agenticdid",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Midnight-powered, privacy-preserving identity protocol for AI agents",
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "contracts/*"
+  ],
+  "scripts": {
+    "setup": "yarn install",
+    "dev": "concurrently \"yarn --cwd apps/verifier-api dev\" \"yarn --cwd apps/web dev\"",
+    "build": "yarn --cwd apps/web build && yarn --cwd apps/verifier-api build",
+    "test": "yarn workspaces foreach run test",
+    "lint": "yarn workspaces foreach run lint",
+    "clean": "yarn workspaces foreach run clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.5",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "yarn": ">=1.22.0"
+  },
+  "keywords": [
+    "midnight",
+    "zkp",
+    "verifiable-credentials",
+    "privacy-preserving",
+    "ai-agents",
+    "did"
+  ],
+  "author": "AgenticDID.io Team",
+  "license": "MIT"
+}
