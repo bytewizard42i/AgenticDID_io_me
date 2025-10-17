@@ -2,6 +2,7 @@
   "name": "@agenticdid/sdk",
   "version": "1.0.0",
   "description": "Core SDK for AgenticDID protocol - PID generation, proof bundles, and VP assembly",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
