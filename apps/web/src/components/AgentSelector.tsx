@@ -9,12 +9,14 @@ export default function AgentSelector({ selectedAgent, onSelect }: Props) {
   return (
     <div className="space-y-3">
       <h3 className="text-lg font-semibold text-midnight-200">Select Agent Identity</h3>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 justify-items-center">
-        {Object.entries(AGENTS).map(([key, agent]) => (
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        {Object.entries(AGENTS).map(([key, agent], index) => (
           <button
             key={key}
             onClick={() => onSelect(key as AgentType)}
-            className={`p-4 rounded-lg border-2 transition-all text-left w-full ${
+            className={`p-4 rounded-lg border-2 transition-all text-left ${
+              index === 3 ? 'md:col-start-2' : ''
+            } ${
               selectedAgent === key
                 ? 'border-midnight-500 bg-midnight-800/50'
                 : 'border-midnight-800 bg-midnight-900/30 hover:border-midnight-700'
