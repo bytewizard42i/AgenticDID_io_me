@@ -2,7 +2,7 @@
  * Demo Agent Definitions
  */
 
-export type AgentType = 'banker' | 'traveler' | 'rogue';
+export type AgentType = 'banker' | 'traveler' | 'shopper' | 'rogue';
 
 export const AGENTS = {
   banker: {
@@ -20,6 +20,15 @@ export const AGENTS = {
     icon: '✈️',
     color: 'text-blue-400',
     description: 'Authorized to book and manage travel',
+  },
+  shopper: {
+    name: 'Amazon Shopping Agent',
+    role: 'Shopper' as const,
+    scopes: ['shop:purchase', 'shop:cart'],
+    icon: '📦',
+    color: 'text-orange-400',
+    description: 'Authorized Amazon agent for e-commerce purchases',
+    isTrustedService: true,
   },
   rogue: {
     name: 'Rogue Agent',
@@ -50,9 +59,9 @@ export const ACTIONS: Action[] = [
   },
   {
     id: 'shop',
-    label: 'Buy Headphones',
-    requiredRole: 'Traveler',
-    requiredScope: 'travel:book',
+    label: 'Buy Headphones ($149)',
+    requiredRole: 'Shopper',
+    requiredScope: 'shop:purchase',
     icon: '🎧',
   },
   {

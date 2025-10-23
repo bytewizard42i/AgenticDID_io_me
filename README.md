@@ -458,8 +458,12 @@ VITE_API_BASE=http://localhost:8787
 |-------|--------|----------|--------|
 | Banker | Send $50 | ✅ PASS | Correct role + scope |
 | Banker | Book Flight | ❌ FAIL | Wrong scope |
+| Banker | Buy Headphones | ❌ FAIL | Wrong role |
 | Traveler | Book Flight | ✅ PASS | Correct role + scope |
 | Traveler | Send $50 | ❌ FAIL | Wrong role |
+| Traveler | Buy Headphones | ❌ FAIL | Wrong role |
+| Amazon Shopper | Buy Headphones | ✅ PASS | Authorized merchant agent |
+| Amazon Shopper | Send $50 | ❌ FAIL | Wrong role |
 | Rogue | Any Action | ❌ FAIL | Revoked credential |
 
 ### Expected Outcomes (Phase 2 - Multi-Party)
