@@ -4,7 +4,18 @@
 
 export type AgentType = 'banker' | 'traveler' | 'shopper' | 'rogue';
 
-export const AGENTS = {
+export type Agent = {
+  name: string;
+  role: string;
+  scopes: string[];
+  icon: string;
+  color: string;
+  description: string;
+  isRogue?: boolean;
+  isTrustedService?: boolean;
+};
+
+export const AGENTS: Record<AgentType, Agent> = {
   banker: {
     name: 'Legit Banker Agent',
     role: 'Banker' as const,
