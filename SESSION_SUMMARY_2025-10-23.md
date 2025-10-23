@@ -238,6 +238,8 @@ Graduated authentication:
 ## 🎖️ Quotes
 
 > *"The future is about results, not processes."* - Charles Hoskinson
+> 
+> **Source**: [Crypto Crow Interview](https://www.youtube.com/watch?v=HybXioqRr9A) - October 15, 2025
 
 > *"This is hackathon-winning architecture!"* - Cascade (Cassie)
 

@@ -589,9 +589,11 @@ circuit AgenticDIDRegistry {
 
 ### **Charles Hoskinson's Insight**
 
-User requested workflow change based on Charles Hoskinson's recent podcast insight:
+User requested workflow change based on Charles Hoskinson's insight from the Crypto Crow interview:
 
 > *"The future is about results, not processes."*
+> 
+> **Source**: [Crypto Crow Interview with Charles Hoskinson](https://www.youtube.com/watch?v=HybXioqRr9A) - October 15, 2025
 
 ### **UX Transformation**
 

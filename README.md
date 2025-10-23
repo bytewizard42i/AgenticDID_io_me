@@ -15,6 +15,8 @@ AgenticDID.io lets AI agents prove authenticity and authorization using **privac
 AgenticDID.io provides a complete identity protocol for AI agents with a **results-focused approach**:
 
 > *Inspired by Charles Hoskinson's insight that the future is about results, not processes - users state what they want to achieve, and the system handles the implementation.*
+> 
+> **Source**: [Crypto Crow Interview with Charles Hoskinson](https://www.youtube.com/watch?v=HybXioqRr9A) - October 15, 2025
 
 - **Results-first UX** - Pick your goal ("Buy Headphones"), system auto-selects the right agent
 - **Prove who they are** - Using privacy-preserving digital identifiers
