@@ -1,9 +1,35 @@
 # 🏆 Google Cloud Run Hackathon Submission
 ## AgenticDID.io - Privacy-Preserving AI Agent Identity Protocol
 
-**Category**: 🤝 **AI Agents Category**
+**Official Hackathon**: [Cloud Run Hackathon - Devpost](https://run.devpost.com/)
 
-**Innovative Integration**: Google ADK Agents + Midnight Network ZKPs
+**Category**: 🤝 **AI Agents Category** ($8,000 prize)
+
+**Innovative Integration**: Google ADK Agents + Midnight Network ZKPs + AI Studio + Gemini CLI
+
+---
+
+## 🔗 Official Hackathon Resources
+
+### Hackathon Links
+- **Main Page**: https://run.devpost.com/
+- **Registration**: https://run.devpost.com/register
+- **Full Rules**: https://run.devpost.com/rules
+- **Schedule**: https://run.devpost.com/details/dates
+- **Submission Portal**: (opens closer to deadline)
+
+### Required Google Tools
+- **Google Cloud Account**: https://developers.google.com/profile (includes free credits!)
+- **Cloud Run Quickstart**: https://cloud.google.com/run/docs/quickstarts
+- **AI Studio**: https://aistudio.google.com (for AI Studio category)
+- **Google ADK**: https://cloud.google.com/agent-development-kit (for AI Agents category)
+- **Gemini CLI**: https://cloud.google.com/gemini/docs/cli (CLI-based AI assistance)
+
+### Documentation
+- **Cloud Run Docs**: https://cloud.google.com/run/docs
+- **Agent Development Kit**: https://cloud.google.com/agent-development-kit/docs
+- **AI Studio Guide**: https://ai.google.dev/aistudio
+- **Gemini Models**: https://ai.google.dev/gemini-api
 
 ---
 
@@ -29,6 +55,8 @@
 #### Optional Enhancements
 - ✅ **Google AI Models** - Gemini integration for agent intelligence (+0.4 pts)
 - ✅ **Multiple Cloud Run Services** - Frontend + Backend (+0.4 pts)
+- ✅ **AI Studio** - Used for prompt engineering and agent design
+- ✅ **Gemini CLI** - Used during development workflow for code generation
 - 🔄 **Blog Post** - Technical deep dive (to be published) (+0.4 pts)
 - 🔄 **Social Media** - #CloudRunHackathon promotion (+0.4 pts)
 
@@ -327,18 +355,31 @@ Success/Failure
 
 ### Phase 2: Google ADK Integration (Day 2)
 
-1. **Install Google ADK**
+1. **Install Google ADK & Gemini CLI**
    ```bash
    npm install @google-cloud/agent-development-kit
+   # Install Gemini CLI for development assistance
+   gcloud components install gemini
    ```
 
-2. **Convert Agents to ADK Format**
+2. **Use AI Studio for Agent Design**
+   - Open https://aistudio.google.com
+   - Design agent prompts and behaviors
+   - Test agent responses with different scenarios
+   - Export prompts for integration
+   - Share app link for hackathon submission
+
+3. **Convert Agents to ADK Format (with Gemini CLI assistance)**
+   ```bash
+   # Use Gemini CLI to accelerate development
+   gemini code generate --prompt "Convert TypeScript agent to Google ADK format"
+   ```
    - Comet → ADK Orchestrator Agent
    - Banker → ADK Financial Agent
    - Shopper → ADK Commerce Agent
    - Traveler → ADK Booking Agent
 
-3. **Implement MCP Communication**
+4. **Implement MCP Communication**
    - Agent-to-agent messaging
    - Service integration points
    - Error handling and retries
@@ -400,6 +441,13 @@ Success/Failure
 - [ ] **Try It Out Link**
   - Live Cloud Run URL: `https://agenticdid-frontend-[hash].run.app`
   - Backend API: `https://agenticdid-api-[hash].run.app`
+
+- [ ] **AI Studio Prompts Link** (Important!)
+  - Open AI Studio: https://aistudio.google.com
+  - Design agent prompts and test
+  - Use "Share App" functionality
+  - Include shared link in Devpost submission
+  - Note: This demonstrates use of AI Studio tools
 
 ### Optional Materials
 
@@ -507,12 +555,31 @@ The future of AI is autonomous. Let's make it trustworthy AND private."
 
 ---
 
+## 🎨 Media Assets
+
+The `/media` folder contains visual assets for the submission:
+
+- `agenticdid-good.png` - Logo/branding
+- `banner-1.png` - Banner image for presentations
+- `trio.jpeg` - Team/concept visualization
+- `utils_AgenticDID_io_me.png` - Architecture/IDE screenshots
+- Additional screenshots from AI Studio and development workflow
+
+**Usage**:
+- Include in Devpost submission gallery
+- Use in demo video
+- Include in blog post
+- Share on social media with #CloudRunHackathon
+
+---
+
 ## 🔗 Links & Resources
 
 ### Project Links
 - **GitHub**: https://github.com/bytewizard42i/AgenticDID_io_me
 - **Live Demo**: https://agenticdid-frontend-[hash].run.app (to be deployed)
 - **API**: https://agenticdid-api-[hash].run.app (to be deployed)
+- **AI Studio Prompts**: (to be shared from aistudio.google.com)
 - **Documentation**: See README.md and docs/ folder
 
 ### Technical Resources
