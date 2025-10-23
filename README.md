@@ -1,4 +1,4 @@
-# 🌙 AgenticDID.io
+# 🔮 AgenticDID.io
 
 **Midnight-powered, privacy-preserving identity protocol for AI agents**
 
@@ -447,5 +447,5 @@ For questions or issues:
 
 ---
 
-**Built with 🌙 for the Midnight Network Hackathon**  
+**Built with 🔮 for the Midnight Network Hackathon**  
 *Prove, then act. Without exposing private data.*
