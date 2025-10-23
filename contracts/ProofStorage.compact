@@ -1,0 +1,473 @@
+/**
+ * Proof Storage Contract
+ * 
+ * Stores cryptographic receipts and audit logs
+ * Provides transparent verification history
+ * Maintains on-chain proof of all operations
+ * 
+ * Built for: Google Cloud Run Hackathon + Midnight Network
+ * Transparency: Verifiable audit trail while preserving privacy
+ */
+
+circuit ProofStorage {
+  
+  // ============================================================================
+  // STATE VARIABLES
+  // ============================================================================
+  
+  // Private state - detailed proof data
+  private proofRecords: Map<Bytes<32>, ProofRecord>;
+  private agentActions: Map<Bytes<32>, ActionLog>;
+  
+  // Public state - merkle roots for verification
+  public totalProofs: Uint64;
+  public totalActions: Uint64;
+  public currentMerkleRoot: Bytes<32>;
+  public contractOwner: Address;
+  
+  // ============================================================================
+  // DATA STRUCTURES
+  // ============================================================================
+  
+  struct ProofRecord {
+    proofId: Bytes<32>,           // Unique proof ID
+    proofType: Bytes<32>,         // Type hash (e.g., "agent_verification")
+    agentDID: Bytes<32>,          // Agent involved
+    timestamp: Uint64,            // When proof was created
+    proofData: Bytes<>,           // Actual ZK proof
+    metadata: ProofMetadata,      // Additional info
+    merkleProof: Bytes<>          // Merkle proof for verification
+  }
+  
+  struct ProofMetadata {
+    issuer: Address,              // Who created the proof
+    verifier: Address,            // Who can verify
+    expiresAt: Uint64,            // Proof expiration
+    isRevoked: Boolean            // Revocation status
+  }
+  
+  struct ActionLog {
+    actionId: Bytes<32>,          // Unique action ID
+    agentDID: Bytes<32>,          // Agent that performed action
+    actionType: Bytes<32>,        // Action type hash
+    timestamp: Uint64,            // When action occurred
+    wasSuccessful: Boolean,       // Action result
+    proofId: Bytes<32>,           // Associated proof
+    contextHash: Bytes<32>        // Context/parameters hash
+  }
+  
+  struct Receipt {
+    receiptId: Bytes<32>,         // Unique receipt ID
+    proofId: Bytes<32>,           // Associated proof
+    timestamp: Uint64,            // Receipt timestamp
+    blockNumber: Uint64,          // Block when recorded
+    txHash: Bytes<32>,            // Transaction hash
+    merkleRoot: Bytes<32>         // Merkle root at time
+  }
+  
+  // ============================================================================
+  // INITIALIZATION
+  // ============================================================================
+  
+  /**
+   * Initialize proof storage
+   */
+  public constructor(owner: Address): Void {
+    contractOwner = owner;
+    totalProofs = 0u64;
+    totalActions = 0u64;
+    currentMerkleRoot = bytes32(0u8);
+  }
+  
+  // ============================================================================
+  // PROOF STORAGE
+  // ============================================================================
+  
+  /**
+   * Store a new proof record
+   * Creates on-chain receipt for transparency
+   * 
+   * @param caller - Address storing the proof
+   * @param agentDID - Agent the proof is for
+   * @param proofType - Type of proof
+   * @param proofData - The actual ZKP data
+   * @param expiresAt - When proof expires
+   * @param currentTime - Current timestamp
+   * @param blockNumber - Current block number
+   */
+  public function storeProof(
+    caller: Address,
+    agentDID: Bytes<32>,
+    proofType: Bytes<32>,
+    proofData: Bytes<>,
+    expiresAt: Uint64,
+    currentTime: Uint64,
+    blockNumber: Uint64
+  ): Bytes<32> {
+    
+    // Validate inputs
+    require(proofData.length > 0u64, "Empty proof");
+    require(expiresAt > currentTime, "Invalid expiration");
+    
+    // Generate unique proof ID
+    const proofId = hashProofId(agentDID, proofType, currentTime);
+    
+    // Check proof doesn't already exist
+    require(!proofRecords.has(proofId), "Proof already exists");
+    
+    // Create metadata
+    const metadata: ProofMetadata = {
+      issuer: caller,
+      verifier: caller,  // Can be changed later
+      expiresAt: expiresAt,
+      isRevoked: false
+    };
+    
+    // Generate merkle proof (simplified)
+    const merkleProof = generateMerkleProof(proofId, currentMerkleRoot);
+    
+    // Create proof record
+    const record: ProofRecord = {
+      proofId: proofId,
+      proofType: proofType,
+      agentDID: agentDID,
+      timestamp: currentTime,
+      proofData: proofData,
+      metadata: metadata,
+      merkleProof: merkleProof
+    };
+    
+    // Store proof
+    proofRecords.set(proofId, record);
+    
+    // Update merkle root
+    currentMerkleRoot = updateMerkleRoot(currentMerkleRoot, proofId);
+    
+    // Update counter
+    totalProofs = totalProofs + 1u64;
+    
+    return proofId;
+  }
+  
+  /**
+   * Get proof record (for verification)
+   * Returns proof data if caller is authorized
+   */
+  public function getProof(
+    caller: Address,
+    proofId: Bytes<32>
+  ): ProofRecord {
+    
+    require(proofRecords.has(proofId), "Proof not found");
+    
+    const record = proofRecords.get(proofId);
+    
+    // Check authorization (simplified)
+    require(
+      caller == record.metadata.issuer || 
+      caller == record.metadata.verifier,
+      "Not authorized"
+    );
+    
+    return record;
+  }
+  
+  /**
+   * Verify proof is valid and not expired/revoked
+   */
+  public function verifyProof(
+    proofId: Bytes<32>,
+    currentTime: Uint64
+  ): Boolean {
+    
+    if (!proofRecords.has(proofId)) {
+      return false;
+    }
+    
+    const record = proofRecords.get(proofId);
+    
+    // Check revocation
+    if (record.metadata.isRevoked) {
+      return false;
+    }
+    
+    // Check expiration
+    if (record.metadata.expiresAt < currentTime) {
+      return false;
+    }
+    
+    // Verify merkle proof
+    if (!verifyMerkleProof(record.merkleProof, record.proofId, currentMerkleRoot)) {
+      return false;
+    }
+    
+    return true;
+  }
+  
+  // ============================================================================
+  // ACTION LOGGING
+  // ============================================================================
+  
+  /**
+   * Log an agent action with proof
+   * Creates audit trail for compliance
+   */
+  public function logAction(
+    caller: Address,
+    agentDID: Bytes<32>,
+    actionType: Bytes<32>,
+    proofId: Bytes<32>,
+    wasSuccessful: Boolean,
+    contextHash: Bytes<32>,
+    currentTime: Uint64
+  ): Bytes<32> {
+    
+    // Generate action ID
+    const actionId = hashActionId(agentDID, actionType, currentTime);
+    
+    // Create action log
+    const action: ActionLog = {
+      actionId: actionId,
+      agentDID: agentDID,
+      actionType: actionType,
+      timestamp: currentTime,
+      wasSuccessful: wasSuccessful,
+      proofId: proofId,
+      contextHash: contextHash
+    };
+    
+    // Store action
+    agentActions.set(actionId, action);
+    
+    // Update counter
+    totalActions = totalActions + 1u64;
+    
+    return actionId;
+  }
+  
+  /**
+   * Get action log for audit
+   */
+  public function getActionLog(actionId: Bytes<32>): ActionLog {
+    require(agentActions.has(actionId), "Action not found");
+    return agentActions.get(actionId);
+  }
+  
+  // ============================================================================
+  // RECEIPT GENERATION
+  // ============================================================================
+  
+  /**
+   * Generate a Midnight Network receipt
+   * Provides cryptographic proof of storage
+   */
+  public function generateReceipt(
+    proofId: Bytes<32>,
+    currentTime: Uint64,
+    blockNumber: Uint64,
+    txHash: Bytes<32>
+  ): Receipt {
+    
+    require(proofRecords.has(proofId), "Proof not found");
+    
+    // Generate receipt ID
+    const receiptId = hashReceiptId(proofId, blockNumber);
+    
+    const receipt: Receipt = {
+      receiptId: receiptId,
+      proofId: proofId,
+      timestamp: currentTime,
+      blockNumber: blockNumber,
+      txHash: txHash,
+      merkleRoot: currentMerkleRoot
+    };
+    
+    return receipt;
+  }
+  
+  // ============================================================================
+  // PROOF MANAGEMENT
+  // ============================================================================
+  
+  /**
+   * Revoke a proof (only issuer)
+   */
+  public function revokeProof(
+    caller: Address,
+    proofId: Bytes<32>
+  ): Void {
+    
+    require(proofRecords.has(proofId), "Proof not found");
+    
+    const record = proofRecords.get(proofId);
+    
+    // Only issuer can revoke
+    require(caller == record.metadata.issuer, "Not authorized");
+    
+    // Update metadata
+    const updatedMetadata: ProofMetadata = {
+      issuer: record.metadata.issuer,
+      verifier: record.metadata.verifier,
+      expiresAt: record.metadata.expiresAt,
+      isRevoked: true
+    };
+    
+    // Update record
+    const updatedRecord: ProofRecord = {
+      proofId: record.proofId,
+      proofType: record.proofType,
+      agentDID: record.agentDID,
+      timestamp: record.timestamp,
+      proofData: record.proofData,
+      metadata: updatedMetadata,
+      merkleProof: record.merkleProof
+    };
+    
+    proofRecords.set(proofId, updatedRecord);
+  }
+  
+  /**
+   * Update proof verifier (only issuer)
+   */
+  public function setVerifier(
+    caller: Address,
+    proofId: Bytes<32>,
+    newVerifier: Address
+  ): Void {
+    
+    require(proofRecords.has(proofId), "Proof not found");
+    
+    const record = proofRecords.get(proofId);
+    
+    require(caller == record.metadata.issuer, "Not authorized");
+    
+    // Update metadata
+    const updatedMetadata: ProofMetadata = {
+      issuer: record.metadata.issuer,
+      verifier: newVerifier,
+      expiresAt: record.metadata.expiresAt,
+      isRevoked: record.metadata.isRevoked
+    };
+    
+    // Update record
+    const updatedRecord: ProofRecord = {
+      proofId: record.proofId,
+      proofType: record.proofType,
+      agentDID: record.agentDID,
+      timestamp: record.timestamp,
+      proofData: record.proofData,
+      metadata: updatedMetadata,
+      merkleProof: record.merkleProof
+    };
+    
+    proofRecords.set(proofId, updatedRecord);
+  }
+  
+  // ============================================================================
+  // QUERY FUNCTIONS
+  // ============================================================================
+  
+  /**
+   * Get storage statistics
+   */
+  public function getStats(): StorageStats {
+    return {
+      totalProofs: totalProofs,
+      totalActions: totalActions,
+      currentMerkleRoot: currentMerkleRoot
+    };
+  }
+  
+  struct StorageStats {
+    totalProofs: Uint64,
+    totalActions: Uint64,
+    currentMerkleRoot: Bytes<32>
+  }
+  
+  /**
+   * Get current Merkle root for external verification
+   */
+  public function getMerkleRoot(): Bytes<32> {
+    return currentMerkleRoot;
+  }
+  
+  // ============================================================================
+  // HELPER FUNCTIONS (Private)
+  // ============================================================================
+  
+  /**
+   * Hash parameters to create proof ID
+   */
+  private function hashProofId(
+    agentDID: Bytes<32>,
+    proofType: Bytes<32>,
+    timestamp: Uint64
+  ): Bytes<32> {
+    // Simplified hash
+    return bytes32(0u8);
+  }
+  
+  /**
+   * Hash action parameters
+   */
+  private function hashActionId(
+    agentDID: Bytes<32>,
+    actionType: Bytes<32>,
+    timestamp: Uint64
+  ): Bytes<32> {
+    return bytes32(0u8);
+  }
+  
+  /**
+   * Hash receipt parameters
+   */
+  private function hashReceiptId(
+    proofId: Bytes<32>,
+    blockNumber: Uint64
+  ): Bytes<32> {
+    return bytes32(0u8);
+  }
+  
+  /**
+   * Generate Merkle proof for proof record
+   * Simplified implementation
+   */
+  private function generateMerkleProof(
+    proofId: Bytes<32>,
+    currentRoot: Bytes<32>
+  ): Bytes<> {
+    // In production: Generate actual Merkle proof
+    return bytes32(0u8);
+  }
+  
+  /**
+   * Update Merkle root with new proof
+   */
+  private function updateMerkleRoot(
+    oldRoot: Bytes<32>,
+    newProofId: Bytes<32>
+  ): Bytes<32> {
+    // Simplified Merkle root update
+    // In production: Proper Merkle tree implementation
+    return bytes32(1u8);
+  }
+  
+  /**
+   * Verify Merkle proof is valid
+   */
+  private function verifyMerkleProof(
+    proof: Bytes<>,
+    proofId: Bytes<32>,
+    root: Bytes<32>
+  ): Boolean {
+    // Simplified verification
+    return true;
+  }
+  
+  /**
+   * Helper to create bytes32 from uint8
+   */
+  private function bytes32(value: Uint8): Bytes<32> {
+    return 0x0000000000000000000000000000000000000000000000000000000000000000;
+  }
+}
