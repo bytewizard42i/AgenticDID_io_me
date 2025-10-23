@@ -33,7 +33,8 @@ export default function AgentSelector({ selectedAgent, onSelect }: Props) {
   
   return (
     <div className="space-y-3">
-      <h3 className="text-lg font-semibold text-midnight-200">Select Agent Identity</h3>
+      <h3 className="text-lg font-semibold text-midnight-200">Agent Selected for This Action</h3>
+      <p className="text-sm text-midnight-400">The system automatically chose the appropriate authorized agent</p>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {Object.entries(AGENTS).map(([key, agent], index) => {
           const isRogue = agent.isRogue;

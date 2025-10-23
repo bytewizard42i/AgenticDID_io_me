@@ -8,7 +8,8 @@ type Props = {
 export default function ActionPanel({ onAction, disabled }: Props) {
   return (
     <div className="space-y-3">
-      <h3 className="text-lg font-semibold text-midnight-200">Try an Action</h3>
+      <h3 className="text-lg font-semibold text-midnight-200">What do you want to do?</h3>
+      <p className="text-sm text-midnight-400">We'll automatically select the right agent for you</p>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {ACTIONS.map((action) => (
           <button

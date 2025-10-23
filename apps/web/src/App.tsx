@@ -62,9 +62,22 @@ export default function App() {
   };
 
   const handleAction = async (action: Action) => {
+    // Auto-select the appropriate agent based on action
+    const actionToAgent: Record<string, AgentType> = {
+      'transfer': 'banker',
+      'shop': 'shopper',
+      'flight': 'traveler',
+    };
+    
+    const appropriateAgent = actionToAgent[action.id] || 'banker';
+    setSelectedAgent(appropriateAgent);
+    
     setIsProcessing(true);
     setResult(null);
     setTimeline([]);
+    
+    // Give UI time to show the selected agent
+    await sleep(300);
 
     try {
       // Step 1: Request Challenge
@@ -92,7 +105,7 @@ export default function App() {
         message: 'Creating verifiable presentation...',
       });
 
-      const credential = createMockCredential(selectedAgent);
+      const credential = createMockCredential(appropriateAgent);
       const disclosed = {
         role: credential.role,
         scopes: credential.scopes,
@@ -194,12 +207,12 @@ export default function App() {
         <Hero />
 
         <div className="max-w-6xl mx-auto space-y-8 mt-12">
+          <ActionPanel onAction={handleAction} disabled={isProcessing} />
+          
           <AgentSelector
             selectedAgent={selectedAgent}
             onSelect={setSelectedAgent}
           />
-
-          <ActionPanel onAction={handleAction} disabled={isProcessing} />
 
           {result && (
             <ResultBanner
