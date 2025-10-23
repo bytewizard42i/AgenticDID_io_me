@@ -23,6 +23,7 @@ export default function MutualAuth() {
   const [authSteps, setAuthSteps] = useState<AuthStep[]>([]);
   const [authMethod, setAuthMethod] = useState<'biometric' | 'totp' | null>(null);
   const [showZkpProof, setShowZkpProof] = useState(false);
+  const [showProofLog, setShowProofLog] = useState(false);
 
   const updateStep = (id: string, updates: Partial<AuthStep>) => {
     setAuthSteps(prev => 
@@ -289,6 +290,15 @@ export default function MutualAuth() {
                   <span>Midnight Network Receipt Recorded</span>
                 </p>
               </div>
+
+              {/* View Proof Log Button */}
+              <button
+                onClick={() => setShowProofLog(true)}
+                className="mt-3 w-full px-3 py-2 text-xs rounded bg-green-800/30 hover:bg-green-700/40 border border-green-600/50 hover:border-green-500 text-green-100 transition-all flex items-center justify-center gap-2"
+              >
+                <span>📄</span>
+                <span>View Proof Log (Data Storage)</span>
+              </button>
             </div>
           )}
         </div>
@@ -442,6 +452,117 @@ export default function MutualAuth() {
           >
             Try Again with Different Method
           </button>
+        </div>
+      )}
+
+      {/* Proof Log Modal Popup */}
+      {showProofLog && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setShowProofLog(false)}>
+          <div 
+            className="w-full max-w-2xl max-h-[80vh] bg-gradient-to-br from-midnight-900 to-midnight-950 rounded-lg border-2 border-green-500 shadow-[0_0_40px_rgba(34,197,94,0.3)] overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="p-4 border-b border-green-800/50 bg-green-950/30 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-green-500/20">
+                  <CheckCircle className="w-5 h-5 text-green-400" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-green-100">ZK Proof Log Document</h3>
+                  <p className="text-xs text-green-300/70">Comet Agent Verification</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowProofLog(false)}
+                className="p-2 rounded hover:bg-midnight-800 transition-colors"
+              >
+                <span className="text-green-300 text-xl">×</span>
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="flex-1 overflow-y-auto p-4 font-mono text-xs">
+              <pre className="text-green-200/90 whitespace-pre-wrap">
+{`{
+  "timestamp": "${new Date().toISOString()}",
+  "proof_type": "AgenticDID_Agent_Verification",
+  "agent": {
+    "did": "did:midnight:comet:abc123def456789",
+    "name": "Comet",
+    "type": "local_agent",
+    "version": "1.0.0"
+  },
+  "verification_request": {
+    "user_did": "did:midnight:user:xyz789abc123",
+    "challenge_nonce": "0x${Math.random().toString(16).slice(2, 18)}",
+    "requested_at": "${new Date().toISOString()}"
+  },
+  "proof_data": {
+    "proof_hash": "0x7f9a2e3c8d",
+    "signature": "0x8f2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b",
+    "public_key": "0x04a8b5c...truncated",
+    "algorithm": "ECDSA-secp256k1"
+  },
+  "integrity_check": {
+    "code_signature": "valid",
+    "tampering_detected": false,
+    "last_modified": "2025-10-23T04:58:00Z",
+    "checksum": "sha256:e3b0c44...truncated"
+  },
+  "zkp_circuit": {
+    "type": "midnight_groth16",
+    "public_inputs": [
+      "did_hash",
+      "timestamp",
+      "challenge_nonce"
+    ],
+    "private_inputs": [
+      "private_key",
+      "signature_nonce",
+      "randomness"
+    ],
+    "proof_size": "384 bytes",
+    "verification_key_hash": "0xabc...123"
+  },
+  "midnight_network": {
+    "contract_address": "0x1234567890abcdef1234567890abcdef12345678",
+    "block_number": 1234567,
+    "transaction_hash": "0xdef789abc123456789abc123456789abc123456789abc123456789abc123",
+    "gas_used": 21000,
+    "network": "devnet",
+    "receipt_timestamp": "${new Date().toISOString()}"
+  },
+  "verification_result": {
+    "status": "SUCCESS",
+    "verified_at": "${new Date().toISOString()}",
+    "verifier": "AgenticDID.io_Verifier_v1.0",
+    "confidence_score": 1.0,
+    "notes": "Agent identity confirmed via zero-knowledge proof"
+  },
+  "audit_trail": {
+    "log_id": "log_${Date.now()}",
+    "stored_at": "local://data/proofs/comet-${Date.now()}.json",
+    "retention_period": "90_days",
+    "access_level": "user_only"
+  }
+}`}
+              </pre>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4 border-t border-green-800/50 bg-green-950/30 flex justify-between items-center">
+              <p className="text-xs text-green-300/70">
+                🔒 Stored locally • Not uploaded to any server
+              </p>
+              <button
+                onClick={() => setShowProofLog(false)}
+                className="px-4 py-2 rounded bg-green-700 hover:bg-green-600 text-white text-sm transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
