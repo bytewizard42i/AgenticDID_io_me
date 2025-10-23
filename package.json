@@ -9,12 +9,12 @@
     "contracts/*"
   ],
   "scripts": {
-    "setup": "npm install",
-    "dev": "concurrently \"npm --prefix apps/verifier-api run dev\" \"npm --prefix apps/web run dev\"",
-    "build": "npm --prefix apps/web run build && npm --prefix apps/verifier-api run build",
-    "test": "npm run test --workspaces",
-    "lint": "npm run lint --workspaces",
-    "clean": "npm run clean --workspaces && rm -rf node_modules"
+    "setup": "bun install",
+    "dev": "concurrently \"bun --cwd apps/verifier-api run dev\" \"bun --cwd apps/web run dev\"",
+    "build": "bun --cwd apps/web run build && bun --cwd apps/verifier-api run build",
+    "test": "bun test",
+    "lint": "bun run lint --filter '*'",
+    "clean": "rm -rf node_modules apps/*/node_modules packages/*/node_modules"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
@@ -23,8 +23,7 @@
     "typescript": "^5.3.3"
   },
   "engines": {
-    "node": ">=18.0.0",
-    "yarn": ">=1.22.0"
+    "bun": ">=1.0.0"
   },
   "keywords": [
     "midnight",
