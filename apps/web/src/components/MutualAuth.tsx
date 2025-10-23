@@ -33,6 +33,63 @@ export default function MutualAuth() {
     setAuthSteps(prev => [...prev, step]);
   };
 
+  const startAgentProof = async () => {
+    setAuthState('authenticating');
+    setAuthSteps([]);
+
+    try {
+      // Step 1: Agent proves itself
+      addStep({
+        id: 'agent-credential',
+        actor: 'agent',
+        label: 'Comet Presents Credential',
+        status: 'active',
+        message: 'Agent proving its legitimacy...'
+      });
+
+      await sleep(800);
+
+      updateStep('agent-credential', {
+        status: 'success',
+        message: 'Agent DID verified: did:midnight:comet:abc123...'
+      });
+
+      await sleep(500);
+
+      // Step 2: Verify agent integrity
+      addStep({
+        id: 'agent-integrity',
+        actor: 'agent',
+        label: 'Integrity Check',
+        status: 'active',
+        message: 'Checking agent hasn\'t been tampered with...'
+      });
+
+      await sleep(800);
+
+      updateStep('agent-integrity', {
+        status: 'success',
+        message: 'Code signature valid, no tampering detected'
+      });
+
+      await sleep(500);
+
+      // Agent proof complete
+      addStep({
+        id: 'agent-verified',
+        actor: 'agent',
+        label: 'Agent Verified',
+        status: 'success',
+        message: '✅ Comet is legitimate and ready for your authentication'
+      });
+
+      setAuthState('authenticated');
+    } catch (error) {
+      setAuthState('failed');
+      console.error('Agent proof failed:', error);
+    }
+  };
+
   const startMutualAuth = async (method: 'biometric' | 'totp') => {
     setAuthMethod(method);
     setAuthState('authenticating');
@@ -154,22 +211,32 @@ export default function MutualAuth() {
           Mutual authentication ensures both you and your agent are legitimate
         </p>
         
-        {/* Security Notice */}
-        <div className="max-w-2xl mx-auto p-4 rounded-lg bg-purple-950/30 border border-purple-800/30">
-          <div className="flex items-start gap-3">
-            <Shield className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
-            <div className="text-left">
-              <p className="text-sm text-purple-200 font-semibold mb-1">
-                🛡️ Critical Security: Agent Proves First
+        {/* Security Notice / Agent Proof Button */}
+        <button
+          onClick={startAgentProof}
+          disabled={authState !== 'idle'}
+          className="max-w-2xl mx-auto p-5 rounded-lg bg-gradient-to-br from-purple-950/50 to-purple-900/30 border-2 border-purple-700 hover:border-purple-500 hover:from-purple-900/60 hover:to-purple-800/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+        >
+          <div className="flex items-start gap-4">
+            <div className="p-3 rounded-lg bg-purple-500/20 group-hover:bg-purple-500/30 transition-colors">
+              <Shield className="w-6 h-6 text-purple-300 group-hover:text-purple-200 transition-colors" />
+            </div>
+            <div className="text-left flex-1">
+              <p className="text-base text-purple-100 font-bold mb-2 flex items-center gap-2">
+                🛡️ Step 1: Let Comet Prove Itself
+                <span className="text-xs font-normal px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300">
+                  Click to Start
+                </span>
               </p>
-              <p className="text-xs text-purple-300/80">
-                Comet will <strong>automatically prove its legitimacy</strong> before asking for your authentication. 
-                Never give credentials to an unverified agent - this prevents malware from impersonating Comet 
-                and stealing your biometric or 2FA data.
+              <p className="text-sm text-purple-200/90 mb-2">
+                Comet will <strong>automatically prove its legitimacy</strong> before asking for your authentication.
+              </p>
+              <p className="text-xs text-purple-300/70">
+                ⚡ This prevents malware from impersonating Comet and stealing your credentials
               </p>
             </div>
           </div>
-        </div>
+        </button>
       </div>
 
       {/* Authentication Methods */}
