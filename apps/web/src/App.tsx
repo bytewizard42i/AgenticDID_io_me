@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
+import MutualAuth from './components/MutualAuth';
 import AgentSelector from './components/AgentSelector';
 import ActionPanel from './components/ActionPanel';
 import Timeline, { TimelineStep } from './components/Timeline';
@@ -207,8 +208,22 @@ export default function App() {
         <Hero />
 
         <div className="max-w-6xl mx-auto space-y-8 mt-12">
+          {/* Step 1: Mutual Authentication */}
+          <div className="border border-midnight-800 rounded-lg p-6 bg-midnight-950/30">
+            <MutualAuth />
+          </div>
+
+          {/* Divider */}
+          <div className="flex items-center gap-4">
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-midnight-700 to-transparent" />
+            <span className="text-xs text-midnight-500 uppercase tracking-wider">Then Delegate Actions</span>
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-midnight-700 to-transparent" />
+          </div>
+
+          {/* Step 2: Pick Action */}
           <ActionPanel onAction={handleAction} disabled={isProcessing} />
           
+          {/* Step 3: See Selected Agent */}
           <AgentSelector
             selectedAgent={selectedAgent}
             onSelect={setSelectedAgent}
