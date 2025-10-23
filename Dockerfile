@@ -10,7 +10,8 @@ WORKDIR /app
 COPY package.json bun.lock ./
 COPY apps/verifier-api/package.json ./apps/verifier-api/
 COPY apps/web/package.json ./apps/web/
-COPY packages/sdk/package.json ./packages/sdk/
+COPY packages/agenticdid-sdk/package.json ./packages/agenticdid-sdk/
+COPY packages/midnight-adapter/package.json ./packages/midnight-adapter/
 
 # Install dependencies
 RUN bun install --frozen-lockfile
