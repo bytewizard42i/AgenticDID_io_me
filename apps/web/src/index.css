@@ -7,3 +7,13 @@
     @apply bg-gradient-to-br from-midnight-950 via-midnight-900 to-black text-white;
   }
 }
+
+/* Custom animations for rogue agent */
+@keyframes scan {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
