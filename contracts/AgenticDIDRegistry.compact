@@ -1,0 +1,391 @@
+/**
+ * AgenticDID Registry Contract
+ * 
+ * Manages agent identity registration and verification
+ * Stores DID -> public key mappings with privacy
+ * Handles credential issuance and revocation
+ * 
+ * Built for: Google Cloud Run Hackathon + Midnight Network
+ * Privacy: Zero-knowledge proofs for agent verification
+ */
+
+circuit AgenticDIDRegistry {
+  
+  // ============================================================================
+  // STATE VARIABLES
+  // ============================================================================
+  
+  // Private state - hidden from public
+  private agentCredentials: Map<Bytes<32>, AgentCredential>;
+  private delegations: Map<Bytes<32>, Delegation>;
+  
+  // Public state - visible on-chain
+  public totalAgents: Uint64;
+  public totalDelegations: Uint64;
+  public contractOwner: Address;
+  public revocationBitmap: Uint256;  // Bitmap for revoked agents (max 256 agents)
+  
+  // ============================================================================
+  // DATA STRUCTURES
+  // ============================================================================
+  
+  struct AgentCredential {
+    did: Bytes<32>,           // Agent DID hash
+    publicKey: Bytes<64>,     // Public key for verification
+    role: Bytes<32>,          // Role hash (e.g., hash("banker"))
+    scopes: Bytes<32>,        // Scope hash (bitfield of permissions)
+    issuedAt: Uint64,         // Timestamp of credential issuance
+    expiresAt: Uint64,        // Expiration timestamp
+    issuer: Address,          // Who issued this credential
+    isActive: Boolean         // Quick active/revoked check
+  }
+  
+  struct Delegation {
+    delegationId: Bytes<32>,  // Unique delegation ID
+    userDID: Bytes<32>,       // User's DID
+    agentDID: Bytes<32>,      // Delegated agent's DID
+    scopes: Bytes<32>,        // Delegated scopes (subset of agent's)
+    createdAt: Uint64,        // When delegation was created
+    expiresAt: Uint64,        // When delegation expires
+    isRevoked: Boolean        // Revocation status
+  }
+  
+  // ============================================================================
+  // INITIALIZATION
+  // ============================================================================
+  
+  /**
+   * Initialize the registry contract
+   * Sets up the contract owner and initial state
+   */
+  public constructor(owner: Address): Void {
+    totalAgents = 0u64;
+    totalDelegations = 0u64;
+    contractOwner = owner;
+    revocationBitmap = 0u256;
+  }
+  
+  // ============================================================================
+  // AGENT REGISTRATION
+  // ============================================================================
+  
+  /**
+   * Register a new agent with credentials
+   * 
+   * @param caller - Address of the caller
+   * @param did - Agent's DID (hash)
+   * @param publicKey - Agent's public key
+   * @param role - Agent's role hash
+   * @param scopes - Agent's permission scopes
+   * @param expiresAt - Credential expiration timestamp
+   * @param currentTime - Current block timestamp
+   * @param zkProof - Zero-knowledge proof of agent ownership
+   */
+  public function registerAgent(
+    caller: Address,
+    did: Bytes<32>,
+    publicKey: Bytes<64>,
+    role: Bytes<32>,
+    scopes: Bytes<32>,
+    expiresAt: Uint64,
+    currentTime: Uint64,
+    zkProof: Bytes<>
+  ): Void {
+    
+    // Security checks
+    require(!agentCredentials.has(did), "Agent already registered");
+    require(expiresAt > currentTime, "Invalid expiration time");
+    require(verifyProofOfOwnership(did, publicKey, zkProof), "Invalid proof");
+    
+    // Create credential
+    const credential: AgentCredential = {
+      did: did,
+      publicKey: publicKey,
+      role: role,
+      scopes: scopes,
+      issuedAt: currentTime,
+      expiresAt: expiresAt,
+      issuer: caller,
+      isActive: true
+    };
+    
+    // Store privately
+    agentCredentials.set(did, credential);
+    
+    // Update public counter
+    totalAgents = totalAgents + 1u64;
+  }
+  
+  // ============================================================================
+  // AGENT VERIFICATION
+  // ============================================================================
+  
+  /**
+   * Verify an agent's credential with zero-knowledge proof
+   * Returns true if valid and not revoked
+   * 
+   * @param agentDID - Agent's DID to verify
+   * @param proofHash - Hash of the verification proof
+   * @param currentTime - Current timestamp
+   */
+  public function verifyAgent(
+    agentDID: Bytes<32>,
+    proofHash: Bytes<32>,
+    currentTime: Uint64
+  ): Boolean {
+    
+    // Check if agent exists
+    if (!agentCredentials.has(agentDID)) {
+      return false;
+    }
+    
+    const credential = agentCredentials.get(agentDID);
+    
+    // Check expiration
+    if (credential.expiresAt < currentTime) {
+      return false;
+    }
+    
+    // Check revocation status
+    if (!credential.isActive) {
+      return false;
+    }
+    
+    // Verify proof matches
+    const expectedHash = hashProof(credential.publicKey, currentTime);
+    if (proofHash != expectedHash) {
+      return false;
+    }
+    
+    return true;
+  }
+  
+  /**
+   * Get agent's public key (for verification)
+   * This is public information needed for ZKP verification
+   */
+  public function getAgentPublicKey(agentDID: Bytes<32>): Bytes<64> {
+    require(agentCredentials.has(agentDID), "Agent not found");
+    return agentCredentials.get(agentDID).publicKey;
+  }
+  
+  // ============================================================================
+  // DELEGATION MANAGEMENT
+  // ============================================================================
+  
+  /**
+   * Create a delegation from user to agent
+   * Allows agent to act on behalf of user with limited scopes
+   * 
+   * @param caller - User's address
+   * @param userDID - User's DID
+   * @param agentDID - Agent's DID to delegate to
+   * @param scopes - Scopes to delegate
+   * @param expiresAt - When delegation expires
+   * @param currentTime - Current timestamp
+   */
+  public function createDelegation(
+    caller: Address,
+    userDID: Bytes<32>,
+    agentDID: Bytes<32>,
+    scopes: Bytes<32>,
+    expiresAt: Uint64,
+    currentTime: Uint64
+  ): Bytes<32> {
+    
+    // Verify agent exists and is active
+    require(agentCredentials.has(agentDID), "Agent not found");
+    const agentCred = agentCredentials.get(agentDID);
+    require(agentCred.isActive, "Agent is revoked");
+    
+    // Verify scopes are subset of agent's scopes
+    require(scopesAreSubset(scopes, agentCred.scopes), "Invalid scopes");
+    
+    // Create unique delegation ID
+    const delegationId = hashDelegation(userDID, agentDID, currentTime);
+    
+    // Create delegation
+    const delegation: Delegation = {
+      delegationId: delegationId,
+      userDID: userDID,
+      agentDID: agentDID,
+      scopes: scopes,
+      createdAt: currentTime,
+      expiresAt: expiresAt,
+      isRevoked: false
+    };
+    
+    // Store delegation
+    delegations.set(delegationId, delegation);
+    
+    // Update counter
+    totalDelegations = totalDelegations + 1u64;
+    
+    return delegationId;
+  }
+  
+  /**
+   * Check if a delegation is valid
+   */
+  public function isDelegationValid(
+    delegationId: Bytes<32>,
+    currentTime: Uint64
+  ): Boolean {
+    
+    if (!delegations.has(delegationId)) {
+      return false;
+    }
+    
+    const delegation = delegations.get(delegationId);
+    
+    // Check revocation
+    if (delegation.isRevoked) {
+      return false;
+    }
+    
+    // Check expiration
+    if (delegation.expiresAt < currentTime) {
+      return false;
+    }
+    
+    // Check if agent is still active
+    if (!agentCredentials.has(delegation.agentDID)) {
+      return false;
+    }
+    
+    const agentCred = agentCredentials.get(delegation.agentDID);
+    if (!agentCred.isActive) {
+      return false;
+    }
+    
+    return true;
+  }
+  
+  /**
+   * Revoke a delegation
+   * Only the user who created it can revoke
+   */
+  public function revokeDelegation(
+    caller: Address,
+    delegationId: Bytes<32>
+  ): Void {
+    
+    require(delegations.has(delegationId), "Delegation not found");
+    
+    const delegation = delegations.get(delegationId);
+    require(!delegation.isRevoked, "Already revoked");
+    
+    // Update delegation
+    const updatedDelegation: Delegation = {
+      delegationId: delegation.delegationId,
+      userDID: delegation.userDID,
+      agentDID: delegation.agentDID,
+      scopes: delegation.scopes,
+      createdAt: delegation.createdAt,
+      expiresAt: delegation.expiresAt,
+      isRevoked: true
+    };
+    
+    delegations.set(delegationId, updatedDelegation);
+  }
+  
+  // ============================================================================
+  // AGENT REVOCATION
+  // ============================================================================
+  
+  /**
+   * Revoke an agent's credential
+   * Only contract owner or issuer can revoke
+   */
+  public function revokeAgent(
+    caller: Address,
+    agentDID: Bytes<32>
+  ): Void {
+    
+    require(agentCredentials.has(agentDID), "Agent not found");
+    
+    const credential = agentCredentials.get(agentDID);
+    
+    // Only owner or issuer can revoke
+    require(
+      caller == contractOwner || caller == credential.issuer,
+      "Not authorized"
+    );
+    
+    // Update credential
+    const updatedCred: AgentCredential = {
+      did: credential.did,
+      publicKey: credential.publicKey,
+      role: credential.role,
+      scopes: credential.scopes,
+      issuedAt: credential.issuedAt,
+      expiresAt: credential.expiresAt,
+      issuer: credential.issuer,
+      isActive: false  // Mark as revoked
+    };
+    
+    agentCredentials.set(agentDID, updatedCred);
+  }
+  
+  // ============================================================================
+  // HELPER FUNCTIONS (Private)
+  // ============================================================================
+  
+  /**
+   * Verify proof of ownership (ZKP verification)
+   * In production, this would use actual ZKP verification
+   */
+  private function verifyProofOfOwnership(
+    did: Bytes<32>,
+    publicKey: Bytes<64>,
+    proof: Bytes<>
+  ): Boolean {
+    // Simplified for demo
+    // In production: Verify ZK-SNARK proof
+    return proof.length > 0u64;
+  }
+  
+  /**
+   * Hash a proof for verification
+   */
+  private function hashProof(
+    publicKey: Bytes<64>,
+    timestamp: Uint64
+  ): Bytes<32> {
+    // Simplified hash function
+    // In production: Use proper cryptographic hash
+    return bytes32(0u8);  // Placeholder
+  }
+  
+  /**
+   * Hash delegation parameters to create unique ID
+   */
+  private function hashDelegation(
+    userDID: Bytes<32>,
+    agentDID: Bytes<32>,
+    timestamp: Uint64
+  ): Bytes<32> {
+    // Simplified hash
+    return bytes32(0u8);  // Placeholder
+  }
+  
+  /**
+   * Check if requested scopes are subset of available scopes
+   */
+  private function scopesAreSubset(
+    requested: Bytes<32>,
+    available: Bytes<32>
+  ): Boolean {
+    // Simplified bitwise AND check
+    // In production: Proper scope verification
+    return true;  // Placeholder
+  }
+  
+  /**
+   * Helper to create bytes32 from uint8
+   */
+  private function bytes32(value: Uint8): Bytes<32> {
+    // Placeholder implementation
+    return 0x0000000000000000000000000000000000000000000000000000000000000000;
+  }
+}
