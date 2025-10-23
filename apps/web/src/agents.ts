@@ -1,5 +1,21 @@
 /**
- * Demo Agent Definitions
+ * Agent Definitions for AgenticDID.io Demo
+ * 
+ * Defines the types of AI agents available in the system and their permissions.
+ * Each agent has:
+ * - name: Display name
+ * - role: Authorization role
+ * - scopes: Specific permissions (OAuth-style scopes)
+ * - icon: Visual representation
+ * - color: UI theme color
+ * - description: What the agent does
+ * - isRogue: (optional) Indicates revoked credential
+ * - isTrustedService: (optional) Marks as trusted service provider
+ * 
+ * Security Model:
+ * - Agents must have matching role AND scope for actions
+ * - Rogue agents always fail (simulates revocation)
+ * - Trusted services (e.g., Amazon) have verified credentials
  */
 
 export type AgentType = 'banker' | 'traveler' | 'shopper' | 'rogue';

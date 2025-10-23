@@ -1,3 +1,24 @@
+/**
+ * AgenticDID.io - Main Application
+ * 
+ * Privacy-preserving identity protocol for AI agents
+ * Built for Midnight Network Hackathon
+ * 
+ * Key Features:
+ * - Results-focused UX (inspired by Charles Hoskinson)
+ * - Mutual authentication (User ⟷ Agent)
+ * - Zero-knowledge proof verification
+ * - Auto-agent selection based on user intent
+ * - Credential verification with Midnight receipts
+ * 
+ * Flow:
+ * 1. Mutual Auth: User ⟷ Comet establish trust
+ * 2. User picks goal: "Buy Headphones", "Send Money", etc.
+ * 3. System auto-selects appropriate agent
+ * 4. Verification flow executes with ZK proofs
+ * 5. Success/failure based on permissions
+ */
+
 import { useState } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
