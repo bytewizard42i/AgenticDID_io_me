@@ -175,13 +175,65 @@ AgenticDID.io solves these with **multi-party mutual authentication** and **dele
 
 ## 🚀 Quick Start
 
-### Prerequisites
+### Option 1: Docker (Recommended for Judges & Reviewers) 🐳
 
+**One command to run everything:**
+
+```bash
+# Clone and run with Docker
+git clone https://github.com/bytewizard42i/AgenticDID_io_me.git
+cd AgenticDID_io_me
+./docker-quickstart.sh
+```
+
+Or manually:
+```bash
+docker-compose up
+```
+
+**That's it!** Open http://localhost:5173 in your browser.
+
+**Stop the demo:**
+```bash
+docker-compose down
+```
+
+---
+
+### Option 2: Local Development (Bun)
+
+**Prerequisites:**
+- Bun >= 1.2 (https://bun.sh)
+- Git
+
+**Installation:**
+
+```bash
+# Clone the repository
+git clone https://github.com/bytewizard42i/AgenticDID_io_me.git
+cd AgenticDID_io_me
+
+# Install dependencies (10x faster with Bun!)
+bun install
+
+# Run both services
+bun run dev
+```
+
+**Visit:**
+- **Frontend**: http://localhost:5173
+- **Backend**: http://localhost:8787
+
+---
+
+### Option 3: Local Development (npm)
+
+**Prerequisites:**
 - Node.js >= 18
 - npm or yarn
 - Git
 
-### Installation
+**Installation:**
 
 ```bash
 # Clone the repository
@@ -201,14 +253,14 @@ npm --prefix packages/midnight-adapter run build
 npm --prefix apps/verifier-api run build
 ```
 
-### Run the Demo
+**Run the Demo:**
 
 ```bash
 # Start both API and frontend
 npm run dev
 ```
 
-Visit:
+**Visit:**
 - **Frontend**: http://localhost:5175
 - **API**: http://localhost:8787
 
