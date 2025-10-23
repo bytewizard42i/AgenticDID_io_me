@@ -29,13 +29,20 @@ These are the public shareable links to our AI Studio prompts, demonstrating use
 
 ---
 
-### 2. Banker - Financial AI Agent 🔄
-**Created**: [To be created]
-**Share Link**: [To be added]
+### 2. Banker - Financial AI Agent ✅
+**Created**: October 23, 2025 at 6:25am
+**Share Link**: https://aistudio.google.com/app/prompts?state=%7B%22ids%22:%5B%221MJrRIK6CgUWoVAlsGT_OP6sTSirM0YT2%22%5D,%22action%22:%22open%22,%22userId%22:%22117323252760887931920%22,%22resourceKeys%22:%7B%7D%7D&usp=sharing
 
 **Description**: Financial operations agent
 **Role**: finance
 **Scopes**: read:balance, transfer:funds, read:transactions
+
+**Key Capabilities**:
+- Check account balances securely
+- Transfer funds with authorization
+- Generate transaction reports
+- Verify user identity with ZKP
+- Maintain cryptographic audit trail
 
 ---
 
