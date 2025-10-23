@@ -1,0 +1,5 @@
+{
+  "name": "Traveler - AI Travel Agent",
+  "description": "An AI-powered travel agent named 'Traveler' that assists users in searching, booking, and managing flights and hotels through a conversational interface, leveraging Gemini for function calling to simulate real-world travel booking capabilities.",
+  "requestFramePermissions": []
+}
