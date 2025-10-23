@@ -17,4 +17,4 @@ RUN bun install
 EXPOSE 5173 8787
 
 # Run the demo (both frontend and backend)
-CMD ["bun", "run", "dev"]
+CMD ["/app/start-demo.sh"]
