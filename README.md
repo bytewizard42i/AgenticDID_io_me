@@ -4,9 +4,17 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Midnight Network](https://img.shields.io/badge/Midnight-Network-purple)](https://midnight.network)
+[![Google Cloud Run](https://img.shields.io/badge/Google-Cloud_Run-4285F4)](https://cloud.google.com/run)
 [![Status: MVP](https://img.shields.io/badge/Status-MVP%20Complete-green)](https://github.com/bytewizard42i/AgenticDID_io_me)
 
-AgenticDID.io lets AI agents prove authenticity and authorization using **privacy-preserving digital identifiers (PIDs)**, **verifiable credentials (VCs)**, and **zero-knowledge proofs (ZKPs)**—all without exposing private data. Built for the Midnight Network hackathon.
+AgenticDID.io lets AI agents prove authenticity and authorization using **privacy-preserving digital identifiers (PIDs)**, **verifiable credentials (VCs)**, and **zero-knowledge proofs (ZKPs)**—all without exposing private data.
+
+### 🏆 Dual-Stack Innovation
+- **Google Cloud Run**: Serverless deployment with Google ADK multi-agent orchestration
+- **Midnight Network**: Zero-knowledge proof verification and privacy preservation
+- **World's First**: Integration of Google's Agent Development Kit with blockchain privacy layer
+
+> 📋 **For Hackathon Judges**: See [CLOUD_RUN_HACKATHON.md](./CLOUD_RUN_HACKATHON.md) for complete submission details
 
 ---
 
