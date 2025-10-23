@@ -22,6 +22,7 @@ export default function MutualAuth() {
   const [authState, setAuthState] = useState<'idle' | 'authenticating' | 'authenticated' | 'failed'>('idle');
   const [authSteps, setAuthSteps] = useState<AuthStep[]>([]);
   const [authMethod, setAuthMethod] = useState<'biometric' | 'totp' | null>(null);
+  const [showZkpProof, setShowZkpProof] = useState(false);
 
   const updateStep = (id: string, updates: Partial<AuthStep>) => {
     setAuthSteps(prev => 
@@ -36,6 +37,7 @@ export default function MutualAuth() {
   const startAgentProof = async () => {
     setAuthState('authenticating');
     setAuthSteps([]);
+    setShowZkpProof(false);
 
     try {
       // Step 1: Agent proves itself
@@ -71,6 +73,9 @@ export default function MutualAuth() {
         status: 'success',
         message: 'Code signature valid, no tampering detected'
       });
+
+      // Show ZKP proof popup
+      setShowZkpProof(true);
 
       await sleep(500);
 
@@ -211,32 +216,82 @@ export default function MutualAuth() {
           Mutual authentication ensures both you and your agent are legitimate
         </p>
         
-        {/* Security Notice / Agent Proof Button */}
-        <button
-          onClick={startAgentProof}
-          disabled={authState !== 'idle'}
-          className="max-w-2xl mx-auto p-5 rounded-lg bg-gradient-to-br from-purple-950/50 to-purple-900/30 border-2 border-purple-700 hover:border-purple-500 hover:from-purple-900/60 hover:to-purple-800/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
-        >
-          <div className="flex items-start gap-4">
-            <div className="p-3 rounded-lg bg-purple-500/20 group-hover:bg-purple-500/30 transition-colors">
-              <Shield className="w-6 h-6 text-purple-300 group-hover:text-purple-200 transition-colors" />
+        {/* Security Notice / Agent Proof Button with ZKP Popup */}
+        <div className="flex items-center gap-4 max-w-4xl mx-auto">
+          <button
+            onClick={startAgentProof}
+            disabled={authState !== 'idle'}
+            className="flex-1 p-5 rounded-lg bg-gradient-to-br from-purple-950/50 to-purple-900/30 border-2 border-purple-700 hover:border-purple-500 hover:from-purple-900/60 hover:to-purple-800/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed group"
+          >
+            <div className="flex items-start gap-4">
+              <div className="p-3 rounded-lg bg-purple-500/20 group-hover:bg-purple-500/30 transition-colors">
+                <Shield className="w-6 h-6 text-purple-300 group-hover:text-purple-200 transition-colors" />
+              </div>
+              <div className="text-left flex-1">
+                <p className="text-base text-purple-100 font-bold mb-2 flex items-center gap-2">
+                  🛡️ Step 1: Let Comet Prove Itself
+                  <span className="text-xs font-normal px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300">
+                    Click to Start
+                  </span>
+                </p>
+                <p className="text-sm text-purple-200/90 mb-2">
+                  Comet will <strong>automatically prove its legitimacy</strong> before asking for your authentication.
+                </p>
+                <p className="text-xs text-purple-300/70">
+                  ⚡ This prevents malware from impersonating Comet and stealing your credentials
+                </p>
+              </div>
             </div>
-            <div className="text-left flex-1">
-              <p className="text-base text-purple-100 font-bold mb-2 flex items-center gap-2">
-                🛡️ Step 1: Let Comet Prove Itself
-                <span className="text-xs font-normal px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300">
-                  Click to Start
-                </span>
-              </p>
-              <p className="text-sm text-purple-200/90 mb-2">
-                Comet will <strong>automatically prove its legitimacy</strong> before asking for your authentication.
-              </p>
-              <p className="text-xs text-purple-300/70">
-                ⚡ This prevents malware from impersonating Comet and stealing your credentials
-              </p>
+          </button>
+
+          {/* ZKP Proof Popup */}
+          {showZkpProof && (
+            <div className="flex-shrink-0 w-80 p-4 rounded-lg border-4 border-green-500 bg-gradient-to-br from-green-950/60 to-green-900/40 shadow-[0_0_30px_rgba(34,197,94,0.4)] animate-[slideIn_0.3s_ease-out]">
+              <div className="flex items-start gap-3 mb-3">
+                <div className="flex-shrink-0 w-10 h-10 rounded-full bg-green-500 flex items-center justify-center">
+                  <CheckCircle className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-green-100 font-bold text-sm mb-1">
+                    ✅ Zero-Knowledge Proof Verified
+                  </p>
+                  <p className="text-xs text-green-200/80">
+                    Agent identity confirmed without revealing private keys
+                  </p>
+                </div>
+              </div>
+
+              {/* Proof Details */}
+              <div className="space-y-2 text-xs">
+                <div className="p-2 rounded bg-green-950/50 border border-green-800/30">
+                  <p className="text-green-300/70 mb-1">DID:</p>
+                  <p className="text-green-100 font-mono break-all">
+                    did:midnight:comet:abc123def456...
+                  </p>
+                </div>
+                <div className="p-2 rounded bg-green-950/50 border border-green-800/30">
+                  <p className="text-green-300/70 mb-1">Proof Hash:</p>
+                  <p className="text-green-100 font-mono break-all">
+                    0x7f9a2e...3c8d
+                  </p>
+                </div>
+                <div className="p-2 rounded bg-green-950/50 border border-green-800/30">
+                  <p className="text-green-300/70 mb-1">Signature:</p>
+                  <p className="text-green-100 font-mono break-all">
+                    Valid ✓
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-3 p-2 rounded bg-green-500/10 border border-green-500/30">
+                <p className="text-xs text-green-200 flex items-center gap-2">
+                  <Lock className="w-3 h-3" />
+                  <span>Midnight Network Receipt Recorded</span>
+                </p>
+              </div>
             </div>
-          </div>
-        </button>
+          )}
+        </div>
       </div>
 
       {/* Authentication Methods */}
