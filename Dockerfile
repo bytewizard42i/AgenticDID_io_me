@@ -14,7 +14,7 @@ COPY packages/agenticdid-sdk/package.json ./packages/agenticdid-sdk/
 COPY packages/midnight-adapter/package.json ./packages/midnight-adapter/
 
 # Install dependencies
-RUN bun install --frozen-lockfile
+RUN bun install
 
 # Copy source code
 COPY . .
