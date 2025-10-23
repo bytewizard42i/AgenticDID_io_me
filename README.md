@@ -18,10 +18,22 @@ AgenticDID.io provides a complete identity protocol for AI agents to:
 - **Prove what they can do** - Via verifiable credentials with role/scope claims  
 - **Execute authorized actions** - Without revealing unnecessary private information
 - **Maintain privacy** - Through zero-knowledge proofs and selective disclosure
+- **Enable safe delegation** - Users can authorize agents to act on their behalf with granular controls
+- **Establish mutual trust** - Bidirectional authentication between users, agents, and services
 
 ### The Problem We Solve
 
-In a world of autonomous AI agents, how do you verify an agent is authorized to perform sensitive actions (like transferring money or booking travel) without exposing all their credentials? Traditional identity systems leak too much information. AgenticDID.io uses Midnight's ZK technology to prove authorization while preserving privacy.
+In a world of autonomous AI agents, critical questions arise:
+
+1. **How do you trust your personal AI agent?** When malware could impersonate your assistant, how do you verify it's really your agent?
+2. **How do agents prove authorization?** When your agent contacts your bank, how does it prove you authorized it to act on your behalf?
+3. **How do services verify authenticity?** When a bank's AI agent responds, how do you know it's not a phishing attack?
+
+AgenticDID.io solves these with **multi-party mutual authentication** and **delegation chains** using Midnight's ZK technology:
+- Users ↔ Agents verify each other (prevent malware impersonation)
+- Users delegate authority to agents (with scopes, time limits, revocation)
+- Agents ↔ Services verify each other (prevent phishing, ensure authenticity)
+- All with zero-knowledge proofs that preserve privacy
 
 ---
 
@@ -38,15 +50,22 @@ In a world of autonomous AI agents, how do you verify an agent is authorized to 
 - ✅ **Verifier API** - Fastify-based Midnight Gatekeeper
 
 ### Phase 2 - Real Midnight Integration (🔜 Planned)
-- 🔜 **Compact Smart Contracts** - On-chain credential registry
+- 🔜 **Bidirectional Authentication** - User ↔ Agent mutual DID verification
+- 🔜 **Delegation Credentials** - Merkle proof-based authorization chains
+- 🔜 **Multi-Party Workflows** - User → Agent → Service verification flows
+- 🔜 **Compact Smart Contracts** - On-chain credential & delegation registry
 - 🔜 **Real ZK Proofs** - Midnight proof server integration
-- 🔜 **Lace Wallet** - Browser wallet integration
+- 🔜 **Lace Wallet Integration** - User DID management
+- 🔜 **Trusted Issuer Network** - BOA, airlines, etc. as verifiers
 - 🔜 **Devnet Deployment** - Live on Midnight testnet
 - 🔜 **Credential Revocation** - On-chain state management
+- 🔜 **Audit Logging** - Cryptographically signed interaction logs
 
 ---
 
-## 🏗️ Architecture
+## 🏭️ Architecture
+
+### **Phase 1: Current MVP (Single-Direction Verification)**
 
 ```
 ┌─────────────────┐
@@ -62,18 +81,45 @@ In a world of autonomous AI agents, how do you verify an agent is authorized to 
          │
          ↓ Verification
 ┌─────────────────────────┐
-│  Midnight Adapter       │ ← Receipt Verification
+│  Midnight Adapter       │ ← Mock Verification (MVP)
 │  (SDK Integration)      │
-└────────┬────────────────┘
-         │
-         ↓ State Queries
-┌─────────────────────────┐
-│  Minokawa Contract      │ ← On-Chain State (Phase 2)
-│  (Compact Language)     │
 └─────────────────────────┘
 ```
 
-### Proof Flow
+### **Phase 2: Multi-Party Delegation (Target Architecture)**
+
+```
+┌───────────────┐               ┌─────────────────────┐
+│     USER       │               │   EXTERNAL SERVICE   │
+│  (Lace Wallet) │               │    (e.g., BOA Agent)  │
+└──────┬────────┘               └─────────┬───────────┘
+       │                                    │
+       │ 1. Mutual Authentication          │
+       │ 2. Delegation Grant               │
+       │    (Merkle Proof)                 │
+       │                                    │
+       ↓                                    │
+┌──────────────────┐                       │
+│  PERSONAL AGENT  │                       │
+│     (Comet)     │ ← Local AI Assistant     │
+│  (Port 5175)    │                       │
+└────────┬─────────┘                       │
+         │                                    │
+         │ 3. Request + Delegation Proof    │
+         │ 4. Verify Service Identity (ZKP) │
+         └────────────────────────────────────┘
+                              │
+                              ↓ All Verifications
+                   ┌────────────────────────────┐
+                   │   AgenticDID Registry    │
+                   │   (Minokawa Contract)    │ ← On-Chain State
+                   │    Midnight Network      │
+                   └────────────────────────────┘
+```
+
+**See [AGENT_DELEGATION_WORKFLOW.md](./AGENT_DELEGATION_WORKFLOW.md) for complete walkthrough**
+
+### Proof Flow (Phase 1 MVP)
 
 ```
 1. Agent requests challenge
@@ -94,6 +140,30 @@ In a world of autonomous AI agents, how do you verify an agent is authorized to 
 5. Issue capability token
    ↓
 6. Agent executes authorized action
+```
+
+### Multi-Party Delegation Flow (Phase 2 Target)
+
+```
+1. User ↔ Comet: Mutual DID authentication
+   ↓
+2. User → Comet: Grant delegation (Merkle proof)
+   Scopes: [bank:read, bank:transfer]
+   ↓
+3. User: "Comet, check my BOA balance"
+   ↓
+4. Comet → BOA Agent: Request + Delegation proof
+   ↓
+5. BOA Agent → Comet: DID + ZKP (verified via Midnight)
+   ↓
+6. Comet verifies: "This is the real BOA agent" ✓
+   ↓
+7. BOA verifies: "User authorized Comet" ✓
+   ↓
+8. BOA → Comet: Account balance
+   ↓
+9. Comet → User: "Your balance is $2,847.53" ✓
+   All interactions logged with cryptographic proofs
 ```
 
 ---
@@ -137,7 +207,7 @@ Visit:
 - **Frontend**: http://localhost:5175
 - **API**: http://localhost:8787
 
-### Try It Out
+### Try It Out (Phase 1 Demo)
 
 1. **Select an agent** (Banker, Traveler, or Rogue)
 2. **Choose an action** (Send $50, Buy Headphones, Book Flight)
@@ -153,6 +223,12 @@ Visit:
 - ✅ Traveler booking flight → **PASS**
 - ❌ Rogue agent (any action) → **FAIL** (revoked)
 - ❌ Wrong role for action → **FAIL** (unauthorized)
+
+### Real-World Use Case
+
+For a complete walkthrough of the **User → Personal Agent (Comet) → Bank Agent (BOA)** delegation flow, see:
+
+**🎯 [AGENT_DELEGATION_WORKFLOW.md](./AGENT_DELEGATION_WORKFLOW.md)** - Multi-party authentication & delegation explained
 
 ---
 
@@ -341,9 +417,27 @@ VITE_API_BASE=http://localhost:8787
 
 ## 📚 Documentation
 
+### **For Hackathon Judges & Users**
+- **[AGENT_DELEGATION_WORKFLOW.md](./AGENT_DELEGATION_WORKFLOW.md)** - 🎯 **START HERE** - Real-world use case walkthrough
+  - Complete multi-party authentication flow
+  - User ↔ Agent ↔ Service delegation chain
+  - Security guarantees and privacy preservation
+  - Step-up authentication and merchant protection
+  - Technical implementation details
+- **[PRIVACY_ARCHITECTURE.md](./PRIVACY_ARCHITECTURE.md)** - 🔐 **Privacy-First Design**
+  - Zero-knowledge verification (no tracking)
+  - Spoof transaction system (white noise)
+  - Selective disclosure proofs
+  - AgenticDID.io as trusted issuer
+  - Attack prevention strategies
+
+### **Technical Documentation**
 - **[RESOURCES.md](./RESOURCES.md)** - Complete link collection for Midnight Network
 - **[MIDNIGHT_DEVELOPMENT_PRIMER.md](./MIDNIGHT_DEVELOPMENT_PRIMER.md)** - Coding guide for Compact and Midnight
 - **[MIDNIGHT_INTEGRATION_GUIDE.md](./MIDNIGHT_INTEGRATION_GUIDE.md)** - Phase 2 implementation blueprint
+- **[PHASE2_IMPLEMENTATION.md](./PHASE2_IMPLEMENTATION.md)** - Step-by-step integration guide
+
+### **Development Logs**
 - **[AI-chat.md](./AI-chat.md)** - Development conversation log
 - **[AIsisters.md](./AIsisters.md)** - Notes for the Triplet AI team
 
@@ -358,7 +452,7 @@ VITE_API_BASE=http://localhost:8787
 3. Test each agent type with different actions
 4. Verify expected pass/fail results
 
-### Expected Outcomes
+### Expected Outcomes (Phase 1)
 
 | Agent | Action | Expected | Reason |
 |-------|--------|----------|--------|
@@ -367,6 +461,16 @@ VITE_API_BASE=http://localhost:8787
 | Traveler | Book Flight | ✅ PASS | Correct role + scope |
 | Traveler | Send $50 | ❌ FAIL | Wrong role |
 | Rogue | Any Action | ❌ FAIL | Revoked credential |
+
+### Expected Outcomes (Phase 2 - Multi-Party)
+
+| Scenario | User Auth | Agent Auth | Delegation | Service Auth | Result |
+|----------|-----------|------------|------------|--------------|--------|
+| User → Comet → BOA (balance) | ✓ | ✓ | ✓ bank:read | ✓ | ✅ PASS |
+| User → Comet → BOA (transfer) | ✓ | ✓ | ✓ bank:transfer | ✓ | ✅ PASS |
+| Malware → BOA | ✗ | ✗ | ✗ | ✓ | ❌ FAIL (no auth) |
+| User → Comet → Fake BOA | ✓ | ✓ | ✓ | ✗ | ❌ FAIL (phishing) |
+| User → Comet (expired delegation) | ✓ | ✓ | ✗ | ✓ | ❌ FAIL (expired) |
 
 ---
 
@@ -422,10 +526,10 @@ MIT License - see [LICENSE](./LICENSE) file for details
 
 ## 🙏 Acknowledgments
 
-- **Midnight Network** - For the incredible ZK infrastructure
-- **Mesh SDK Team** - For the excellent developer tools
+- **Midnight Network** - For the incredible ZK infrastructure and hackathon opportunity
+- **Mesh SDK Team** - For the excellent developer tools and documentation
 - **The Triplet Team** - Alice (architecture), Cassie (implementation), Casey (maintenance)
-- **John Santi** - Product vision and guidance
+- **John Santi** - Product vision, real-world use cases, and guidance
 
 ---
 
