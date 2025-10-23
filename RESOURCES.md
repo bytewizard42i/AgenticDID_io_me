@@ -37,6 +37,27 @@
 
 ## 🛠️ Mesh SDK Documentation
 
+### [Mesh SDK Homepage](https://meshjs.dev/)
+**Complete Cardano & Midnight development toolkit**
+- Comprehensive TypeScript libraries for blockchain development
+- Built for modern Web3 development
+- Frontend components & React hooks
+- Universal wallet support (Cardano & Midnight)
+- Sponsor blockchain transaction fees for users (eliminate friction)
+- Mesh is developed closely to network updates
+- Open-source library for accessible dApp building
+- Enterprise-ready SDK - professionally designed & robust
+- Simple transaction builders
+- Seamless wallet integrations  
+- Reliable data services
+- **GitHub**: [github.com/MeshJS/mesh](https://github.com/MeshJS/mesh)
+- **NPM**: [@meshsdk/core](https://www.npmjs.com/package/@meshsdk/core)
+- **Features**:
+  - UTXO transaction builders
+  - React hooks for wallet integration
+  - Cardano & Midnight provider tools
+  - Multi-chain support (Cardano + Midnight)
+
 ### [Mesh SDK - Midnight Setup](https://meshjs.dev/midnight/setup)
 **Complete development setup guide**
 - Installation instructions (npm/yarn)
@@ -140,6 +161,34 @@
 
 ---
 
+## 📺 Educational Resources
+
+### [Edda Labs](https://www.eddalabs.io/)
+**Cardano & Midnight educational content creators**
+- Multilingual video tutorials for web2 and business developers
+- Weekly YouTube content in English, Spanish, and Portuguese
+- Comprehensive training for transitioning from web2 to blockchain
+- Focus on practical, real-world dApp development
+- **Project Catalyst Initiative**: [Cardano for Business & Web2 Devs](https://projectcatalyst.io/funds/13/cardano-open-ecosystem/cardano-for-business-and-web2-devs-multilingual-video-tutorials-by-edda-labs)
+- **Topics Covered**:
+  - Cardano Fundamentals for Business Developers
+  - Midnight Tools Integration
+  - Practical Application Development (dApps)
+  - Database integration (reactive databases)
+  - Authentication systems implementation
+  - UI/UX enhancement for blockchain apps
+  - Web2 tooling within Cardano ecosystem
+- **Content Structure**:
+  - Beginner to Advanced progression
+  - Thematic series (Authentication, Database Integration, etc.)
+  - Hands-on projects with code repositories
+  - Step-by-step tutorials
+  - Real-world use cases
+- **Target Audience**: Web2 developers, business developers, hackathon organizers
+- **Benefits**: Lowers barriers to entry, reduces development costs, multilingual accessibility
+
+---
+
 ## 🔧 Additional Resources
 
 ### Devnet Information
@@ -212,5 +261,6 @@
 
 ---
 
-*Last updated: October 17, 2025*  
-*For: AgenticDID.io Midnight Integration - Phase 2*
+*Last updated: October 23, 2025*  
+*For: AgenticDID.io Midnight Integration - Phase 2*  
+*Recent additions: Mesh SDK Homepage, Edda Labs educational resources*
