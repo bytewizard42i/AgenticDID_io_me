@@ -150,9 +150,26 @@ export default function MutualAuth() {
         <h3 className="text-xl font-bold text-midnight-100 mb-2">
           Establish Trust with Comet
         </h3>
-        <p className="text-sm text-midnight-400">
+        <p className="text-sm text-midnight-400 mb-3">
           Mutual authentication ensures both you and your agent are legitimate
         </p>
+        
+        {/* Security Notice */}
+        <div className="max-w-2xl mx-auto p-4 rounded-lg bg-purple-950/30 border border-purple-800/30">
+          <div className="flex items-start gap-3">
+            <Shield className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
+            <div className="text-left">
+              <p className="text-sm text-purple-200 font-semibold mb-1">
+                🛡️ Critical Security: Agent Proves First
+              </p>
+              <p className="text-xs text-purple-300/80">
+                Comet will <strong>automatically prove its legitimacy</strong> before asking for your authentication. 
+                Never give credentials to an unverified agent - this prevents malware from impersonating Comet 
+                and stealing your biometric or 2FA data.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Authentication Methods */}
