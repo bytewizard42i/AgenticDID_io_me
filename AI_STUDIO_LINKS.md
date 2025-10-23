@@ -46,13 +46,20 @@ These are the public shareable links to our AI Studio prompts, demonstrating use
 
 ---
 
-### 3. Shopper - E-commerce AI Agent 🔄
-**Created**: [To be created]
-**Share Link**: [To be added]
+### 3. Shopper - E-commerce AI Agent ✅
+**Created**: October 23, 2025 at 6:51am
+**Share Link**: https://aistudio.google.com/app/prompts?state=%7B%22ids%22:%5B%221bkxOiEMp6N_t6hDBTTZ7uIxHpRkak2ap%22%5D,%22action%22:%22open%22,%22userId%22:%22117323252760887931920%22,%22resourceKeys%22:%7B%7D%7D&usp=sharing
 
 **Description**: Online shopping and purchase agent
 **Role**: commerce
 **Scopes**: search:products, purchase:items, read:orders
+
+**Key Capabilities**:
+- Search products with Gemini AI
+- Shopping cart management
+- Purchase authorization with ZKP
+- Spoof queries to prevent tracking
+- Order tracking and management
 
 ---
 
