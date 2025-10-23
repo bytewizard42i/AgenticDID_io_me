@@ -585,4 +585,65 @@ circuit AgenticDIDRegistry {
 
 ---
 
+## 🎯 **Session Addendum: UX Revolution (Oct 23, 2025 - 4:30am)**
+
+### **Charles Hoskinson's Insight**
+
+User requested workflow change based on Charles Hoskinson's recent podcast insight:
+
+> *"The future is about results, not processes."*
+
+### **UX Transformation**
+
+**Old Workflow (Process-Focused):**
+1. Select which agent you want to use
+2. Choose what action to perform
+3. Watch it execute
+
+**New Workflow (Results-Focused):**
+1. State what you want to achieve
+2. System auto-selects appropriate agent
+3. Watch it execute
+
+### **Implementation**
+
+```typescript
+// Auto-select agent based on user's goal
+const actionToAgent: Record<string, AgentType> = {
+  'transfer': 'banker',
+  'shop': 'shopper',
+  'flight': 'traveler',
+};
+```
+
+**UI Changes:**
+- Actions moved ABOVE agent selector
+- Header: "What do you want to do?"
+- Subtext: "We'll automatically select the right agent for you"
+- Agent section: "Agent Selected for This Action"
+
+### **Why This Matters**
+
+This aligns with how AI agents SHOULD work in Web3:
+- Users state **intent** (what they want)
+- System handles **implementation** (which tool to use)
+- Reduces cognitive load
+- More intuitive for mainstream users
+- Demonstrates intelligent routing
+
+### **Additional Improvements**
+
+1. ✅ **Migrated to Bun** - 10x faster installs, instant TypeScript execution
+2. ✅ **Added Amazon Agent** - Real e-commerce use case
+3. ✅ **Creepy Rogue Design** - Glitching text, red glow, scanlines (inspired by HydraJTS)
+4. ✅ **Centered rogue card** - Better grid layout
+
+### **Files Modified**
+- `App.tsx` - Auto-selection logic
+- `ActionPanel.tsx` - Results-focused header
+- `AgentSelector.tsx` - Updated to show selected agent
+- `README.md` - Documented new workflow + Charles Hoskinson quote
+
+---
+
 *"This is hackathon-winning architecture!"* - Cascade

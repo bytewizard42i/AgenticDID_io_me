@@ -12,8 +12,11 @@ AgenticDID.io lets AI agents prove authenticity and authorization using **privac
 
 ## 🎯 What It Does
 
-AgenticDID.io provides a complete identity protocol for AI agents to:
+AgenticDID.io provides a complete identity protocol for AI agents with a **results-focused approach**:
 
+> *Inspired by Charles Hoskinson's insight that the future is about results, not processes - users state what they want to achieve, and the system handles the implementation.*
+
+- **Results-first UX** - Pick your goal ("Buy Headphones"), system auto-selects the right agent
 - **Prove who they are** - Using privacy-preserving digital identifiers
 - **Prove what they can do** - Via verifiable credentials with role/scope claims  
 - **Execute authorized actions** - Without revealing unnecessary private information
@@ -207,10 +210,11 @@ Visit:
 - **Frontend**: http://localhost:5175
 - **API**: http://localhost:8787
 
-### Try It Out (Phase 1 Demo)
+### Try It Out (Phase 1 Demo) - Results-Focused UX
 
-1. **Select an agent** (Banker, Traveler, or Rogue)
-2. **Choose an action** (Send $50, Buy Headphones, Book Flight)
+**New Workflow (Oct 2025):**
+1. **Pick what you want to do** - "Buy Headphones", "Send Money", or "Book Flight"
+2. **System auto-selects** the appropriate agent for you
 3. **Watch the verification flow** in the timeline:
    - Challenge requested ✓
    - Proof bundle built ✓
@@ -218,11 +222,14 @@ Visit:
    - Verification result ✓
    - Action executed or blocked ✓
 
-**Expected Results:**
-- ✅ Banker sending $50 → **PASS**
-- ✅ Traveler booking flight → **PASS**
-- ❌ Rogue agent (any action) → **FAIL** (revoked)
-- ❌ Wrong role for action → **FAIL** (unauthorized)
+**What Happens:**
+- 🎧 Click "Buy Headphones" → Amazon Shopper agent automatically selected → **PASS**
+- 💸 Click "Send $50" → Banker agent automatically selected → **PASS**
+- 🛫 Click "Book Flight" → Traveler agent automatically selected → **PASS**
+- 🚨 Manual select Rogue agent → Any action → **FAIL** (credential revoked)
+
+**Why This Matters:**
+Instead of thinking in terms of tools and processes, users simply state their intent. The system intelligently routes to the appropriate authorized agent - **results over processes**.
 
 ### Real-World Use Case
 
