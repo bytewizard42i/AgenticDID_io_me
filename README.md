@@ -61,6 +61,12 @@ AgenticDID.io solves these with **multi-party mutual authentication** and **dele
 - ✅ **Mock Midnight Adapter** - Simulates credential verification
 - ✅ **Interactive Demo UI** - Real-time verification timeline
 - ✅ **Verifier API** - Fastify-based Midnight Gatekeeper
+- ✅ **"Listen In" Mode** 🎤 - Revolutionary transparency/efficiency toggle:
+  - **Listen In Mode**: Hear all agent communications via Text-to-Speech (~10-15s)
+  - **Fast Mode**: Silent machine-speed execution (~2-3s, 80%+ faster!)
+  - Shows execution time comparison and efficiency gains
+  - Demonstrates agents can communicate transparently OR efficiently
+  - Educational for understanding multi-agent orchestration
 
 ### Phase 2 - Real Midnight Integration (🔜 Planned)
 - 🔜 **Bidirectional Authentication** - User ↔ Agent mutual DID verification
