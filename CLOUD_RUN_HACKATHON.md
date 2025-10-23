@@ -3,9 +3,14 @@
 
 **Official Hackathon**: [Cloud Run Hackathon - Devpost](https://run.devpost.com/)
 
-**Category**: 🤝 **AI Agents Category** ($8,000 prize)
+**Total Prize Pool**: 💰 **$50,000+ in prizes!**
 
-**Innovative Integration**: Google ADK Agents + Midnight Network ZKPs + AI Studio + Gemini CLI
+**Our Target Categories**: 
+- 🎯 **Best of AI Agents** ($8,000 USD + $1,000 credits + perks)
+- 🎯 **Best of AI Studio** ($8,000 USD + $1,000 credits + perks)
+- 🌟 **Grand Prize** ($20,000 USD + $3,000 credits + premium perks)
+
+**Innovative Integration**: Google ADK Agents + Midnight Network ZKPs + AI Studio + Gemini 2.5 Pro
 
 ---
 
@@ -30,6 +35,87 @@
 - **Agent Development Kit**: https://cloud.google.com/agent-development-kit/docs
 - **AI Studio Guide**: https://ai.google.dev/aistudio
 - **Gemini Models**: https://ai.google.dev/gemini-api
+
+---
+
+## 💰 Complete Prize Breakdown
+
+### 🏆 Grand Prize (1 Winner)
+**Total Value: ~$26,000+**
+- 💵 $20,000 USD
+- 🎁 $3,000 Google Cloud Credits
+- 🎟️ 1 year Google Developer Program Premium (2 subscriptions, ~$600 value)
+- ☕ Virtual Coffee with Google Team Member
+- 📱 Social Media Promotion
+
+### 🤖 Best of AI Agents (1 Winner) - **OUR PRIMARY TARGET**
+**Total Value: ~$10,000+**
+- 💵 $8,000 USD
+- 🎁 $1,000 Google Cloud Credits
+- ☕ Virtual Coffee with Google Team Member
+- 📱 Social Media Promotion
+
+**Why We'll Win:**
+- ✅ Multi-agent system (Comet + 3 specialists)
+- ✅ Novel orchestration with "Listen In" mode
+- ✅ Real-world problem (AI agent trust)
+- ✅ Google ADK integration
+- ✅ World's first dual-stack architecture
+
+### 🎨 Best of AI Studio (1 Winner) - **OUR SECONDARY TARGET**
+**Total Value: ~$10,000+**
+- 💵 $8,000 USD
+- 🎁 $1,000 Google Cloud Credits
+- ☕ Virtual Coffee with Google Team Member
+- 📱 Social Media Promotion
+
+**Why We'll Win:**
+- ✅ All 4 agents created in AI Studio
+- ✅ Complete prompt engineering documentation
+- ✅ Share links for all agents saved
+- ✅ Gemini 2.5 Pro function calling
+- ✅ Demonstrated AI Studio workflow
+
+### 🚀 Best of GPUs (1 Winner)
+**Total Value: ~$10,000+**
+- 💵 $8,000 USD
+- 🎁 $1,000 Google Cloud Credits
+- ☕ Virtual Coffee with Google Team Member
+- 📱 Social Media Promotion
+
+*(Not our focus, but our ZKP proofs could qualify)*
+
+### 🌟 Honorable Mentions (Multiple Winners)
+**Total Value: ~$2,500 each**
+- 💵 $2,000 USD
+- 🎁 $500 Google Cloud Credits
+
+---
+
+## 🎯 Our Multi-Category Strategy
+
+**We're positioned to win MULTIPLE categories!**
+
+### **Scenario 1: Conservative** (Most Likely)
+- 🏆 Win **Best of AI Agents**: $8,000 + $1,000 credits
+- **Total: $9,000+**
+
+### **Scenario 2: Ambitious** (Very Possible)
+- 🏆 Win **Best of AI Agents**: $8,000 + $1,000 credits
+- 🏆 Win **Best of AI Studio**: $8,000 + $1,000 credits
+- **Total: $18,000+** 🎉
+
+### **Scenario 3: Dream** (Within Reach!)
+- 🏆 Win **Grand Prize**: $20,000 + $3,000 credits
+- 🏆 Also **Best of AI Agents**: $8,000 + $1,000 credits
+- **Total: $32,000+** 🚀
+
+**Plus in all scenarios:**
+- ☕ Coffee with Google Team (networking!)
+- 📱 Social promotion (visibility!)
+- 🎟️ Premium subscriptions (tools!)
+- 💼 Portfolio piece (career boost!)
+- 🏢 IP ownership (commercialization!)
 
 ---
 
