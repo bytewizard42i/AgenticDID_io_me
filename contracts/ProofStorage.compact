@@ -43,7 +43,7 @@ struct ProofMetadata {
   issuer: Address;              // Who created the proof
   verifier: Address;            // Who can verify
   expiresAt: Uint<64>;          // Proof expiration
-  isRevoked: Bool;              // Revocation status
+  isRevoked: Boolean;              // Revocation status
 }
   
 struct ActionLog {
@@ -51,7 +51,7 @@ struct ActionLog {
   agentDID: Bytes<32>;          // Agent that performed action
   actionType: Bytes<32>;        // Action type hash
   timestamp: Uint<64>;          // When action occurred
-  wasSuccessful: Bool;          // Action result
+  wasSuccessful: Boolean;          // Action result
   proofId: Bytes<32>;           // Associated proof
   contextHash: Bytes<32>;       // Context/parameters hash
 }
@@ -178,7 +178,7 @@ export circuit getProof(
 export circuit verifyProof(
   proofId: Bytes<32>,
   currentTime: Uint<64>
-): Bool {
+): Boolean {
   
   if (!proofRecords.has(proofId)) {
     return false;
@@ -217,7 +217,7 @@ export circuit logAction(
   agentDID: Bytes<32>,
   actionType: Bytes<32>,
   proofId: Bytes<32>,
-  wasSuccessful: Bool,
+  wasSuccessful: Boolean,
   contextHash: Bytes<32>,
   currentTime: Uint<64>
 ): Bytes<32> {
@@ -460,7 +460,7 @@ circuit verifyMerkleProof(
   proof: Bytes<256>,
   leaf: Bytes<32>,
   root: Bytes<32>
-): Bool {
+): Boolean {
   // Simplified verification
   // In production: Proper Merkle proof verification
   return true;  // Placeholder

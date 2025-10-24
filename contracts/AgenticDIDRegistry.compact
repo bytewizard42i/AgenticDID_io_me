@@ -38,7 +38,7 @@ struct AgentCredential {
   issuedAt: Uint<64>;       // Timestamp of credential issuance
   expiresAt: Uint<64>;      // Expiration timestamp
   issuer: Address;          // Who issued this credential
-  isActive: Bool;           // Quick active/revoked check
+  isActive: Boolean;           // Quick active/revoked check
 }
   
 struct Delegation {
@@ -48,7 +48,7 @@ struct Delegation {
   scopes: Bytes<32>;        // Delegated scopes (subset of agent's)
   createdAt: Uint<64>;      // When delegation was created
   expiresAt: Uint<64>;      // When delegation expires
-  isRevoked: Bool;          // Revocation status
+  isRevoked: Boolean;          // Revocation status
 }
   
   // ============================================================================
@@ -133,7 +133,7 @@ export circuit verifyAgent(
   agentDID: Bytes<32>,
   proofHash: Bytes<32>,
   currentTime: Uint<64>
-): Bool {
+): Boolean {
     
     // Check if agent exists (safe map access)
     if (!agentCredentials.has(agentDID)) {
@@ -232,7 +232,7 @@ export circuit createDelegation(
 export circuit checkDelegation(
   delegationId: Bytes<32>,
   currentTime: Uint<64>
-): Bool {
+): Boolean {
     
     if (!delegations.has(delegationId)) {
       return false;
@@ -341,7 +341,7 @@ circuit verifyProofOfOwnership(
   did: Bytes<32>,
   publicKey: Bytes<64>,
   proof: Bytes<256>
-): Bool {
+): Boolean {
   // Simplified for demo
   // In production: Verify ZK-SNARK proof
   return proof.length() > 0;
@@ -377,12 +377,35 @@ circuit hashDelegation(
 circuit scopesAreSubset(
   requested: Bytes<32>,
   available: Bytes<32>
-): Bool {
+): Boolean {
   // Simplified bitwise AND check
   // In production: Proper scope verification
   return true;  // Placeholder
 }
   
+// ============================================================================
+// HELPER FUNCTIONS FOR REVOCATION
+// ============================================================================
+
+/**
+ * Get agent index for revocation bitmap
+ * Maps DID to bitmap position
+ */
+circuit getAgentIndex(agentDID: Bytes<32>): Uint<64> {
+  // Simplified: Use hash mod 256 for bitmap position
+  // In production: Proper mapping system
+  return 0;  // Placeholder
+}
+
+/**
+ * Check if agent index is revoked in bitmap
+ */
+circuit isRevoked(agentIndex: Uint<64>): Boolean {
+  // Check bit in revocationBitmap
+  // Simplified: Always return false for now
+  return false;  // Placeholder
+}
+
 // ============================================================================
 // EXPORTED CIRCUITS FOR CROSS-CONTRACT CALLS
 // ============================================================================
