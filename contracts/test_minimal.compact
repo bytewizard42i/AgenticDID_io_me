@@ -1,0 +1,12 @@
+pragma language_version 0.18;
+import CompactStandardLibrary;
+
+ledger owner: Address;
+
+constructor(addr: Address) {
+  owner = addr;
+}
+
+export circuit testOne(param: Address): [] {
+  owner = param;
+}
