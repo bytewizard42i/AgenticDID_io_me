@@ -8,11 +8,11 @@
  * Built for: Google Cloud Run Hackathon + Midnight Network
  * Privacy: Zero-knowledge proofs for agent verification
  * 
- * Compact Version: 0.26
+ * Compact Version: Compiler v0.26.0, Language v0.18
  * Compiler: compactc_v0.26.0_x86_64-unknown-linux-musl
  */
 
-pragma language_version 0.26;
+pragma language_version 0.18;
 import CompactStandardLibrary;
   
 // ============================================================================
@@ -59,10 +59,10 @@ struct Delegation {
  * Initialize the registry contract
  * Sets up the contract owner and initial state
  */
-export circuit initialize(owner: Address): [] {
+constructor(caller: Address) {
   totalAgents = 0;
   totalDelegations = 0;
-  contractOwner = owner;
+  contractOwner = caller;
   revocationBitmap = 0;
 }
   
@@ -90,7 +90,7 @@ export circuit registerAgent(
   scopes: Bytes<32>,
   expiresAt: Uint<64>,
   currentTime: Uint<64>,
-  zkProof: Bytes<>
+  zkProof: Bytes<256>
 ): [] {
   
   // Security checks (using assert instead of require)
@@ -98,8 +98,8 @@ export circuit registerAgent(
   assert(expiresAt > currentTime, "Invalid expiration time");
   assert(verifyProofOfOwnership(did, publicKey, zkProof), "Invalid proof");
   
-  // Create credential (using let instead of const)
-  let credential = AgentCredential {
+  // Create credential (using const for local variable)
+  const credential = AgentCredential {
     did: did,
     publicKey: publicKey,
     role: role,
@@ -140,7 +140,7 @@ export circuit verifyAgent(
       return false;
     }
     
-    let credential = agentCredentials.get(agentDID);
+    const credential = agentCredentials.get(agentDID);
     
     // Check expiration
     if (credential.expiresAt < currentTime) {
@@ -153,7 +153,7 @@ export circuit verifyAgent(
     }
     
     // Verify proof matches
-    let expectedHash = hashProof(credential.publicKey, currentTime);
+    const expectedHash = hashProof(credential.publicKey, currentTime);
     if (proofHash != expectedHash) {
       return false;
     }
@@ -196,17 +196,17 @@ export circuit createDelegation(
   
   // Verify agent exists and is active
   assert(agentCredentials.has(agentDID), "Agent not found");
-  let agentCred = agentCredentials.get(agentDID);
+  const agentCred = agentCredentials.get(agentDID);
   assert(agentCred.isActive, "Agent is revoked");
   
   // Verify scopes are subset of agent's scopes
   assert(scopesAreSubset(scopes, agentCred.scopes), "Invalid scopes");
   
   // Create unique delegation ID
-  let delegationId = hashDelegation(userDID, agentDID, currentTime);
+  const delegationId = hashDelegation(userDID, agentDID, currentTime);
   
-  // Create delegation
-  let delegation = Delegation {
+  // Create delegation record
+  const delegation = Delegation {
     delegationId: delegationId,
     userDID: userDID,
     agentDID: agentDID,
@@ -226,9 +226,10 @@ export circuit createDelegation(
 }
   
   /**
-   * Check if a delegation is valid
+   * Check if a delegation is valid (by delegation ID)
+   * Returns Bool for internal checks
    */
-export circuit isDelegationValid(
+export circuit checkDelegation(
   delegationId: Bytes<32>,
   currentTime: Uint<64>
 ): Bool {
@@ -237,7 +238,7 @@ export circuit isDelegationValid(
       return false;
     }
     
-    let delegation = delegations.get(delegationId);
+    const delegation = delegations.get(delegationId);
     
     // Check revocation
     if (delegation.isRevoked) {
@@ -254,7 +255,7 @@ export circuit isDelegationValid(
       return false;
     }
     
-    let agentCred = agentCredentials.get(delegation.agentDID);
+    const agentCred = agentCredentials.get(delegation.agentDID);
     if (!agentCred.isActive) {
       return false;
     }
@@ -273,11 +274,11 @@ export circuit revokeDelegation(
   
   assert(delegations.has(delegationId), "Delegation not found");
   
-  let delegation = delegations.get(delegationId);
+  const delegation = delegations.get(delegationId);
   assert(!delegation.isRevoked, "Already revoked");
   
   // Update delegation
-  let updatedDelegation = Delegation {
+  const updatedDelegation = Delegation {
     delegationId: delegation.delegationId,
     userDID: delegation.userDID,
     agentDID: delegation.agentDID,
@@ -305,7 +306,7 @@ export circuit revokeAgent(
   
   assert(agentCredentials.has(agentDID), "Agent not found");
   
-  let credential = agentCredentials.get(agentDID);
+  const credential = agentCredentials.get(agentDID);
   
   // Only owner or issuer can revoke
   assert(
@@ -314,7 +315,7 @@ export circuit revokeAgent(
   );
   
   // Update credential
-  let updatedCred = AgentCredential {
+  const updatedCred = AgentCredential {
     did: credential.did,
     publicKey: credential.publicKey,
     role: credential.role,
@@ -339,7 +340,7 @@ export circuit revokeAgent(
 circuit verifyProofOfOwnership(
   did: Bytes<32>,
   publicKey: Bytes<64>,
-  proof: Bytes<>
+  proof: Bytes<256>
 ): Bool {
   // Simplified for demo
   // In production: Verify ZK-SNARK proof
@@ -398,14 +399,14 @@ export circuit checkCredential(
   // Check if agent exists
   assert(agentCredentials.has(agentDID), "Agent not found");
   
-  let credential = agentCredentials.get(agentDID);
+  const credential = agentCredentials.get(agentDID);
   
   // Validation chain using assert
   assert(credential.isActive, "Agent not active");
   assert(credential.expiresAt >= currentTime, "Credential expired");
   
   // Check revocation bitmap
-  let agentIndex = getAgentIndex(agentDID);
+  const agentIndex = getAgentIndex(agentDID);
   assert(!isRevoked(agentIndex), "Agent revoked");
   
   // If we reach here, credential is valid!
@@ -422,12 +423,12 @@ export circuit isDelegationValid(
   currentTime: Uint<64>
 ): [] {
   // Generate delegation ID
-  let delegationId = hashDelegation(userDID, agentDID, currentTime);
+  const delegationId = hashDelegation(userDID, agentDID, currentTime);
   
   // Check if delegation exists
   assert(delegations.has(delegationId), "Delegation not found");
   
-  let delegation = delegations.get(delegationId);
+  const delegation = delegations.get(delegationId);
   
   // Validation chain
   assert(delegation.isActive, "Delegation not active");

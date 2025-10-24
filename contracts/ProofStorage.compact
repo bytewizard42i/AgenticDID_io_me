@@ -3,16 +3,15 @@
  * 
  * Stores cryptographic receipts and audit logs
  * Provides transparent verification history
- * Maintains on-chain proof of all operations
  * 
  * Built for: Google Cloud Run Hackathon + Midnight Network
  * Transparency: Verifiable audit trail while preserving privacy
  * 
- * Compact Version: 0.26
+ * Compact Version: Compiler v0.26.0, Language v0.18
  * Compiler: compactc_v0.26.0_x86_64-unknown-linux-musl
  */
 
-pragma language_version 0.26;
+pragma language_version 0.18;
 import CompactStandardLibrary;
   
 // ============================================================================
@@ -35,9 +34,9 @@ struct ProofRecord {
   proofType: Bytes<32>;         // Type hash (e.g., "agent_verification")
   agentDID: Bytes<32>;          // Agent involved
   timestamp: Uint<64>;          // When proof was created
-  proofData: Bytes<>;           // Actual ZK proof
+  proofData: Bytes<256>;        // Actual ZK proof
   metadata: ProofMetadata;      // Additional info
-  merkleProof: Bytes<>;         // Merkle proof for verification
+  merkleProof: Bytes<256>;      // Merkle proof for verification
 }
   
 struct ProofMetadata {
@@ -71,9 +70,9 @@ struct Receipt {
   // ============================================================================
   
 /**
- * Initialize proof storage
+ * Constructor - initialize proof storage
  */
-export circuit initialize(owner: Address): [] {
+constructor(owner: Address) {
   contractOwner = owner;
   totalProofs = 0;
   totalActions = 0;
@@ -100,7 +99,7 @@ export circuit storeProof(
   caller: Address,
   agentDID: Bytes<32>,
   proofType: Bytes<32>,
-  proofData: Bytes<>,
+  proofData: Bytes<256>,
   expiresAt: Uint<64>,
   currentTime: Uint<64>,
   blockNumber: Uint<64>
@@ -111,13 +110,13 @@ export circuit storeProof(
   assert(expiresAt > currentTime, "Invalid expiration");
   
   // Generate unique proof ID
-  let proofId = hashProofId(agentDID, proofType, currentTime);
+  const proofId = hashProofId(agentDID, proofType, currentTime);
   
   // Check proof doesn't already exist
   assert(!proofRecords.has(proofId), "Proof already exists");
   
   // Create metadata
-  let metadata = ProofMetadata {
+  const metadata = ProofMetadata {
     issuer: caller,
     verifier: caller,  // Can be changed later
     expiresAt: expiresAt,
@@ -125,10 +124,10 @@ export circuit storeProof(
   };
   
   // Generate merkle proof (simplified)
-  let merkleProof = generateMerkleProof(proofId, currentMerkleRoot);
+  const merkleProof = generateMerkleProof(proofId, currentMerkleRoot);
   
   // Create proof record
-  let record = ProofRecord {
+  const record = ProofRecord {
     proofId: proofId,
     proofType: proofType,
     agentDID: agentDID,
@@ -161,7 +160,7 @@ export circuit getProof(
   
   assert(proofRecords.has(proofId), "Proof not found");
   
-  let record = proofRecords.get(proofId);
+  const record = proofRecords.get(proofId);
   
   // Check authorization (simplified)
   assert(
@@ -185,7 +184,7 @@ export circuit verifyProof(
     return false;
   }
   
-  let record = proofRecords.get(proofId);
+  const record = proofRecords.get(proofId);
   
   // Check revocation
   if (record.metadata.isRevoked) {
@@ -224,10 +223,10 @@ export circuit logAction(
 ): Bytes<32> {
   
   // Generate action ID
-  let actionId = hashActionId(agentDID, actionType, currentTime);
+  const actionId = hashActionId(agentDID, actionType, currentTime);
   
   // Create action log
-  let action = ActionLog {
+  const action = ActionLog {
     actionId: actionId,
     agentDID: agentDID,
     actionType: actionType,
@@ -272,9 +271,9 @@ export circuit generateReceipt(
   assert(proofRecords.has(proofId), "Proof not found");
   
   // Generate receipt ID
-  let receiptId = hashReceiptId(proofId, blockNumber);
+  const receiptId = hashReceiptId(proofId, blockNumber);
   
-  let receipt = Receipt {
+  const receipt = Receipt {
     receiptId: receiptId,
     proofId: proofId,
     timestamp: currentTime,
@@ -300,13 +299,13 @@ export circuit revokeProof(
   
   assert(proofRecords.has(proofId), "Proof not found");
   
-  let record = proofRecords.get(proofId);
+  const record = proofRecords.get(proofId);
   
   // Only issuer can revoke
   assert(caller == record.metadata.issuer, "Not authorized");
   
   // Update metadata
-  let updatedMetadata = ProofMetadata {
+  const updatedMetadata = ProofMetadata {
     issuer: record.metadata.issuer,
     verifier: record.metadata.verifier,
     expiresAt: record.metadata.expiresAt,
@@ -314,7 +313,7 @@ export circuit revokeProof(
   };
   
   // Update record
-  let updatedRecord = ProofRecord {
+  const updatedRecord = ProofRecord {
     proofId: record.proofId,
     proofType: record.proofType,
     agentDID: record.agentDID,
@@ -338,12 +337,12 @@ export circuit setVerifier(
   
   assert(proofRecords.has(proofId), "Proof not found");
   
-  let record = proofRecords.get(proofId);
+  const record = proofRecords.get(proofId);
   
   assert(caller == record.metadata.issuer, "Not authorized");
   
   // Update metadata
-  let updatedMetadata = ProofMetadata {
+  const updatedMetadata = ProofMetadata {
     issuer: record.metadata.issuer,
     verifier: newVerifier,
     expiresAt: record.metadata.expiresAt,
@@ -351,7 +350,7 @@ export circuit setVerifier(
   };
   
   // Update record
-  let updatedRecord = ProofRecord {
+  const updatedRecord = ProofRecord {
     proofId: record.proofId,
     proofType: record.proofType,
     agentDID: record.agentDID,
@@ -437,7 +436,7 @@ circuit hashReceiptId(
 circuit generateMerkleProof(
   proofId: Bytes<32>,
   root: Bytes<32>
-): Bytes<> {
+): Bytes<256> {
   // Placeholder - return empty proof
   // In production: Generate actual Merkle proof path
   return 0x;
@@ -458,7 +457,7 @@ circuit updateMerkleRoot(
  * Verify a merkle proof
  */
 circuit verifyMerkleProof(
-  proof: Bytes<>,
+  proof: Bytes<256>,
   leaf: Bytes<32>,
   root: Bytes<32>
 ): Bool {
