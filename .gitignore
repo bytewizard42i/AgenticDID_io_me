@@ -37,3 +37,6 @@ temp/
 *.js.map
 .turbo/
 .cache/
+
+# Reference repositories (cloned examples, not part of our project)
+reference-repos/
