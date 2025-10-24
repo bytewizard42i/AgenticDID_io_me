@@ -261,10 +261,10 @@ export circuit checkDelegation(
     }
     
     return true;
-  }
-  
-  /**
-   * Revoke a delegation
+}
+
+/**
+ * Revoke a delegation
    * Only the user who created it can revoke
    */
 export circuit revokeDelegation(
@@ -291,14 +291,14 @@ export circuit revokeDelegation(
   delegations.set(delegationId, updatedDelegation);
 }
   
-  // ============================================================================
-  // AGENT REVOCATION
-  // ============================================================================
-  
-  /**
-   * Revoke an agent's credential
-   * Only contract owner or issuer can revoke
-   */
+// ============================================================================
+// AGENT REVOCATION  
+// ============================================================================
+
+/**
+ * Revoke an agent's credential
+ * Only contract owner or issuer can revoke
+ */
 export circuit revokeAgent(
   caller: Address,
   agentDID: Bytes<32>
