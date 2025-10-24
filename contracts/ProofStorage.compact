@@ -349,48 +349,48 @@ export circuit setVerifier(
     expiresAt: record.metadata.expiresAt,
     isRevoked: record.metadata.isRevoked
   };
-    
-    // Update record
-    const updatedRecord: ProofRecord = {
-      proofId: record.proofId,
-      proofType: record.proofType,
-      agentDID: record.agentDID,
-      timestamp: record.timestamp,
-      proofData: record.proofData,
-      metadata: updatedMetadata,
-      merkleProof: record.merkleProof
-    };
-    
-    proofRecords.set(proofId, updatedRecord);
-  }
+  
+  // Update record
+  let updatedRecord = ProofRecord {
+    proofId: record.proofId,
+    proofType: record.proofType,
+    agentDID: record.agentDID,
+    timestamp: record.timestamp,
+    proofData: record.proofData,
+    metadata: updatedMetadata,
+    merkleProof: record.merkleProof
+  };
+  
+  proofRecords.set(proofId, updatedRecord);
+}
   
   // ============================================================================
   // QUERY FUNCTIONS
   // ============================================================================
   
-  /**
-   * Get storage statistics
-   */
-  public function getStats(): StorageStats {
-    return {
-      totalProofs: totalProofs,
-      totalActions: totalActions,
-      currentMerkleRoot: currentMerkleRoot
-    };
-  }
+struct StorageStats {
+  totalProofs: Uint<64>;
+  totalActions: Uint<64>;
+  currentMerkleRoot: Bytes<32>;
+}
+
+/**
+ * Get storage statistics
+ */
+export circuit getStats(): StorageStats {
+  return StorageStats {
+    totalProofs: totalProofs,
+    totalActions: totalActions,
+    currentMerkleRoot: currentMerkleRoot
+  };
+}
   
-  struct StorageStats {
-    totalProofs: Uint64,
-    totalActions: Uint64,
-    currentMerkleRoot: Bytes<32>
-  }
-  
-  /**
-   * Get current Merkle root for external verification
-   */
-  public function getMerkleRoot(): Bytes<32> {
-    return currentMerkleRoot;
-  }
+/**
+ * Get current Merkle root for external verification
+ */
+export circuit getMerkleRoot(): Bytes<32> {
+  return currentMerkleRoot;
+}
   
   // ============================================================================
   // HELPER FUNCTIONS (Private)
