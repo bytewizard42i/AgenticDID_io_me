@@ -382,6 +382,65 @@ circuit scopesAreSubset(
   return true;  // Placeholder
 }
   
+// ============================================================================
+// EXPORTED CIRCUITS FOR CROSS-CONTRACT CALLS
+// ============================================================================
+
+/**
+ * Check if agent credential is valid
+ * Called by CredentialVerifier for verification
+ * Uses assert() pattern for idiomatic error handling
+ */
+export circuit checkCredential(
+  agentDID: Bytes<32>,
+  currentTime: Uint<64>
+): [] {
+  // Check if agent exists
+  assert(agentCredentials.has(agentDID), "Agent not found");
+  
+  let credential = agentCredentials.get(agentDID);
+  
+  // Validation chain using assert
+  assert(credential.isActive, "Agent not active");
+  assert(credential.expiresAt >= currentTime, "Credential expired");
+  
+  // Check revocation bitmap
+  let agentIndex = getAgentIndex(agentDID);
+  assert(!isRevoked(agentIndex), "Agent revoked");
+  
+  // If we reach here, credential is valid!
+}
+
+/**
+ * Check if delegation is valid
+ * Called by CredentialVerifier for delegation verification
+ */
+export circuit isDelegationValid(
+  userDID: Bytes<32>,
+  agentDID: Bytes<32>,
+  requiredScopes: Bytes<32>,
+  currentTime: Uint<64>
+): [] {
+  // Generate delegation ID
+  let delegationId = hashDelegation(userDID, agentDID, currentTime);
+  
+  // Check if delegation exists
+  assert(delegations.has(delegationId), "Delegation not found");
+  
+  let delegation = delegations.get(delegationId);
+  
+  // Validation chain
+  assert(delegation.isActive, "Delegation not active");
+  assert(delegation.expiresAt >= currentTime, "Delegation expired");
+  assert(scopesAreSubset(requiredScopes, delegation.scopes), "Scope mismatch");
+  
+  // If we reach here, delegation is valid!
+}
+
+// ============================================================================
+// HELPER FUNCTIONS (Private)
+// ============================================================================
+
   /**
    * Helper to create bytes32 from uint8
    */
