@@ -43,14 +43,18 @@
 
 ---
 
-## 📚 Midnight Compact 0.15 Syntax Reference
+## 📚 Midnight Compact 0.26.0 Syntax Reference
+
+**Compiler Version**: compactc_v0.26.0_x86_64-unknown-linux-musl
 
 ### **1. File Header (REQUIRED)**
 
 ```compact
-pragma language_version 0.15;
+pragma language_version 0.26;
 import CompactStandardLibrary;
 ```
+
+**Note**: Language version should match compiler version (0.26 for compactc v0.26.0)
 
 ### **2. Contract Declaration**
 
@@ -223,7 +227,7 @@ Address  // Correct
 
 1. **Add header** (line 1):
 ```compact
-pragma language_version 0.15;
+pragma language_version 0.26;
 import CompactStandardLibrary;
 ```
 
@@ -330,14 +334,17 @@ Same pattern of fixes apply.
 ### **Phase 1: Local Testing (30 min)**
 
 ```bash
+# Compiler version
+# compactc_v0.26.0_x86_64-unknown-linux-musl.zip
+
 # Install Midnight SDK (if not installed)
 npm install @midnight-ntwrk/midnight-js-sdk
 
 # Compile contracts
 cd contracts
-midnight compile AgenticDIDRegistry.compact
-midnight compile CredentialVerifier.compact
-midnight compile ProofStorage.compact
+compactc AgenticDIDRegistry.compact
+compactc CredentialVerifier.compact
+compactc ProofStorage.compact
 
 # Run local tests
 midnight test
@@ -529,7 +536,7 @@ Add:
 - Grand Prize: 30-40% chance ⬆️
 
 **Why?** Real blockchain integration proves:
-- Technical competence
+- Technical competence (using latest Compact 0.26.0)
 - Production viability
 - True innovation
 - Complete vision

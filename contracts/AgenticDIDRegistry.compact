@@ -8,10 +8,11 @@
  * Built for: Google Cloud Run Hackathon + Midnight Network
  * Privacy: Zero-knowledge proofs for agent verification
  * 
- * Compact Version: 0.15
+ * Compact Version: 0.26
+ * Compiler: compactc_v0.26.0_x86_64-unknown-linux-musl
  */
 
-pragma language_version 0.15;
+pragma language_version 0.26;
 import CompactStandardLibrary;
   
 // ============================================================================
