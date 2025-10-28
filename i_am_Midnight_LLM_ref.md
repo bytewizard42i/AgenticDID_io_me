@@ -1116,12 +1116,211 @@ type SparseCompactCellADT = {
 
 ---
 
+### SparseCompactContractAddress
+
+A data structure indicating that the current CompactValue being explored is a contract reference.
+
+```typescript
+type SparseCompactContractAddress = {
+  tag: "contractAddress";
+};
+```
+
+When this type is recognized, the current CompactValue should be a ContractAddress, and the address is added to the dependency set.
+
+---
+
+### SparseCompactListADT
+
+A data structure indicating the locations of all contract references in a Compact List ADT.
+
+```typescript
+type SparseCompactListADT = {
+  tag: "list";
+  valueType: SparseCompactValue;
+};
+```
+
+**Properties**:
+- `tag`: Discriminator tag "list"
+- `valueType`: A data structure indicating the locations of all contract references in a Compact value in the outer List ADT
+
+---
+
+### SparseCompactMapADT
+
+A data structure indicating the locations of all contract references in a Compact Map ADT.
+
+```typescript
+type SparseCompactMapADT = {
+  tag: "map";
+  keyType?: SparseCompactValue;
+  valueType?: SparseCompactADT | SparseCompactValue;
+};
+```
+
+**Properties**:
+- `tag`: Discriminator tag "map"
+- `keyType`: (Optional) A data structure indicating the locations of all contract references in the Compact values that are the keys of the outer Map ADT
+- `valueType`: (Optional) A data structure indicating the locations of all contract references in the Compact entities that are the values of the outer Map ADT. Since the values of a Map ADT may be either Compact values or other Map ADTs, we take the union of the corresponding data structures
+
+---
+
+### SparseCompactSetADT
+
+A data structure indicating the locations of all contract references in a Compact Set ADT.
+
+```typescript
+type SparseCompactSetADT = {
+  tag: "set";
+  valueType: SparseCompactValue;
+};
+```
+
+**Properties**:
+- `tag`: Discriminator tag "set"
+- `valueType`: A data structure indicating the locations of all contract references in a Compact value in the outer Set ADT
+
+---
+
+### SparseCompactStruct
+
+A data structure indicating the locations of contract references in a Compact struct.
+
+```typescript
+type SparseCompactStruct = {
+  tag: "struct";
+  elements: Record<string, SparseCompactType>;
+};
+```
+
+**Properties**:
+- `tag`: Discriminator tag "struct"
+- `elements`: A data structure indicating the locations of contract references in the elements of a Compact struct. The keys of the record correspond to fields of the Compact struct that contain contract references. We use the keys of the record to explore the elements of the corresponding CompactStruct
+
+---
+
+### SparseCompactType
+
+A data structure indicating the locations of contract references in a Compact struct, vector, or (the terminating case) a contract address.
+
+```typescript
+type SparseCompactType = 
+  | SparseCompactVector
+  | SparseCompactStruct
+  | SparseCompactContractAddress;
+```
+
+---
+
+### SparseCompactValue
+
+A data structure indicating the locations of all contract references in a Compact value.
+
+```typescript
+type SparseCompactValue = {
+  tag: "compactValue";
+  descriptor: CompactType<unknown>;
+  sparseType: SparseCompactType;
+};
+```
+
+**Properties**:
+- `tag`: Discriminator tag "compactValue"
+- `descriptor`: A descriptor that can be used to convert an AlignedValue into a TypeScript representation of the same value. This descriptor will only ever decode structs or Vectors that contain contract addresses
+- `sparseType`: A data structure indicating how to navigate to the contract addresses present in the output of the above descriptor
+
+---
+
+### SparseCompactVector
+
+A data structure indicating the locations of contract references in a Compact vector.
+
+```typescript
+type SparseCompactVector = {
+  tag: "vector";
+  sparseType: SparseCompactType;
+};
+```
+
+**Properties**:
+- `tag`: Discriminator tag "vector"
+- `sparseType`: A data structure indicating the locations of contract references in the elements of a Compact vector
+
+---
+
 ### TokenType
 
-A token type identifier, as a hex-encoded 256-bit string.
+A token type (or color), as a hex-encoded 35-byte string.
 
 ```typescript
 type TokenType = string;
+```
+
+---
+
+### Transcript
+
+A transcript of operations and their effects, for inclusion and replay in transactions.
+
+```typescript
+type Transcript = ocrt.Transcript<AlignedValue>;
+```
+
+---
+
+### Value
+
+An onchain data value, in field-aligned binary format.
+
+```typescript
+type Value = Uint8Array[];
+```
+
+---
+
+## Variables
+
+### BooleanDescriptor
+Descriptor for Boolean type.
+
+### Bytes32Descriptor
+Descriptor for Bytes<32> type.
+
+### CoinInfoDescriptor
+Descriptor for CoinInfo type.
+
+### CoinRecipientDescriptor
+Descriptor for coin recipient type.
+
+### ContractAddressDescriptor
+Descriptor for ContractAddress type.
+
+### DUMMY_ADDRESS
+
+⚠️ **DEPRECATED**: Cannot handle NetworkIds, use `dummyContractAddress()` instead.
+
+```typescript
+const DUMMY_ADDRESS: string;
+```
+
+A valid placeholder contract address.
+
+### MAX_FIELD
+
+```typescript
+const MAX_FIELD: bigint;
+```
+
+The maximum value representable in Compact's Field type. One less than the prime modulus of the proof system's scalar field.
+
+### MaxUint8Descriptor
+Descriptor for maximum Uint8 value.
+
+### versionString
+
+```typescript
+const versionString: string = "0.9.0";
 ```
 
 ---
