@@ -24,7 +24,7 @@ ledger delegations: Map<Bytes<32>, Delegation>;
 ledger totalAgents: Uint<64>;
 ledger totalDelegations: Uint<64>;
 ledger contractOwner: ContractAddress;
-ledger revocationBitmap: Uint<256>;  // Bitmap for revoked agents (max 256 agents)
+ledger revocationBitmap: Uint<254>;  // Bitmap for revoked agents (max 256 agents)
   
   // ============================================================================
   // DATA STRUCTURES
@@ -94,7 +94,7 @@ export circuit registerAgent(
 ): [] {
   
   // Security checks (using assert instead of require)
-  assert(!agentCredentials.has(did), "Agent already registered");
+  assert(!agentCredentials.member(did), "Agent already registered");
   assert(expiresAt > currentTime, "Invalid expiration time");
   assert(verifyProofOfOwnership(did, publicKey, zkProof), "Invalid proof");
   
@@ -111,10 +111,10 @@ export circuit registerAgent(
   };
   
   // Store in ledger
-  agentCredentials.set(did, credential);
+  agentCredentials.insert(did, credential);
   
   // Update counter
-  totalAgents = totalAgents + 1;
+  totalAgents = totalAgents + 1 as Uint<64>;
 }
   
   // ============================================================================
@@ -136,11 +136,11 @@ export circuit verifyAgent(
 ): Boolean {
     
     // Check if agent exists (safe map access)
-    if (!agentCredentials.has(agentDID)) {
+    if (!agentCredentials.member(agentDID)) {
       return false;
     }
     
-    const credential = agentCredentials.get(agentDID);
+    const credential = agentCredentials.lookup(agentDID);
     
     // Check expiration
     if (credential.expiresAt < currentTime) {
@@ -166,8 +166,8 @@ export circuit verifyAgent(
  * This is public information needed for ZKP verification
  */
 export circuit getAgentPublicKey(agentDID: Bytes<32>): Bytes<64> {
-  assert(agentCredentials.has(agentDID), "Agent not found");
-  return agentCredentials.get(agentDID).publicKey;
+  assert(agentCredentials.member(agentDID), "Agent not found");
+  return agentCredentials.lookup(agentDID).publicKey;
 }
   
   // ============================================================================
@@ -195,8 +195,8 @@ export circuit createDelegation(
 ): Bytes<32> {
   
   // Verify agent exists and is active
-  assert(agentCredentials.has(agentDID), "Agent not found");
-  const agentCred = agentCredentials.get(agentDID);
+  assert(agentCredentials.member(agentDID), "Agent not found");
+  const agentCred = agentCredentials.lookup(agentDID);
   assert(agentCred.isActive, "Agent is revoked");
   
   // Verify scopes are subset of agent's scopes
@@ -217,10 +217,10 @@ export circuit createDelegation(
   };
   
   // Store delegation
-  delegations.set(delegationId, delegation);
+  delegations.insert(delegationId, delegation);
   
   // Update counter
-  totalDelegations = totalDelegations + 1;
+  totalDelegations = totalDelegations + 1 as Uint<64>;
   
   return delegationId;
 }
@@ -234,11 +234,11 @@ export circuit checkDelegation(
   currentTime: Uint<64>
 ): Boolean {
     
-    if (!delegations.has(delegationId)) {
+    if (!delegations.member(delegationId)) {
       return false;
     }
     
-    const delegation = delegations.get(delegationId);
+    const delegation = delegations.lookup(delegationId);
     
     // Check revocation
     if (delegation.isRevoked) {
@@ -251,11 +251,11 @@ export circuit checkDelegation(
     }
     
     // Check if agent is still active
-    if (!agentCredentials.has(delegation.agentDID)) {
+    if (!agentCredentials.member(delegation.agentDID)) {
       return false;
     }
     
-    const agentCred = agentCredentials.get(delegation.agentDID);
+    const agentCred = agentCredentials.lookup(delegation.agentDID);
     if (!agentCred.isActive) {
       return false;
     }
@@ -272,9 +272,9 @@ export circuit revokeDelegation(
   delegationId: Bytes<32>
 ): [] {
   
-  assert(delegations.has(delegationId), "Delegation not found");
+  assert(delegations.member(delegationId), "Delegation not found");
   
-  const delegation = delegations.get(delegationId);
+  const delegation = delegations.lookup(delegationId);
   assert(!delegation.isRevoked, "Already revoked");
   
   // Update delegation
@@ -288,7 +288,7 @@ export circuit revokeDelegation(
     isRevoked: true
   };
   
-  delegations.set(delegationId, updatedDelegation);
+  delegations.insert(delegationId, updatedDelegation);
 }
   
 // ============================================================================
@@ -304,9 +304,9 @@ export circuit revokeAgent(
   agentDID: Bytes<32>
 ): [] {
   
-  assert(agentCredentials.has(agentDID), "Agent not found");
+  assert(agentCredentials.member(agentDID), "Agent not found");
   
-  const credential = agentCredentials.get(agentDID);
+  const credential = agentCredentials.lookup(agentDID);
   
   // Only owner or issuer can revoke
   assert(
@@ -326,7 +326,7 @@ export circuit revokeAgent(
     isActive: false  // Mark as revoked
   };
   
-  agentCredentials.set(agentDID, updatedCred);
+  agentCredentials.insert(agentDID, updatedCred);
 }
   
   // ============================================================================
@@ -357,7 +357,7 @@ circuit hashProof(
 ): Bytes<32> {
   // Simplified hash function
   // In production: Use proper cryptographic hash
-  return 0x0000000000000000000000000000000000000000000000000000000000000000;  // Placeholder
+  return default<Bytes<32>>;  // Zero-filled placeholder
 }
   
   /**
@@ -369,7 +369,7 @@ circuit hashDelegation(
   timestamp: Uint<64>
 ): Bytes<32> {
   // Simplified hash
-  return 0x0000000000000000000000000000000000000000000000000000000000000000;  // Placeholder
+  return default<Bytes<32>>;  // Zero-filled placeholder
 }
   
   /**
@@ -421,9 +421,9 @@ export circuit checkCredential(
   currentTime: Uint<64>
 ): [] {
   // Check if agent exists
-  assert(agentCredentials.has(agentDID), "Agent not found");
+  assert(agentCredentials.member(agentDID), "Agent not found");
   
-  const credential = agentCredentials.get(agentDID);
+  const credential = agentCredentials.lookup(agentDID);
   
   // Validation chain using assert
   assert(credential.isActive, "Agent not active");
@@ -450,9 +450,9 @@ export circuit isDelegationValid(
   const delegationId = hashDelegation(userDID, agentDID, currentTime);
   
   // Check if delegation exists
-  assert(delegations.has(delegationId), "Delegation not found");
+  assert(delegations.member(delegationId), "Delegation not found");
   
-  const delegation = delegations.get(delegationId);
+  const delegation = delegations.lookup(delegationId);
   
   // Validation chain
   assert(!delegation.isRevoked, "Delegation not active");

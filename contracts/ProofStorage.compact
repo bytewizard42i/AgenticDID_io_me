@@ -76,7 +76,7 @@ constructor(owner: ContractAddress) {
   contractOwner = owner;
   totalProofs = 0;
   totalActions = 0;
-  currentMerkleRoot = 0x0000000000000000000000000000000000000000000000000000000000000000;
+  currentMerkleRoot = default<Bytes<32>>;
 }
   
   // ============================================================================
@@ -113,7 +113,7 @@ export circuit storeProof(
   const proofId = hashProofId(agentDID, proofType, currentTime);
   
   // Check proof doesn't already exist
-  assert(!proofRecords.has(proofId), "Proof already exists");
+  assert(!proofRecords.member(proofId), "Proof already exists");
   
   // Create metadata
   const metadata = ProofMetadata {
@@ -138,13 +138,13 @@ export circuit storeProof(
   };
   
   // Store proof
-  proofRecords.set(proofId, record);
+  proofRecords.insert(proofId, record);
   
   // Update merkle root
   currentMerkleRoot = updateMerkleRoot(currentMerkleRoot, proofId);
   
   // Update counter
-  totalProofs = totalProofs + 1;
+  totalProofs = totalProofs + 1 as Uint<64>;
   
   return proofId;
 }
@@ -158,9 +158,9 @@ export circuit getProof(
   proofId: Bytes<32>
 ): ProofRecord {
   
-  assert(proofRecords.has(proofId), "Proof not found");
+  assert(proofRecords.member(proofId), "Proof not found");
   
-  const record = proofRecords.get(proofId);
+  const record = proofRecords.lookup(proofId);
   
   // Check authorization (simplified)
   assert(
@@ -180,11 +180,11 @@ export circuit verifyProof(
   currentTime: Uint<64>
 ): Boolean {
   
-  if (!proofRecords.has(proofId)) {
+  if (!proofRecords.member(proofId)) {
     return false;
   }
   
-  const record = proofRecords.get(proofId);
+  const record = proofRecords.lookup(proofId);
   
   // Check revocation
   if (record.metadata.isRevoked) {
@@ -237,10 +237,10 @@ export circuit logAction(
   };
   
   // Store action
-  agentActions.set(actionId, action);
+  agentActions.insert(actionId, action);
   
   // Update counter
-  totalActions = totalActions + 1;
+  totalActions = totalActions + 1 as Uint<64>;
   
   return actionId;
 }
@@ -249,8 +249,8 @@ export circuit logAction(
  * Get action log for audit
  */
 export circuit getActionLog(actionId: Bytes<32>): ActionLog {
-  assert(agentActions.has(actionId), "Action not found");
-  return agentActions.get(actionId);
+  assert(agentActions.member(actionId), "Action not found");
+  return agentActions.lookup(actionId);
 }
   
   // ============================================================================
@@ -268,7 +268,7 @@ export circuit generateReceipt(
   txHash: Bytes<32>
 ): Receipt {
   
-  assert(proofRecords.has(proofId), "Proof not found");
+  assert(proofRecords.member(proofId), "Proof not found");
   
   // Generate receipt ID
   const receiptId = hashReceiptId(proofId, blockNumber);
@@ -297,9 +297,9 @@ export circuit revokeProof(
   proofId: Bytes<32>
 ): [] {
   
-  assert(proofRecords.has(proofId), "Proof not found");
+  assert(proofRecords.member(proofId), "Proof not found");
   
-  const record = proofRecords.get(proofId);
+  const record = proofRecords.lookup(proofId);
   
   // Only issuer can revoke
   assert(caller == record.metadata.issuer, "Not authorized");
@@ -323,7 +323,7 @@ export circuit revokeProof(
     merkleProof: record.merkleProof
   };
   
-  proofRecords.set(proofId, updatedRecord);
+  proofRecords.insert(proofId, updatedRecord);
 }
   
 /**
@@ -335,9 +335,9 @@ export circuit setVerifier(
   newVerifier: ContractAddress
 ): [] {
   
-  assert(proofRecords.has(proofId), "Proof not found");
+  assert(proofRecords.member(proofId), "Proof not found");
   
-  const record = proofRecords.get(proofId);
+  const record = proofRecords.lookup(proofId);
   
   assert(caller == record.metadata.issuer, "Not authorized");
   
@@ -360,7 +360,7 @@ export circuit setVerifier(
     merkleProof: record.merkleProof
   };
   
-  proofRecords.set(proofId, updatedRecord);
+  proofRecords.insert(proofId, updatedRecord);
 }
   
   // ============================================================================
@@ -405,7 +405,7 @@ circuit hashProofId(
 ): Bytes<32> {
   // Simplified hash
   // In production: Use proper cryptographic hash
-  return 0x0000000000000000000000000000000000000000000000000000000000000000;
+  return default<Bytes<32>>;
 }
   
 /**
@@ -416,7 +416,7 @@ circuit hashActionId(
   actionType: Bytes<32>,
   timestamp: Uint<64>
 ): Bytes<32> {
-  return 0x0000000000000000000000000000000000000000000000000000000000000000;
+  return default<Bytes<32>>;
 }
   
 /**
@@ -426,7 +426,7 @@ circuit hashReceiptId(
   proofId: Bytes<32>,
   blockNumber: Uint<64>
 ): Bytes<32> {
-  return 0x0000000000000000000000000000000000000000000000000000000000000000;
+  return default<Bytes<32>>;
 }
   
 /**
@@ -439,8 +439,7 @@ circuit generateMerkleProof(
 ): Bytes<256> {
   // Placeholder - simplified for compatibility
   // In production: Generate actual Merkle proof path
-  // Return proofId extended to 256 bytes (simplified)
-  return proofId as Bytes<256>;
+  return default<Bytes<256>>;
 }
   
 /**
@@ -452,7 +451,7 @@ circuit updateMerkleRoot(
 ): Bytes<32> {
   // Simplified root update
   // In production: Proper Merkle root calculation
-  return 0x0000000000000000000000000000000000000000000000000000000000000001;  // Placeholder
+  return default<Bytes<32>>;  // Placeholder
 }
 /**
  * Verify a merkle proof
