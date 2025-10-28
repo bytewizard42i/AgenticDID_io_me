@@ -715,6 +715,170 @@ class ProofErasedOutput {
 
 ---
 
+### ProofErasedTransaction
+
+Transaction with all proof information erased.
+
+```typescript
+class ProofErasedTransaction {
+  private constructor();
+  
+  readonly guaranteedCoins: undefined | ProofErasedOffer;     // Guaranteed Zswap offer
+  readonly fallibleCoins: undefined | ProofErasedOffer;       // Fallible Zswap offer
+  readonly contractCalls: ContractAction[];                   // Contract interactions
+  readonly mint: undefined | ProofErasedAuthorizedMint;       // Mint (if applicable)
+  
+  // Transaction analysis
+  fees(params: LedgerParameters): bigint;
+  identifiers(): string[];
+  imbalances(guaranteed: boolean, fees?: bigint): Map<string, bigint>;
+  wellFormed(ref_state: LedgerState, strictness: WellFormedStrictness): void;
+  
+  // Transaction operations
+  merge(other: ProofErasedTransaction): ProofErasedTransaction;
+  
+  // Serialization
+  serialize(netid: NetworkId): Uint8Array;
+  toString(compact?: boolean): string;
+  
+  static deserialize(raw: Uint8Array, netid: NetworkId): ProofErasedTransaction;
+}
+```
+
+**Description**:
+Primarily for use in testing, or handling data known to be correct from external information.
+
+**Properties**:
+- `guaranteedCoins`: The guaranteed Zswap offer
+- `fallibleCoins`: The fallible Zswap offer
+- `contractCalls`: The contract interactions contained in this transaction
+- `mint`: The mint this transaction represents, if applicable
+
+**Methods**:
+- `fees()`: The cost of this transaction, in the atomic unit of the base token
+- `identifiers()`: Returns the set of identifiers. Any may be used to watch for this transaction
+- `imbalances()`: For given fees and section (guaranteed/fallible), the surplus or deficit in any token type
+- `wellFormed()`: Tests well-formedness criteria, optionally including transaction balancing (doesn't check proofs). Throws if not well-formed
+- `merge()`: Merges this transaction with another. Throws if both have contract interactions or spend same coins
+
+---
+
+### ProofErasedTransient
+
+A Transient with all proof information erased.
+
+```typescript
+class ProofErasedTransient {
+  private constructor();
+  
+  readonly commitment: string;                      // Commitment of the transient
+  readonly nullifier: string;                       // Nullifier of the transient
+  readonly contractAddress: undefined | string;     // Contract address (if applicable)
+  
+  serialize(netid: NetworkId): Uint8Array;
+  toString(compact?: boolean): string;
+  
+  static deserialize(raw: Uint8Array, netid: NetworkId): ProofErasedTransient;
+}
+```
+
+**Properties**:
+- `commitment`: The commitment of the transient
+- `nullifier`: The nullifier of the transient
+- `contractAddress`: The contract address creating the transient, if applicable
+
+**Usage**: Primarily for use in testing, or handling data known to be correct from external information.
+
+---
+
+### QueryContext
+
+Provides the information needed to fully process a transaction, including information about the rest of the transaction and the state of the chain at the time of execution.
+
+```typescript
+class QueryContext {
+  constructor(state: StateValue, address: string);  // Basic context from state and address
+  
+  readonly address: string;                         // Contract address
+  block: BlockContext;                              // Block-level information
+  readonly state: StateValue;                       // Current contract state
+  readonly comIndicies: Map<string, bigint>;        // Commitment indices map
+  effects: Effects;                                 // Effects during execution
+  
+  // Commitment management
+  insertCommitment(comm: string, index: bigint): QueryContext;
+  qualify(coin: Value): undefined | Value;  // Internal
+  
+  // Transaction operations
+  query(ops: Op<null>[], cost_model: CostModel, gas_limit?: bigint): QueryResults;
+  runTranscript(transcript: Transcript<AlignedValue>, cost_model: CostModel): QueryContext;
+  
+  /** @deprecated Use ledger's partitionTranscripts instead */
+  intoTranscript(program: Op<AlignedValue>[], cost_model: CostModel): 
+    [undefined | Transcript<AlignedValue>, undefined | Transcript<AlignedValue>];
+  
+  toString(compact?: boolean): string;
+}
+```
+
+**Properties**:
+- `address`: The address of the contract
+- `block`: The block-level information accessible to the contract
+- `state`: The current contract state retained in the context
+- `comIndicies`: The commitment indices map accessible to the contract, primarily via qualify
+- `effects`: The effects that occurred during execution, should match those declared in a Transcript
+
+**Methods**:
+- `insertCommitment()`: Register a coin commitment at a specific index, for receiving coins in-contract
+- `qualify()`: Internal - upgrades CoinInfo to QualifiedCoinInfo using inserted commitments
+- `query()`: Runs operations in gather mode, returns results
+- `runTranscript()`: Runs transcript in verifying mode, outputs new context with updated state and effects
+- `intoTranscript()`: ⚠️ Deprecated - use ledger's partitionTranscripts instead
+
+---
+
+### QueryResults
+
+The results of making a query against a specific state or context.
+
+```typescript
+class QueryResults {
+  private constructor();
+  
+  readonly context: QueryContext;        // Context state after query
+  readonly events: GatherResult[];       // Events/results during query
+  readonly gasCost: bigint;              // Measured cost of query
+  
+  toString(compact?: boolean): string;
+}
+```
+
+**Properties**:
+- `context`: The context state after executing the query (can be used to execute further queries)
+- `events`: Any events/results that occurred during or from the query
+- `gasCost`: The measured cost of executing the query
+
+---
+
+### ReplaceAuthority
+
+An update instruction to replace the current contract maintenance authority with a new one.
+
+```typescript
+class ReplaceAuthority {
+  constructor(authority: ContractMaintenanceAuthority);
+  
+  readonly authority: ContractMaintenanceAuthority;
+  
+  toString(compact?: boolean): string;
+}
+```
+
+**Description**:
+Used in conjunction with MaintenanceUpdate to change the governance structure of a contract.
+
+---
+
 ### LocalState
 
 The local state of a user/wallet, consisting of their secret key and a set of unspent coins.
