@@ -545,13 +545,42 @@ interface CurvePoint {
 
 ### EncodedCoinInfo
 
-Compact's CoinInfo TypeScript representation.
+A CoinInfo with its fields encoded as byte strings. This representation is used internally by the contract executable.
 
 ```typescript
 interface EncodedCoinInfo {
-  nonce: Uint8Array;
-  color: Uint8Array;
-  value: bigint;
+  readonly nonce: Uint8Array;      // Coin's randomness, prevents collisions
+  readonly color: Uint8Array;      // Coin's type, identifies currency
+  readonly value: bigint;          // Coin's value in atomic units (64-bit)
+}
+```
+
+**Properties**:
+- `nonce`: The coin's randomness, preventing it from colliding with other coins
+- `color`: The coin's type, identifying the currency it represents
+- `value`: The coin's value, in atomic units dependent on the currency. Bounded to be a non-negative 64-bit integer
+
+---
+
+### EncodedCoinPublicKey
+
+A CoinPublicKey encoded as a byte string. This representation is used internally by the contract executable.
+
+```typescript
+interface EncodedCoinPublicKey {
+  readonly bytes: Uint8Array;      // The coin public key's bytes
+}
+```
+
+---
+
+### EncodedContractAddress
+
+A ContractAddress encoded as a byte string. This representation is used internally by the contract executable.
+
+```typescript
+interface EncodedContractAddress {
+  readonly bytes: Uint8Array;      // The contract address's bytes
 }
 ```
 
@@ -559,37 +588,75 @@ interface EncodedCoinInfo {
 
 ### EncodedQualifiedCoinInfo
 
-Compact's QualifiedCoinInfo TypeScript representation.
+A QualifiedCoinInfo with its fields encoded as byte strings. This representation is used internally by the contract executable.
 
 ```typescript
 interface EncodedQualifiedCoinInfo {
-  nonce: Uint8Array;
-  color: Uint8Array;
-  value: bigint;
-  mt_index: bigint;
+  readonly nonce: Uint8Array;      // Coin's randomness, prevents collisions
+  readonly color: Uint8Array;      // Coin's type, identifies currency
+  readonly value: bigint;          // Coin's value in atomic units (64-bit)
+  readonly mt_index: bigint;       // Coin's Merkle tree location (64-bit)
 }
 ```
+
+**Properties**:
+- `nonce`: The coin's randomness, preventing it from colliding with other coins
+- `color`: The coin's type, identifying the currency it represents
+- `value`: The coin's value, in atomic units dependent on the currency. Bounded to be a non-negative 64-bit integer
+- `mt_index`: The coin's location in the chain's Merkle tree of coin commitments. Bounded to be a non-negative 64-bit integer
 
 ---
 
 ### EncodedRecipient
 
-Encoded recipient (coin public key or contract address).
+A Recipient with its fields encoded as byte strings. This representation is used internally by the contract executable.
 
 ```typescript
 interface EncodedRecipient {
-  coinPublicKey?: Uint8Array;
-  contractAddress?: Uint8Array;
+  readonly is_left: boolean;                    // User or contract?
+  readonly left: EncodedCoinPublicKey;          // Recipient's public key (if user)
+  readonly right: EncodedContractAddress;       // Recipient's address (if contract)
 }
 ```
+
+**Properties**:
+- `is_left`: Whether the recipient is a user or a contract
+- `left`: The recipient's public key, if the recipient is a user
+- `right`: The recipient's contract address, if the recipient is a contract
+
+---
+
+### EncodedZswapLocalState
+
+Tracks the coins consumed and produced throughout circuit execution.
+
+```typescript
+interface EncodedZswapLocalState {
+  coinPublicKey: EncodedCoinPublicKey;          // User's Zswap public key
+  currentIndex: bigint;                         // Next coin's Merkle tree index
+  inputs: EncodedQualifiedCoinInfo[];           // Coins consumed as inputs
+  outputs: {                                     // Coins produced as outputs
+    coinInfo: EncodedCoinInfo;
+    recipient: EncodedRecipient;
+  }[];
+}
+```
+
+**Properties**:
+- `coinPublicKey`: The Zswap coin public key of the user executing the circuit
+- `currentIndex`: The Merkle tree index of the next coin produced
+- `inputs`: The coins consumed as inputs to the circuit
+- `outputs`: The coins produced as outputs from the circuit
 
 ---
 
 ### MerkleTreeDigest
 
+The hash value of a Merkle tree. TypeScript representation of the Compact type of the same name.
+
 ```typescript
 interface MerkleTreeDigest {
-  field: bigint;
+  readonly field: bigint;
 }
 ```
 
@@ -597,10 +664,12 @@ interface MerkleTreeDigest {
 
 ### MerkleTreePath<a>
 
+A path demonstrating inclusion in a Merkle tree. TypeScript representation of the Compact type of the same name.
+
 ```typescript
 interface MerkleTreePath<a> {
-  leaf: a;
-  path: MerkleTreePathEntry[];
+  readonly leaf: a;
+  readonly path: MerkleTreePathEntry[];
 }
 ```
 
@@ -608,10 +677,12 @@ interface MerkleTreePath<a> {
 
 ### MerkleTreePathEntry
 
+An entry in a Merkle path. TypeScript representation of the Compact type of the same name.
+
 ```typescript
 interface MerkleTreePathEntry {
-  sibling: MerkleTreeDigest;
-  goesLeft: boolean;
+  readonly sibling: MerkleTreeDigest;
+  readonly goes_left: boolean;
 }
 ```
 
@@ -619,53 +690,326 @@ interface MerkleTreePathEntry {
 
 ### ProofData
 
-Data required to prove circuit execution.
+Encapsulates the data required to produce a zero-knowledge proof.
 
 ```typescript
 interface ProofData {
-  publicInputs: bigint[];
-  proof: Uint8Array;
+  input: AlignedValue;                          // Circuit inputs
+  output: AlignedValue;                         // Circuit outputs
+  privateTranscriptOutputs: AlignedValue[];     // Witness call outputs
+  publicTranscript: Op<AlignedValue>[];         // Public operations transcript
 }
 ```
+
+**Properties**:
+- `input`: The inputs to a circuit
+- `output`: The outputs from a circuit
+- `privateTranscriptOutputs`: The transcript of the witness call outputs
+- `publicTranscript`: The public transcript of operations
 
 ---
 
 ### Recipient
 
-Decoded recipient.
+The recipient of a coin produced by a circuit.
 
 ```typescript
 interface Recipient {
-  coinPublicKey?: string;
-  contractAddress?: string;
+  readonly is_left: boolean;      // User or contract?
+  readonly left: string;          // Recipient's public key (if user)
+  readonly right: string;         // Recipient's address (if contract)
 }
 ```
+
+**Properties**:
+- `is_left`: Whether the recipient is a user or a contract
+- `left`: The recipient's public key, if the recipient is a user
+- `right`: The recipient's contract address, if the recipient is a contract
 
 ---
 
 ### WitnessContext<L, T>
 
-Context for witness execution.
+The external information accessible from within a Compact witness call.
 
 ```typescript
 interface WitnessContext<L, T> {
-  ledger: L;
-  privateState: T;
-  contractAddress: string;
+  readonly ledger: L;                 // Projected ledger state
+  readonly privateState: T;            // Current private state
+  readonly contractAddress: string;    // Contract being called
 }
 ```
+
+**Properties**:
+- `ledger`: The projected ledger state, if the transaction were to run against the ledger state as you locally see it currently
+- `privateState`: The current private state for the contract
+- `contractAddress`: The address of the contract being called
 
 ---
 
 ### ZswapLocalState
 
-Local Zswap state.
+Tracks the coins consumed and produced throughout circuit execution.
 
 ```typescript
 interface ZswapLocalState {
-  inputs: QualifiedCoinInfo[];
-  outputs: { coin: CoinInfo; recipient: Recipient }[];
+  coinPublicKey: string;                // User's Zswap public key
+  currentIndex: bigint;                  // Next coin's Merkle tree index
+  inputs: QualifiedCoinInfo[];          // Coins consumed as inputs
+  outputs: {                             // Coins produced as outputs
+    coinInfo: CoinInfo;
+    recipient: Recipient;
+  }[];
 }
+```
+
+**Properties**:
+- `coinPublicKey`: The Zswap coin public key of the user executing the circuit
+- `currentIndex`: The Merkle tree index of the next coin produced
+- `inputs`: The coins consumed as inputs to the circuit
+- `outputs`: The coins produced as outputs from the circuit
+
+---
+
+## Type Aliases
+
+### AlignedValue
+
+An onchain data value, in field-aligned binary format, annotated with its alignment.
+
+```typescript
+type AlignedValue = {
+  alignment: Alignment;
+  value: Value;
+};
+```
+
+---
+
+### Alignment
+
+The alignment of an onchain field-aligned binary data value.
+
+```typescript
+type Alignment = AlignmentSegment[];
+```
+
+---
+
+### AlignmentAtom
+
+An atom in a larger Alignment.
+
+```typescript
+type AlignmentAtom = 
+  | { tag: "compress"; }
+  | { tag: "field"; }
+  | { tag: "bytes"; length: number; };
+```
+
+---
+
+### AlignmentSegment
+
+A segment in a larger Alignment.
+
+```typescript
+type AlignmentSegment = 
+  | { tag: "option"; value: Alignment[]; }
+  | { tag: "atom"; value: AlignmentAtom; };
+```
+
+---
+
+### BlockContext
+
+The context information about a block available inside the VM.
+
+```typescript
+type BlockContext = {
+  blockHash: string;                  // Hex-encoded block hash
+  secondsSinceEpoch: bigint;          // Seconds since UNIX epoch
+  secondsSinceEpochErr: number;       // Maximum error (positive seconds)
+};
+```
+
+**Properties**:
+- `blockHash`: The hash of the block prior to this transaction, as a hex-encoded string
+- `secondsSinceEpoch`: The seconds since the UNIX epoch that have elapsed
+- `secondsSinceEpochErr`: The maximum error on secondsSinceEpoch that should occur, as a positive seconds value
+
+---
+
+### CoinCommitment
+
+A Zswap coin commitment, as a hex-encoded 256-bit bitstring.
+
+```typescript
+type CoinCommitment = string;
+```
+
+---
+
+### CoinInfo
+
+Information required to create a new coin, alongside details about the recipient.
+
+```typescript
+type CoinInfo = {
+  nonce: Nonce;           // Coin's randomness (prevents collisions)
+  type: TokenType;        // Coin's type (identifies currency)
+  value: bigint;          // Coin's value in atomic units (64-bit)
+};
+```
+
+**Properties**:
+- `nonce`: The coin's randomness, preventing it from colliding with other coins
+- `type`: The coin's type, identifying the currency it represents
+- `value`: The coin's value, in atomic units dependent on the currency. Bounded to be a non-negative 64-bit integer
+
+---
+
+### CoinPublicKey
+
+A user public key capable of receiving Zswap coins, as a hex-encoded 35-byte string.
+
+```typescript
+type CoinPublicKey = string;
+```
+
+---
+
+### ContractAddress
+
+A contract address, as a hex-encoded 35-byte string.
+
+```typescript
+type ContractAddress = string;
+```
+
+---
+
+### ContractReferenceLocations
+
+A data structure indicating the locations of all contract references in a given ledger state.
+
+```typescript
+type ContractReferenceLocations = EmptyPublicLedger | PublicLedgerSegments;
+```
+
+If it is a `EmptyPublicLedger`, then no contract references are present in the ledger state. If it is a `PublicLedgerSegments`, then contract references are present and can be extracted using `contractDependencies`.
+
+---
+
+### DomainSeperator
+
+A token domain separator, the pre-stage of TokenType, as 32-byte bytearray.
+
+```typescript
+type DomainSeperator = Uint8Array;
+```
+
+---
+
+### Effects
+
+The contract-external effects of a transcript.
+
+```typescript
+type Effects = {
+  claimedNullifiers: Nullifier[];                          // Spends required
+  claimedReceives: CoinCommitment[];                       // Outputs as receives
+  claimedSpends: CoinCommitment[];                         // Outputs as sends
+  claimedContractCalls: [bigint, ContractAddress, string, Fr][];  // Calls made
+  mints: Map<string, bigint>;                              // Tokens minted
+};
+```
+
+**Properties**:
+- `claimedNullifiers`: The nullifiers (spends) this contract call requires
+- `claimedReceives`: The coin commitments (outputs) this contract call requires, as coins received
+- `claimedSpends`: The coin commitments (outputs) this contract call requires, as coins sent
+- `claimedContractCalls`: The contracts called from this contract. The values are, in order:
+  - The sequence number of this call
+  - The contract being called
+  - The entry point being called
+  - The communications commitment
+- `mints`: The tokens minted in this call, as a map from hex-encoded 256-bit domain separators to non-negative 64-bit integers
+
+---
+
+### Fr
+
+An internal encoding of a value of the proof system's scalar field.
+
+```typescript
+type Fr = Uint8Array;
+```
+
+---
+
+### GatherResult
+
+An individual result of observing the results of a non-verifying VM program execution.
+
+```typescript
+type GatherResult = 
+  | { tag: "read"; content: AlignedValue; }
+  | { tag: "log"; content: EncodedStateValue; };
+```
+
+---
+
+### Key
+
+A key used to index into an array or map in the onchain VM.
+
+```typescript
+type Key = 
+  | { tag: "value"; value: AlignedValue; }
+  | { tag: "stack"; };
+```
+
+---
+
+### Nonce
+
+A Zswap nonce, as a hex-encoded 256-bit string.
+
+```typescript
+type Nonce = string;
+```
+
+---
+
+### Nullifier
+
+A Zswap nullifier (prevents double-spend).
+
+```typescript
+type Nullifier = string;
+```
+
+---
+
+### QualifiedCoinInfo
+
+Extended coin information including Merkle tree location.
+
+```typescript
+type QualifiedCoinInfo = CoinInfo & {
+  mt_index: bigint;       // Merkle tree index (64-bit)
+};
+```
+
+---
+
+### TokenType
+
+A token type identifier, as a hex-encoded 256-bit string.
+
+```typescript
+type TokenType = string;
 ```
 
 ---
