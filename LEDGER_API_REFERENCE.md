@@ -424,6 +424,143 @@ const costModel = params.transactionCostModel;
 
 ---
 
+### LedgerState
+
+The state of the Midnight ledger.
+
+```typescript
+class LedgerState {
+  constructor(zswap: ZswapChainState);  // Initialize from Zswap state with empty contracts
+  
+  readonly zswap: ZswapChainState;                  // Zswap part of ledger state
+  readonly unmintedNativeTokenSupply: bigint;       // Remaining unminted native tokens
+  
+  // Transaction application
+  apply(transaction: ProofErasedTransaction, context: TransactionContext): 
+    [LedgerState, TransactionResult];
+  applySystemTx(transaction: SystemTransaction): LedgerState;
+  
+  // Contract state management
+  index(address: string): undefined | ContractState;
+  updateIndex(address: string, context: QueryContext): LedgerState;
+  
+  // Treasury and minting
+  treasuryBalance(token_type: string): bigint;
+  unclaimedMints(recipient: string, token_type: string): bigint;
+  
+  // Serialization
+  serialize(netid: NetworkId): Uint8Array;
+  toString(compact?: boolean): string;
+  
+  static blank(): LedgerState;  // Fully blank state
+  static deserialize(raw: Uint8Array, netid: NetworkId): LedgerState;
+}
+```
+
+**Constructor**:
+- Initializes from a Zswap state, with an empty contract set
+
+**Properties**:
+- `zswap`: The Zswap part of the ledger state
+- `unmintedNativeTokenSupply`: The remaining unminted supply of native tokens
+
+**Methods**:
+- `apply()`: Applies a ProofErasedTransaction, returns new state and result
+- `applySystemTx()`: Applies a system transaction to this ledger state
+- `index()`: Indexes into the contract state map with a given contract address
+- `updateIndex()`: Sets the state of a given contract address from a QueryContext
+- `treasuryBalance()`: Retrieves the balance of the treasury for a specific token type
+- `unclaimedMints()`: How much in minting rewards a recipient is owed and can claim
+- `serialize()`: Serialize state for network transmission
+- `toString()`: Human-readable string representation
+- `blank()`: Static method to create a fully blank state
+- `deserialize()`: Deserialize from bytes
+
+---
+
+### LocalState
+
+The local state of a user/wallet, consisting of their secret key and a set of unspent coins.
+
+```typescript
+class LocalState {
+  constructor();  // Creates new state with randomly sampled secret key
+  
+  readonly coinPublicKey: string;                            // Wallet's coin public key
+  readonly encryptionPublicKey: string;                      // Wallet's encryption public key
+  readonly coins: Set<QualifiedCoinInfo>;                    // Spendable coins
+  readonly firstFree: bigint;                                // First free Merkle tree index
+  readonly pendingOutputs: Map<string, CoinInfo>;            // Expected outputs
+  readonly pendingSpends: Map<string, QualifiedCoinInfo>;    // Expected spends
+  
+  // Transaction application
+  apply(offer: Offer): LocalState;
+  applyProofErased(offer: ProofErasedOffer): LocalState;
+  applyTx(tx: Transaction, res: "success" | "partialSuccess" | "failure"): LocalState;
+  applyProofErasedTx(tx: ProofErasedTransaction, res: "success" | "partialSuccess" | "failure"): LocalState;
+  applySystemTx(tx: SystemTransaction): LocalState;
+  
+  // Failed transaction handling
+  applyFailed(offer: Offer): LocalState;
+  applyFailedProofErased(offer: ProofErasedOffer): LocalState;
+  
+  // Merkle tree updates
+  applyCollapsedUpdate(update: MerkleTreeCollapsedUpdate): LocalState;
+  
+  // Spending coins
+  spend(coin: QualifiedCoinInfo): [LocalState, UnprovenInput];
+  spendFromOutput(coin: QualifiedCoinInfo, output: UnprovenOutput): [LocalState, UnprovenTransient];
+  
+  // Watching for coins
+  watchFor(coin: CoinInfo): LocalState;
+  
+  // Secret key access
+  yesIKnowTheSecurityImplicationsOfThis_encryptionSecretKey(): EncryptionSecretKey;
+  
+  // Serialization
+  serialize(netid: NetworkId): Uint8Array;
+  toString(compact?: boolean): string;
+  
+  static fromSeed(seed: Uint8Array): LocalState;  // From recovery phrase/seed
+  static deserialize(raw: Uint8Array, netid: NetworkId): LocalState;
+}
+```
+
+**Description**:
+The local state keeps track of:
+- Coins that are in-flight (expecting to spend or receive)
+- A local copy of the global coin commitment Merkle tree to generate proofs
+
+**Properties**:
+- `coinPublicKey`: The coin public key of this wallet
+- `encryptionPublicKey`: The encryption public key of this wallet
+- `coins`: The set of spendable coins of this wallet
+- `firstFree`: The first free index in the internal coin commitments Merkle tree (identifies which updates are necessary)
+- `pendingOutputs`: The outputs that this wallet is expecting to receive in the future
+- `pendingSpends`: The spends that this wallet is expecting to be finalized on-chain
+
+**Key Methods**:
+- `apply()`: Locally applies an offer to the current state
+- `applyProofErased()`: Locally applies a proof-erased offer
+- `applyTx()`: Locally applies a transaction with result status
+- `applyFailed()`: Marks an offer as failed, allowing inputs to be spendable again
+- `applyCollapsedUpdate()`: Fast forwards through Merkle tree indices
+- `spend()`: Initiates a spend of a specific coin, returns UnprovenInput
+- `spendFromOutput()`: Spends a not-yet-received output, returns UnprovenTransient
+- `watchFor()`: Adds a coin to the expected-to-receive list
+- `yesIKnowTheSecurityImplicationsOfThis_encryptionSecretKey()`: ⚠️ Access encryption secret key
+- `fromSeed()`: Creates state from recovery seed
+
+**Merkle Tree Update Flow**:
+1. Find where you left off (`firstFree`)
+2. Find where you're going (ask for remote `firstFree`)
+3. Filter entries you care about
+4. In order of Merkle tree indices:
+   - Insert (with `apply`) offers you care about
+   - Skip sections you don't care about (with `applyCollapsedUpdate`)
+
+---
+
 ## Network Configuration
 
 ### setNetworkId()
