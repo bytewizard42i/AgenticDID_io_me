@@ -30,6 +30,226 @@ npm install @midnight-ntwrk/ledger
 
 ---
 
+## API Classes
+
+### AuthorizedMint
+
+A request to mint a coin, authorized by the mint's recipient.
+
+```typescript
+class AuthorizedMint {
+  private constructor();
+  
+  readonly coin: CoinInfo;          // The coin to be minted
+  readonly recipient: string;        // The recipient of this mint
+  
+  erase_proof(): ProofErasedAuthorizedMint;
+  serialize(netid: NetworkId): Uint8Array;
+  toString(compact?: boolean): string;
+  
+  static deserialize(raw: Uint8Array, netid: NetworkId): AuthorizedMint;
+}
+```
+
+**Properties**:
+- `coin`: The coin to be minted
+- `recipient`: The recipient of this mint
+
+**Methods**:
+- `erase_proof()`: Returns proof-erased version for testing
+- `serialize()`: Serialize to bytes for network transmission
+- `toString()`: Human-readable string representation
+- `deserialize()`: Deserialize from bytes
+
+---
+
+### ContractCall
+
+A single contract call segment.
+
+```typescript
+class ContractCall {
+  private constructor();
+  
+  readonly address: string;                                      // Address being called
+  readonly entryPoint: string | Uint8Array;                      // Entry point being called
+  readonly guaranteedTranscript: undefined | Transcript<AlignedValue>;  // Guaranteed stage
+  readonly fallibleTranscript: undefined | Transcript<AlignedValue>;    // Fallible stage
+  readonly communicationCommitment: string;                      // Communication commitment
+  
+  toString(compact?: boolean): string;
+}
+```
+
+**Properties**:
+- `address`: The address being called
+- `entryPoint`: The entry point being called
+- `guaranteedTranscript`: The guaranteed execution stage transcript
+- `fallibleTranscript`: The fallible execution stage transcript
+- `communicationCommitment`: The communication commitment of this call
+
+---
+
+### ContractCallPrototype
+
+A ContractCall still being assembled.
+
+```typescript
+class ContractCallPrototype {
+  constructor(
+    address: string,                                              // Address being called
+    entry_point: string | Uint8Array,                            // Entry point being called
+    op: ContractOperation,                                        // Expected operation
+    guaranteed_public_transcript: undefined | Transcript<AlignedValue>,  // Guaranteed transcript
+    fallible_public_transcript: undefined | Transcript<AlignedValue>,    // Fallible transcript
+    private_transcript_outputs: AlignedValue[],                  // Private transcript outputs
+    input: AlignedValue,                                          // Input(s) provided
+    output: AlignedValue,                                         // Output(s) computed
+    communication_commitment_rand: string,                        // Communication randomness
+    key_location: string                                          // Key lookup identifier
+  );
+  
+  toString(compact?: boolean): string;
+}
+```
+
+**Parameters**:
+- `address`: The address being called
+- `entry_point`: The entry point being called
+- `op`: The operation expected at this entry point
+- `guaranteed_public_transcript`: The guaranteed transcript computed for this call
+- `fallible_public_transcript`: The fallible transcript computed for this call
+- `private_transcript_outputs`: The private transcript recorded for this call
+- `input`: The input(s) provided to this call
+- `output`: The output(s) computed from this call
+- `communication_commitment_rand`: The communication randomness used for this call
+- `key_location`: An identifier for how the key for this call may be looked up
+
+---
+
+### ContractCallsPrototype
+
+An atomic collection of ContractActions, which may interact with each other.
+
+```typescript
+class ContractCallsPrototype {
+  constructor();
+  
+  addCall(call: ContractCallPrototype): ContractCallsPrototype;
+  addDeploy(deploy: ContractDeploy): ContractCallsPrototype;
+  addMaintenanceUpdate(upd: MaintenanceUpdate): ContractCallsPrototype;
+  toString(compact?: boolean): string;
+}
+```
+
+**Methods**:
+- `addCall()`: Add a contract call to the collection
+- `addDeploy()`: Add a contract deployment to the collection
+- `addMaintenanceUpdate()`: Add a maintenance update to the collection
+- `toString()`: String representation
+
+---
+
+### ContractDeploy
+
+A contract deployment segment, instructing the creation of a new contract address (if not already present).
+
+```typescript
+class ContractDeploy {
+  constructor(initial_state: ContractState);  // Creates deployment with randomized address
+  
+  readonly address: string;               // Address this deployment will create
+  readonly initialState: ContractState;   // Initial contract state
+  
+  toString(compact?: boolean): string;
+}
+```
+
+**Constructor**:
+- Creates a deployment for an arbitrary contract state
+- The deployment and its address are randomized
+
+**Properties**:
+- `address`: The address this deployment will attempt to create
+- `initialState`: The initial state for the deployed contract
+
+---
+
+### ContractMaintenanceAuthority
+
+A committee permitted to make changes to this contract.
+
+```typescript
+class ContractMaintenanceAuthority {
+  constructor(
+    committee: string[],      // Committee public keys
+    threshold: number,        // Required signatures
+    counter?: bigint          // Replay protection counter (default 0n)
+  );
+  
+  readonly committee: string[];    // Committee public keys
+  readonly threshold: number;      // How many keys must sign rule changes
+  readonly counter: bigint;        // Replay protection counter
+  
+  serialize(networkid: NetworkId): Uint8Array;
+  toString(compact?: boolean): string;
+  
+  static deserialize(raw: Uint8Array, networkid: NetworkId): ContractState;
+}
+```
+
+**Description**:
+If a threshold of the public keys in this committee sign off, they can change the rules of this contract or recompile it for a new version.
+
+If the threshold is greater than the number of committee members, it is impossible for them to sign anything.
+
+**Constructor**:
+- Values should be non-negative, and at most 2^32 - 1
+- At deployment, counter must be 0n
+- Any subsequent update should set counter to exactly one greater than the current value
+
+---
+
+### ContractOperation
+
+An individual operation or entry point of a contract.
+
+```typescript
+class ContractOperation {
+  constructor();
+  
+  verifierKey: Uint8Array;    // ZK verifier key (latest version)
+  
+  serialize(networkid: NetworkId): Uint8Array;
+  toString(compact?: boolean): string;
+  
+  static deserialize(raw: Uint8Array, networkid: NetworkId): ContractOperation;
+}
+```
+
+**Description**:
+Consists primarily of ZK verifier keys, potentially for different versions of the proving system. Only the latest available version is exposed to this API.
+
+**Note**: The serialized form of the key is checked on initialization.
+
+---
+
+### ContractOperationVersion
+
+The version associated with a ContractOperation.
+
+```typescript
+class ContractOperationVersion {
+  constructor(version: "v1");
+  
+  readonly version: "v1";    // Currently only v1 supported
+  
+  toString(compact?: boolean): string;
+}
+```
+
+---
+
 ## Network Configuration
 
 ### setNetworkId()
