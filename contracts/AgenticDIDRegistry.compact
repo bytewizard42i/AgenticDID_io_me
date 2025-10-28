@@ -110,11 +110,11 @@ export circuit registerAgent(
     isActive: true
   };
   
-  // Store in ledger
-  agentCredentials.insert(did, credential);
+  // Store in ledger (with disclose() for witness data)
+  agentCredentials.insert(disclose(did), credential);
   
-  // Update counter
-  totalAgents = totalAgents + 1 as Uint<64>;
+  // Update counter (Uint arithmetic works directly)
+  totalAgents = totalAgents + 1;
 }
   
   // ============================================================================
@@ -216,13 +216,14 @@ export circuit createDelegation(
     isRevoked: false
   };
   
-  // Store delegation
-  delegations.insert(delegationId, delegation);
+  // Store delegation (with disclose() for witness data)
+  delegations.insert(disclose(delegationId), delegation);
   
-  // Update counter
-  totalDelegations = totalDelegations + 1 as Uint<64>;
+  // Update counter (Uint arithmetic works directly)
+  totalDelegations = totalDelegations + 1;
   
-  return delegationId;
+  // Return with disclose() (witness-derived value)
+  return disclose(delegationId);
 }
   
   /**
@@ -288,7 +289,8 @@ export circuit revokeDelegation(
     isRevoked: true
   };
   
-  delegations.insert(delegationId, updatedDelegation);
+  // Update with disclose() wrapper
+  delegations.insert(disclose(delegationId), updatedDelegation);
 }
   
 // ============================================================================
@@ -326,7 +328,8 @@ export circuit revokeAgent(
     isActive: false  // Mark as revoked
   };
   
-  agentCredentials.insert(agentDID, updatedCred);
+  // Update with disclose() wrapper
+  agentCredentials.insert(disclose(agentDID), updatedCred);
 }
   
   // ============================================================================
@@ -349,27 +352,52 @@ circuit verifyProofOfOwnership(
 }
   
   /**
-   * Hash a proof for verification
-   */
+ * Hash a proof for verification
+ * Uses persistentHash() for cryptographic security
+ */
 circuit hashProof(
   publicKey: Bytes<64>,
   timestamp: Uint<64>
 ): Bytes<32> {
-  // Simplified hash function
-  // In production: Use proper cryptographic hash
-  return default<Bytes<32>>;  // Zero-filled placeholder
+  // Create structured input for type-safe hashing
+  struct ProofHashInput {
+    key: Bytes<64>;
+    time: Uint<64>;
+  }
+  
+  const input = ProofHashInput {
+    key: publicKey,
+    time: timestamp
+  };
+  
+  // Use persistentHash() for ledger-safe cryptographic hashing
+  return persistentHash<ProofHashInput>(input);
 }
   
   /**
-   * Hash delegation parameters to create unique ID
-   */
+ * Hash delegation parameters to create unique ID
+ * Uses persistentHash() for cryptographic security
+ */
 circuit hashDelegation(
   userDID: Bytes<32>,
   agentDID: Bytes<32>,
   timestamp: Uint<64>
 ): Bytes<32> {
-  // Simplified hash
-  return default<Bytes<32>>;  // Zero-filled placeholder
+  // Create structured input for type-safe hashing
+  struct DelegationHashInput {
+    user: Bytes<32>;
+    agent: Bytes<32>;
+    time: Uint<64>;
+  }
+  
+  const input = DelegationHashInput {
+    user: userDID,
+    agent: agentDID,
+    time: timestamp
+  };
+  
+  // Use persistentHash() for unique, cryptographically secure delegation IDs
+  return persistentHash<DelegationHashInput>(input);
 }
   
   /**
