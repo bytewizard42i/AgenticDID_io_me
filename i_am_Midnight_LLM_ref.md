@@ -984,7 +984,7 @@ type Nonce = string;
 
 ### Nullifier
 
-A Zswap nullifier (prevents double-spend).
+A Zswap nullifier, as a hex-encoded 256-bit bitstring.
 
 ```typescript
 type Nullifier = string;
@@ -992,15 +992,127 @@ type Nullifier = string;
 
 ---
 
-### QualifiedCoinInfo
+### Op<R>
 
-Extended coin information including Merkle tree location.
+An individual operation in the onchain VM.
 
 ```typescript
-type QualifiedCoinInfo = CoinInfo & {
+type Op<R> = 
+  | { noop: { n: number; }; }
+  | "lt" | "eq" | "type" | "size" | "new"
+  | "and" | "or" | "neg" | "log" | "root" | "pop"
+  | { popeq: { cached: boolean; result: R; }; }
+  | { addi: { immediate: number; }; }
+  | { subi: { immediate: number; }; }
+  | { push: { storage: boolean; value: EncodedStateValue; }; }
+  | { branch: { skip: number; }; }
+  | { jmp: { skip: number; }; }
+  | "add" | "sub"
+  | { concat: { cached: boolean; n: number; }; }
+  | "member"
+  | { rem: { cached: boolean; }; }
+  | { dup: { n: number; }; }
+  | { swap: { n: number; }; }
+  | { idx: { cached: boolean; path: Key[]; pushPath: boolean; }; }
+  | { ins: { cached: boolean; n: number; }; }
+  | "ckpt";
+```
+
+**Type Parameters**:
+- `R`: `null` or `AlignedValue`, for gathering and verifying mode respectively
+
+---
+
+### QualifiedCoinInfo
+
+Information required to spend an existing coin, alongside authorization of the owner.
+
+```typescript
+type QualifiedCoinInfo = {
   mt_index: bigint;       // Merkle tree index (64-bit)
+  nonce: Nonce;           // Coin's randomness (prevents collisions)
+  type: TokenType;        // Coin's type (identifies currency)
+  value: bigint;          // Coin's value in atomic units (64-bit)
 };
 ```
+
+**Properties**:
+- `mt_index`: The coin's location in the chain's Merkle tree of coin commitments. Bounded to be a non-negative 64-bit integer
+- `nonce`: The coin's randomness, preventing it from colliding with other coins
+- `type`: The coin's type, identifying the currency it represents
+- `value`: The coin's value, in atomic units dependent on the currency. Bounded to be a non-negative 64-bit integer
+
+---
+
+### Signature
+
+A hex-encoded signature BIP-340 signature, with a 3-byte version prefix.
+
+```typescript
+type Signature = string;
+```
+
+---
+
+### SignatureVerifyingKey
+
+A hex-encoded signature BIP-340 verifying key, with a 3-byte version prefix.
+
+```typescript
+type SignatureVerifyingKey = string;
+```
+
+---
+
+### SigningKey
+
+A hex-encoded signature BIP-340 signing key, with a 3-byte version prefix.
+
+```typescript
+type SigningKey = string;
+```
+
+---
+
+### SparseCompactADT
+
+A discriminated union describing the locations of contract references in either a Compact Cell, List, Set, or Map ADT.
+
+```typescript
+type SparseCompactADT = 
+  | SparseCompactCellADT
+  | SparseCompactArrayLikeADT
+  | SparseCompactMapADT;
+```
+
+---
+
+### SparseCompactArrayLikeADT
+
+A data structure indicating the locations of all contract references in a Compact Set or List ADT.
+
+```typescript
+type SparseCompactArrayLikeADT = 
+  | SparseCompactSetADT
+  | SparseCompactListADT;
+```
+
+---
+
+### SparseCompactCellADT
+
+A data structure indicating the locations of all contract references in a Compact Cell ADT.
+
+```typescript
+type SparseCompactCellADT = {
+  tag: "cell";
+  valueType: SparseCompactValue;
+};
+```
+
+**Properties**:
+- `tag`: Discriminator tag "cell"
+- `valueType`: A data structure indicating the locations of all contract references in the Compact value contained in the outer Cell ADT
 
 ---
 
