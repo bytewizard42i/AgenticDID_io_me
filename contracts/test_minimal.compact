@@ -1,12 +1,12 @@
 pragma language_version 0.18;
 import CompactStandardLibrary;
 
-ledger owner: Address;
+ledger owner: ContractAddress;
 
-constructor(addr: Address) {
+constructor(addr: ContractAddress) {
   owner = addr;
 }
 
-export circuit testOne(param: Address): [] {
+export circuit testOne(param: ContractAddress): [] {
   owner = param;
 }
