@@ -478,6 +478,243 @@ class LedgerState {
 
 ---
 
+### MaintenanceUpdate
+
+A contract maintenance update, updating associated operations or changing the maintenance authority.
+
+```typescript
+class MaintenanceUpdate {
+  constructor(
+    address: string,
+    updates: SingleUpdate[],
+    counter: bigint
+  );
+  
+  readonly address: string;                   // Address this update targets
+  readonly updates: SingleUpdate[];           // Updates to carry out
+  readonly counter: bigint;                   // Counter this update is valid against
+  readonly dataToSign: Uint8Array;           // Raw data for signature approval
+  readonly signatures: [bigint, string][];    // Signatures on this update
+  
+  addSignature(idx: bigint, signature: string): MaintenanceUpdate;
+  toString(compact?: boolean): string;
+}
+```
+
+**Properties**:
+- `address`: The address this deployment will attempt to create
+- `updates`: The updates to carry out
+- `counter`: The counter this update is valid against
+- `dataToSign`: The raw data any valid signature must be over to approve this update
+- `signatures`: The signatures on this update
+
+**Methods**:
+- `addSignature()`: Adds a new signature to this update
+
+---
+
+### MerkleTreeCollapsedUpdate
+
+A compact delta on the coin commitments Merkle tree, used to keep local spending trees in sync with the global state without requiring receiving all transactions.
+
+```typescript
+class MerkleTreeCollapsedUpdate {
+  constructor(
+    state: ZswapChainState,
+    start: bigint,     // Inclusive start index
+    end: bigint        // Inclusive end index
+  );
+  
+  serialize(netid: NetworkId): Uint8Array;
+  toString(compact?: boolean): string;
+  
+  static deserialize(raw: Uint8Array, netid: NetworkId): MerkleTreeCollapsedUpdate;
+}
+```
+
+**Description**:
+Creates a new compact update from a non-compact state, and inclusive start and end indices.
+
+**Throws**: If the indices are out-of-bounds for the state, or end < start.
+
+**Usage**: Enables efficient synchronization of local Merkle trees without downloading all transactions.
+
+---
+
+### Offer
+
+A full Zswap offer; the zswap part of a transaction.
+
+```typescript
+class Offer {
+  private constructor();
+  
+  readonly inputs: Input[];                    // Inputs this offer is composed of
+  readonly outputs: Output[];                  // Outputs this offer is composed of
+  readonly transient: Transient[];            // Transients this offer is composed of
+  readonly deltas: Map<string, bigint>;       // Value for each token type
+  
+  merge(other: Offer): Offer;  // Combine with another offer
+  serialize(netid: NetworkId): Uint8Array;
+  toString(compact?: boolean): string;
+  
+  static deserialize(raw: Uint8Array, netid: NetworkId): Offer;
+}
+```
+
+**Description**:
+Consists of sets of Inputs, Outputs, and Transients, as well as a deltas vector of the transaction value.
+
+**Properties**:
+- `inputs`: The inputs this offer is composed of
+- `outputs`: The outputs this offer is composed of
+- `transient`: The transients this offer is composed of
+- `deltas`: The value of this offer for each token type (may be negative). This is input coin values - output coin values
+
+**Methods**:
+- `merge()`: Combine this offer with another (for atomic operations)
+
+---
+
+### Output
+
+A shielded transaction output (creates a new coin).
+
+```typescript
+class Output {
+  private constructor();
+  
+  readonly commitment: string;                      // Commitment of the output
+  readonly contractAddress: undefined | string;     // Contract address (if recipient is contract)
+  
+  serialize(netid: NetworkId): Uint8Array;
+  toString(compact?: boolean): string;
+  
+  static deserialize(raw: Uint8Array, netid: NetworkId): Output;
+}
+```
+
+**Properties**:
+- `commitment`: The commitment of the output
+- `contractAddress`: The contract address receiving the output, if the recipient is a contract (undefined for user outputs)
+
+---
+
+### PreTranscript
+
+A transcript prior to partitioning, consisting of the context to run it in, the program, and optionally a communication commitment.
+
+```typescript
+class PreTranscript {
+  constructor(
+    context: QueryContext,
+    program: Op<AlignedValue>[],
+    comm_comm?: string           // Optional communication commitment
+  );
+  
+  toString(compact?: boolean): string;
+}
+```
+
+**Description**:
+Used to bind calls together with communication commitment when constructing contract calls.
+
+---
+
+### ProofErasedAuthorizedMint
+
+A request to mint a coin, authorized by the mint's recipient, with the authorizing proof having been erased.
+
+```typescript
+class ProofErasedAuthorizedMint {
+  private constructor();
+  
+  readonly coin: CoinInfo;          // The coin to be minted
+  readonly recipient: string;        // The recipient of this mint
+  
+  serialize(netid: NetworkId): Uint8Array;
+  toString(compact?: boolean): string;
+  
+  static deserialize(raw: Uint8Array, netid: NetworkId): ProofErasedAuthorizedMint;
+}
+```
+
+**Usage**: Primarily for use in testing, or handling data known to be correct from external information.
+
+---
+
+### ProofErasedInput
+
+An Input with all proof information erased.
+
+```typescript
+class ProofErasedInput {
+  private constructor();
+  
+  readonly nullifier: string;                      // Nullifier of the input
+  readonly contractAddress: undefined | string;    // Contract address (if sender is contract)
+  
+  serialize(netid: NetworkId): Uint8Array;
+  toString(compact?: boolean): string;
+  
+  static deserialize(raw: Uint8Array, netid: NetworkId): ProofErasedInput;
+}
+```
+
+**Usage**: Primarily for use in testing, or handling data known to be correct from external information.
+
+---
+
+### ProofErasedOffer
+
+An Offer with all proof information erased.
+
+```typescript
+class ProofErasedOffer {
+  private constructor();
+  
+  readonly inputs: ProofErasedInput[];         // Inputs this offer is composed of
+  readonly outputs: ProofErasedOutput[];       // Outputs this offer is composed of
+  readonly transient: ProofErasedTransient[];  // Transients this offer is composed of
+  readonly deltas: Map<string, bigint>;        // Value for each token type
+  
+  merge(other: ProofErasedOffer): ProofErasedOffer;
+  serialize(netid: NetworkId): Uint8Array;
+  toString(compact?: boolean): string;
+  
+  static deserialize(raw: Uint8Array, netid: NetworkId): ProofErasedOffer;
+}
+```
+
+**Description**:
+Same structure as Offer, but with all proof information erased for testing purposes.
+
+**Usage**: Primarily for use in testing, or handling data known to be correct from external information.
+
+---
+
+### ProofErasedOutput
+
+An Output with all proof information erased.
+
+```typescript
+class ProofErasedOutput {
+  private constructor();
+  
+  readonly commitment: string;                      // Commitment of the output
+  readonly contractAddress: undefined | string;     // Contract address (if recipient is contract)
+  
+  serialize(netid: NetworkId): Uint8Array;
+  toString(compact?: boolean): string;
+  
+  static deserialize(raw: Uint8Array, netid: NetworkId): ProofErasedOutput;
+}
+```
+
+**Usage**: Primarily for use in testing, or handling data known to be correct from external information.
+
+---
+
 ### LocalState
 
 The local state of a user/wallet, consisting of their secret key and a set of unspent coins.
