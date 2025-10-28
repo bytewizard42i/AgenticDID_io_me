@@ -1163,6 +1163,363 @@ class UnprovenAuthorizedMint {
 
 ---
 
+### UnprovenInput
+
+An Input before being proven.
+
+```typescript
+class UnprovenInput {
+  private constructor();
+  
+  readonly nullifier: string;                      // Nullifier of the input
+  readonly contractAddress: undefined | string;    // Contract address (if sender is contract)
+  
+  serialize(netid: NetworkId): Uint8Array;
+  toString(compact?: boolean): string;
+  
+  static deserialize(raw: Uint8Array, netid: NetworkId): UnprovenInput;
+  static newContractOwned(
+    coin: QualifiedCoinInfo,
+    contract: string,
+    state: ZswapChainState
+  ): UnprovenInput;
+}
+```
+
+**Warning**: All "shielded" information in the input can still be extracted at this stage!
+
+**Methods**:
+- `newContractOwned()`: Creates a new input spending a coin from a smart contract. Note: inputs created this way also need contract authorization.
+
+---
+
+### UnprovenOffer
+
+An Offer prior to being proven.
+
+```typescript
+class UnprovenOffer {
+  constructor();
+  
+  readonly inputs: UnprovenInput[];         // Inputs this offer is composed of
+  readonly outputs: UnprovenOutput[];       // Outputs this offer is composed of
+  readonly transient: UnprovenTransient[];  // Transients this offer is composed of
+  readonly deltas: Map<string, bigint>;     // Value for each token type
+  
+  merge(other: UnprovenOffer): UnprovenOffer;
+  serialize(netid: NetworkId): Uint8Array;
+  toString(compact?: boolean): string;
+  
+  static deserialize(raw: Uint8Array, netid: NetworkId): UnprovenOffer;
+  static fromInput(input: UnprovenInput, type_: string, value: bigint): UnprovenOffer;
+  static fromOutput(output: UnprovenOutput, type_: string, value: bigint): UnprovenOffer;
+  static fromTransient(transient: UnprovenTransient): UnprovenOffer;
+}
+```
+
+**Warning**: All "shielded" information in the offer can still be extracted at this stage!
+
+**Static Constructors**:
+- `fromInput()`: Creates singleton offer from an UnprovenInput and its value vector
+- `fromOutput()`: Creates singleton offer from an UnprovenOutput and its value vector
+- `fromTransient()`: Creates singleton offer from an UnprovenTransient
+
+---
+
+### UnprovenOutput
+
+An Output before being proven.
+
+```typescript
+class UnprovenOutput {
+  private constructor();
+  
+  readonly commitment: string;                      // Commitment of the output
+  readonly contractAddress: undefined | string;     // Contract address (if recipient is contract)
+  
+  serialize(netid: NetworkId): Uint8Array;
+  toString(compact?: boolean): string;
+  
+  static deserialize(raw: Uint8Array, netid: NetworkId): UnprovenOutput;
+  static new(
+    coin: CoinInfo,
+    target_cpk: string,
+    target_epk?: string
+  ): UnprovenOutput;
+  static newContractOwned(coin: CoinInfo, contract: string): UnprovenOutput;
+}
+```
+
+**Warning**: All "shielded" information in the output can still be extracted at this stage!
+
+**Static Constructors**:
+- `new()`: Creates new output targeted to user's coin public key. Optionally includes ciphertext encrypted to user's encryption public key
+- `newContractOwned()`: Creates new output targeted to smart contract. Contract must explicitly receive the coin.
+
+---
+
+### UnprovenTransaction
+
+Transaction prior to being proven.
+
+```typescript
+class UnprovenTransaction {
+  constructor(
+    guaranteed: UnprovenOffer,
+    fallible?: UnprovenOffer,
+    calls?: ContractCallsPrototype
+  );
+  
+  readonly guaranteedCoins: undefined | UnprovenOffer;      // Guaranteed offer
+  readonly fallibleCoins: undefined | UnprovenOffer;        // Fallible offer
+  readonly contractCalls: ContractAction[];                 // Contract interactions
+  readonly mint: undefined | UnprovenAuthorizedMint;        // Mint (if applicable)
+  
+  // Transaction analysis
+  identifiers(): string[];
+  imbalances(guaranteed: boolean, fees?: bigint): Map<string, bigint>;
+  
+  // Transaction operations
+  merge(other: UnprovenTransaction): UnprovenTransaction;
+  eraseProofs(): ProofErasedTransaction;
+  
+  // Serialization
+  serialize(netid: NetworkId): Uint8Array;
+  toString(compact?: boolean): string;
+  
+  static deserialize(raw: Uint8Array, netid: NetworkId): UnprovenTransaction;
+  static fromMint(mint: UnprovenAuthorizedMint): UnprovenTransaction;
+}
+```
+
+**Warning**: All "shielded" information in the transaction can still be extracted at this stage!
+
+**Constructor**: Creates transaction from guaranteed/fallible UnprovenOffers and ContractCallsPrototype.
+
+**Methods**:
+- `identifiers()`: Returns set of identifiers for watching this transaction
+- `imbalances()`: Returns surplus/deficit for given section and fees
+- `merge()`: Merges with another transaction. Throws if both have contract interactions or spend same coins
+- `eraseProofs()`: Converts to ProofErasedTransaction
+- `fromMint()`: Creates minting claim transaction (funds must have been legitimately minted previously)
+
+---
+
+### UnprovenTransient
+
+A Transient before being proven.
+
+```typescript
+class UnprovenTransient {
+  private constructor();
+  
+  readonly commitment: string;                      // Commitment of the transient
+  readonly nullifier: string;                       // Nullifier of the transient
+  readonly contractAddress: undefined | string;     // Contract address (if applicable)
+  
+  serialize(netid: NetworkId): Uint8Array;
+  toString(compact?: boolean): string;
+  
+  static deserialize(raw: Uint8Array, netid: NetworkId): UnprovenTransient;
+  static newFromContractOwnedOutput(
+    coin: QualifiedCoinInfo,
+    output: UnprovenOutput
+  ): UnprovenTransient;
+}
+```
+
+**Warning**: All "shielded" information in the transient can still be extracted at this stage!
+
+**Static Constructor**:
+- `newFromContractOwnedOutput()`: Creates new contract-owned transient from output and coin. QualifiedCoinInfo should have mt_index of 0.
+
+---
+
+### VerifierKeyInsert
+
+An update instruction to insert a verifier key at a specific operation and version.
+
+```typescript
+class VerifierKeyInsert {
+  constructor(
+    operation: string | Uint8Array,
+    vk: ContractOperationVersionedVerifierKey
+  );
+  
+  readonly operation: string | Uint8Array;
+  readonly vk: ContractOperationVersionedVerifierKey;
+  
+  toString(compact?: boolean): string;
+}
+```
+
+**Usage**: Part of contract maintenance updates to add new verifier keys.
+
+---
+
+### VerifierKeyRemove
+
+An update instruction to remove a verifier key of a specific operation and version.
+
+```typescript
+class VerifierKeyRemove {
+  constructor(
+    operation: string | Uint8Array,
+    version: ContractOperationVersion
+  );
+  
+  readonly operation: string | Uint8Array;
+  readonly version: ContractOperationVersion;
+  
+  toString(compact?: boolean): string;
+}
+```
+
+**Usage**: Part of contract maintenance updates to remove old verifier keys.
+
+---
+
+### VmResults
+
+Represents the results of a VM call.
+
+```typescript
+class VmResults {
+  private constructor();
+  
+  readonly stack: VmStack;               // VM stack at end of invocation
+  readonly events: GatherResult[];       // Events emitted by VM invocation
+  readonly gasCost: bigint;              // Computed gas cost
+  
+  toString(compact?: boolean): string;
+}
+```
+
+**Properties**:
+- `stack`: The VM stack state at the end of the invocation
+- `events`: Events that were emitted during execution
+- `gasCost`: The computed gas cost of running the invocation
+
+---
+
+### VmStack
+
+Represents the state of the VM's stack at a specific point.
+
+```typescript
+class VmStack {
+  constructor();
+  
+  get(idx: number): undefined | StateValue;
+  isStrong(idx: number): undefined | boolean;
+  length(): number;
+  push(value: StateValue, is_strong: boolean): void;
+  removeLast(): void;
+  toString(compact?: boolean): string;
+}
+```
+
+**Description**:
+The stack is an array of StateValues, each annotated with whether it is "strong" or "weak":
+- **Strong**: Permitted to be stored on-chain
+- **Weak**: Not permitted to be stored on-chain
+
+**Methods**:
+- `get()`: Retrieve StateValue at index
+- `isStrong()`: Check if value at index is strong (on-chain eligible)
+- `length()`: Get stack size
+- `push()`: Push value with strength annotation
+- `removeLast()`: Remove top value from stack
+
+---
+
+### WellFormedStrictness
+
+Strictness criteria for evaluating transaction well-formedness.
+
+```typescript
+class WellFormedStrictness {
+  constructor();
+  
+  verifyNativeProofs: boolean;       // Validate Midnight-native proofs
+  verifyContractProofs: boolean;     // Validate contract proofs
+  enforceBalancing: boolean;         // Require non-negative balance
+}
+```
+
+**Usage**: Used for disabling parts of transaction validation for testing.
+
+**Properties**:
+- `verifyNativeProofs`: Whether to validate Midnight-native (non-contract) proofs in the transaction
+- `verifyContractProofs`: Whether to validate contract proofs in the transaction
+- `enforceBalancing`: Whether to require the transaction to have a non-negative balance
+
+---
+
+### ZswapChainState
+
+The on-chain state of Zswap.
+
+```typescript
+class ZswapChainState {
+  constructor();
+  
+  readonly firstFree: bigint;  // First free index in coin commitment tree
+  
+  // State updates
+  tryApply(offer: Offer, whitelist?: Set<string>): [ZswapChainState, Map<string, bigint>];
+  tryApplyProofErased(offer: ProofErasedOffer, whitelist?: Set<string>): [ZswapChainState, Map<string, bigint>];
+  
+  // Serialization
+  serialize(netid: NetworkId): Uint8Array;
+  toString(compact?: boolean): string;
+  
+  static deserialize(raw: Uint8Array, netid: NetworkId): ZswapChainState;
+  static deserializeFromLedgerState(raw: Uint8Array, netid: NetworkId): ZswapChainState;
+}
+```
+
+**Description**:
+Consists of:
+- Merkle tree of coin commitments
+- Set of nullifiers
+- Index into the Merkle tree
+- Set of valid past Merkle tree roots
+
+**Methods**:
+- `tryApply()`: Apply an Offer to the state, returning updated state and map of newly inserted coin commitments to their indices
+- `tryApplyProofErased()`: Same as tryApply for ProofErasedOffers
+- `deserializeFromLedgerState()`: Given whole ledger serialized state, deserialize only the Zswap portion
+
+**Whitelist Parameter**: Set of contract addresses of interest. If set, only these addresses are tracked and all other information is discarded.
+
+---
+
+## Enumerations
+
+### NetworkId
+
+The network currently being targeted.
+
+```typescript
+enum NetworkId {
+  Undeployed = 0,  // Local test network
+  DevNet = 1,      // Developer network (not guaranteed persistent)
+  TestNet = 2,     // Persistent testnet
+  MainNet = 3      // Midnight mainnet
+}
+```
+
+**Usage**: Used throughout the API for serialization/deserialization to specify target network.
+
+**Networks**:
+- `Undeployed` (0): A local test network
+- `DevNet` (1): A developer network, not guaranteed to be persistent
+- `TestNet` (2): A persistent testnet (currently Testnet_02)
+- `MainNet` (3): The Midnight mainnet (future)
+
+---
+
 ### LocalState
 
 The local state of a user/wallet, consisting of their secret key and a set of unspent coins.
