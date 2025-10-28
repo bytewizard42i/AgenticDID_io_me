@@ -655,23 +655,23 @@ const sum: CurvePoint = ecAdd(p1, p2);  // Represents 8*G
 
 ### ecMul
 
-Multiply an elliptic curve point by a scalar.
+Multiply an elliptic curve point by a scalar (in multiplicative notation).
 
 **Signature**:
 ```compact
-circuit ecMul(scalar: Field, point: CurvePoint): CurvePoint
+circuit ecMul(a: CurvePoint, b: Field): CurvePoint
 ```
 
 **Parameters**:
-- `scalar`: Multiplier
-- `point`: Point to multiply
+- `a`: Point to multiply
+- `b`: Scalar multiplier (Field element)
 
-**Returns**: Scalar multiple of the point
+**Returns**: Scalar multiple of the point (a * b)
 
 **Example**:
 ```compact
 const g: CurvePoint = ecMulGenerator(1);
-const result: CurvePoint = ecMul(5, g);  // 5*G
+const result: CurvePoint = ecMul(g, 5);  // g * 5 = 5*G
 ```
 
 ---
@@ -714,11 +714,18 @@ circuit hashToCurve<T>(value: T): CurvePoint
 ```
 
 **Parameters**:
-- `value`: Data to hash to curve
+- `value`: Data to hash to curve (any Compact type)
 
 **Returns**: Curve point deterministically derived from value
 
-**Use Case**: Derive curve points from arbitrary data
+**Guarantees**:
+- ✅ Outputs have **unknown discrete logarithm** with respect to group base
+- ✅ Outputs have **unknown discrete logarithm** with respect to any other output
+- ⚠️ Outputs are **not guaranteed to be unique** (a given input can be proven correct for multiple outputs)
+
+**Note**: Inputs of different types `T` may have the **same output** if they have the same field-aligned binary representation.
+
+**Use Case**: Derive curve points from arbitrary data for cryptographic protocols
 
 ---
 
@@ -780,21 +787,21 @@ export circuit verifyMembership(expectedRoot: MerkleTreeDigest): Boolean {
 
 ### merkleTreePathRootNoLeafHash
 
-Compute Merkle tree root from a path (leaf already hashed in path).
+Compute Merkle tree root from a path (leaf already hashed externally).
 
 **Signature**:
 ```compact
-circuit merkleTreePathRootNoLeafHash<T>(
-  path: MerkleTreePath<T>
-): MerkleTreeDigest
+circuit merkleTreePathRootNoLeafHash<#n>(path: MerkleTreePath<n, Bytes<32>>): MerkleTreeDigest
 ```
 
 **Parameters**:
-- `path`: Merkle proof path with leaf hash included
+- `path`: Merkle proof path where leaf type is `Bytes<32>` (pre-hashed)
 
 **Returns**: Computed Merkle root
 
-**Use Case**: When path already includes hashed leaf
+**Difference from `merkleTreePathRoot`**: This variant assumes that the tree leaves have **already been hashed externally**.
+
+**Use Case**: When you want to control leaf hashing separately from path verification
 
 ---
 
@@ -802,17 +809,28 @@ circuit merkleTreePathRootNoLeafHash<T>(
 
 ### tokenType
 
-Get the token type for a domain separator.
+Transform a domain separator into a globally namespaced token type.
 
 **Signature**:
 ```compact
-circuit tokenType(domainSep: Bytes<32>): Bytes<32>
+circuit tokenType(domainSep: Bytes<32>, contract: ContractAddress): Bytes<32>
 ```
 
 **Parameters**:
-- `domainSep`: Domain separator for token
+- `domainSep`: Domain separator chosen by the contract
+- `contract`: Contract address (usually `kernel.self()`)
 
-**Returns**: Token type identifier
+**Returns**: Globally unique token type identifier
+
+**Purpose**: 
+- Allows a contract to create **new token types**
+- Due to collision resistance, contract **cannot mint tokens** for another contract's token type
+- Used as the `color` field in `CoinInfo`
+
+**Example**:
+```compact
+const myTokenType = tokenType(pad(32, "MyToken"), kernel.self());
+```
 
 ---
 
@@ -886,136 +904,177 @@ circuit createZswapOutput(
 
 ### mintToken
 
-Mint new tokens.
+Create a new shielded coin, minted by this contract.
 
 **Signature**:
 ```compact
 circuit mintToken(
   domainSep: Bytes<32>,
-  amount: Uint<64>
-): []
+  value: Uint<128>,
+  nonce: Bytes<32>,
+  recipient: Either<ZswapCoinPublicKey, ContractAddress>
+): CoinInfo
 ```
 
 **Parameters**:
 - `domainSep`: Domain separator for token type
-- `amount`: Amount to mint
+- `value`: Amount to mint
+- `nonce`: Unique nonce (use `evolveNonce()` for deterministic generation)
+- `recipient`: Who receives the minted coin
 
-**Use Case**: Create new tokens (if contract has minting rights)
+**Returns**: `CoinInfo` for the newly minted coin
+
+**⚠️ Security**: Requires inputting a **unique nonce** to function securely. Left to user how to produce this.
+
+**Use Case**: Contract creates new tokens and sends to recipient
 
 ---
 
 ### evolveNonce
 
-Evolve a nonce value.
+Deterministically derive a CoinInfo nonce from a counter index and prior nonce.
 
 **Signature**:
 ```compact
-circuit evolveNonce(nonce: Field): Field
+circuit evolveNonce(index: Uint<64>, nonce: Bytes<32>): Bytes<32>
 ```
 
 **Parameters**:
-- `nonce`: Current nonce
+- `index`: Counter index (e.g., iteration number)
+- `nonce`: Prior nonce (starting point)
 
-**Returns**: Evolved nonce
+**Returns**: New evolved nonce as `Bytes<32>`
 
-**Use Case**: Generate unique nonces
+**Use Case**: Generate unique, deterministic nonces for coin creation
+
+**Example**:
+```compact
+ledger nonceCounter: Counter;
+witness getInitialNonce(): Bytes<32>;
+
+export circuit createCoin(): [] {
+  const idx = nonceCounter.read();
+  const baseNonce = getInitialNonce();
+  const nonce = evolveNonce(idx, baseNonce);
+  
+  nonceCounter += 1;
+  // Use nonce for coin creation
+}
+```
 
 ---
 
 ### receive
 
-Receive a coin (claim it in transaction).
+Receive a shielded coin, adding validation that it's present in the transaction.
 
 **Signature**:
 ```compact
-circuit receive(coin: CoinInfo): QualifiedCoinInfo
+circuit receive(coin: CoinInfo): []
 ```
 
 **Parameters**:
-- `coin`: Coin information to receive
+- `coin`: Coin to receive
 
-**Returns**: Qualified coin with Merkle index
+**Returns**: None (empty tuple)
 
-**Use Case**: Accept incoming coins
+**Effect**: Adds a validation condition requiring:
+- This coin is present as an **output** addressed to this contract
+- This coin is **not received by another call** (prevents double-claiming)
+
+**Use Case**: Claim incoming coins sent to the contract
 
 ---
 
 ### send
 
-Send a coin to a recipient.
+Send value from a shielded coin owned by the contract to a recipient.
 
 **Signature**:
 ```compact
 circuit send(
-  coin: QualifiedCoinInfo,
+  input: QualifiedCoinInfo,
   recipient: Either<ZswapCoinPublicKey, ContractAddress>,
-  amount: Uint<64>,
-  tokenType: Bytes<32>
+  value: Uint<128>
 ): SendResult
 ```
 
 **Parameters**:
-- `coin`: Coin to send from
-- `recipient`: Who receives
-- `amount`: Amount to send
-- `tokenType`: Token type
+- `input`: Existing coin in ledger to send from
+- `recipient`: User pubkey or contract address to receive
+- `value`: Amount to send
 
-**Returns**: Send operation result
+**Returns**: `SendResult` with sent coin and optional change
 
-**Use Case**: Send shielded coins
+**Important Notes**:
+- Any **change is returned** and should be managed by the contract
+- ⚠️ Currently does **not create coin ciphertexts**, so sending to a user public key (except current user) will not inform them of the coin
+
+**Use Case**: Send from coins already in the ledger
 
 ---
 
 ### sendImmediate
 
-Send a coin immediately (synchronous).
+Like `send`, but for coins created within this transaction.
 
 **Signature**:
 ```compact
 circuit sendImmediate(
-  coin: QualifiedCoinInfo,
-  recipient: Either<ZswapCoinPublicKey, ContractAddress>,
-  amount: Uint<64>,
-  tokenType: Bytes<32>
+  input: CoinInfo,
+  target: Either<ZswapCoinPublicKey, ContractAddress>,
+  value: Uint<128>
 ): SendResult
 ```
 
-**Similar to**: `send()` but executes immediately
+**Parameters**:
+- `input`: Coin created in current transaction (not yet in ledger)
+- `target`: User pubkey or contract address to receive
+- `value`: Amount to send
+
+**Returns**: `SendResult` with sent coin and optional change
+
+**Difference from `send()`**: Operates on `CoinInfo` (newly created) instead of `QualifiedCoinInfo` (existing in ledger)
 
 ---
 
 ### mergeCoin
 
-Merge multiple coins into one.
+Combine two coins stored on the ledger into one.
 
 **Signature**:
 ```compact
-circuit mergeCoin(
-  coins: Vector<N, QualifiedCoinInfo>
-): QualifiedCoinInfo
+circuit mergeCoin(a: QualifiedCoinInfo, b: QualifiedCoinInfo): CoinInfo
 ```
 
 **Parameters**:
-- `coins`: Vector of coins to merge
+- `a`: First coin from ledger
+- `b`: Second coin from ledger
 
-**Returns**: Single merged coin
+**Returns**: Combined coin as `CoinInfo` (not yet qualified)
 
-**Use Case**: Combine multiple small coins
+**Note**: Takes **two** coins, not a vector. Returns newly created `CoinInfo`.
+
+**Use Case**: Combine multiple small coins into one larger coin
 
 ---
 
 ### mergeCoinImmediate
 
-Merge coins immediately (synchronous).
+Combine one ledger coin and one newly created coin into one.
 
 **Signature**:
 ```compact
-circuit mergeCoinImmediate(
-  coins: Vector<N, QualifiedCoinInfo>
-): QualifiedCoinInfo
+circuit mergeCoinImmediate(a: QualifiedCoinInfo, b: CoinInfo): CoinInfo
 ```
 
-**Similar to**: `mergeCoin()` but executes immediately
+**Parameters**:
+- `a`: Coin from ledger (qualified)
+- `b`: Coin created in current transaction (not yet qualified)
+
+**Returns**: Combined coin as `CoinInfo`
+
+**Use Case**: Merge an existing coin with a newly created one
 
 ---
 
