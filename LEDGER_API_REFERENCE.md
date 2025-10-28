@@ -879,6 +879,290 @@ Used in conjunction with MaintenanceUpdate to change the governance structure of
 
 ---
 
+### StateBoundedMerkleTree
+
+Represents a fixed-depth Merkle tree storing hashed data, whose preimages are unknown.
+
+```typescript
+class StateBoundedMerkleTree {
+  constructor(height: number);  // Create blank tree with given height
+  
+  readonly height: number;
+  
+  // Tree operations
+  update(index: bigint, leaf: AlignedValue): StateBoundedMerkleTree;
+  collapse(start: bigint, end: bigint): StateBoundedMerkleTree;  // Internal
+  
+  // Path operations
+  root(): Value;  // Internal
+  pathForLeaf(index: bigint, leaf: AlignedValue): AlignedValue;  // Internal
+  findPathForLeaf(leaf: AlignedValue): AlignedValue;  // Internal
+  
+  toString(compact?: boolean): string;
+}
+```
+
+**Methods**:
+- `update()`: Inserts a value into the Merkle tree, returning updated tree. Throws if index out-of-bounds
+- `collapse()`: Internal - Erases all but necessary hashes between indices (inclusive). Throws if out-of-bounds or end < start
+- `root()`: Internal - Merkle tree root primitive
+- `pathForLeaf()`: Internal - Path construction primitive. Throws if index out-of-bounds
+- `findPathForLeaf()`: Internal - Finding path primitive. Throws if leaf not in tree
+
+---
+
+### StateMap
+
+Represents a key-value map, where keys are AlignedValues and values are StateValues.
+
+```typescript
+class StateMap {
+  constructor();
+  
+  get(key: AlignedValue): undefined | StateValue;
+  insert(key: AlignedValue, value: StateValue): StateMap;
+  remove(key: AlignedValue): StateMap;
+  keys(): AlignedValue[];
+  toString(compact?: boolean): string;
+}
+```
+
+---
+
+### StateValue
+
+Represents the core of a contract's state, and recursively represents each of its components.
+
+```typescript
+class StateValue {
+  private constructor();
+  
+  // Type checking
+  type(): "map" | "null" | "cell" | "array" | "boundedMerkleTree";
+  
+  // Type conversion
+  asCell(): AlignedValue;
+  asMap(): undefined | StateMap;
+  asArray(): undefined | StateValue[];
+  asBoundedMerkleTree(): undefined | StateBoundedMerkleTree;
+  
+  // Array operations
+  arrayPush(value: StateValue): StateValue;
+  
+  // Utility
+  logSize(): number;
+  encode(): EncodedStateValue;  // Internal
+  toString(compact?: boolean): string;
+  
+  // Static constructors
+  static newNull(): StateValue;
+  static newCell(value: AlignedValue): StateValue;
+  static newMap(map: StateMap): StateValue;
+  static newArray(): StateValue;
+  static newBoundedMerkleTree(tree: StateBoundedMerkleTree): StateValue;
+  static decode(value: EncodedStateValue): StateValue;  // Internal
+}
+```
+
+**Description**:
+Different classes of state values:
+- `null`
+- Cells of AlignedValues
+- Maps from AlignedValues to state values
+- Bounded Merkle trees containing AlignedValue leaves
+- Short (<= 15 element) arrays of state values
+
+**Immutability**: State values are immutable; any operations that mutate states will return a new state instead.
+
+---
+
+### SystemTransaction
+
+A privileged transaction issued by the system.
+
+```typescript
+class SystemTransaction {
+  private constructor();
+  
+  serialize(netid: NetworkId): Uint8Array;
+  toString(compact?: boolean): string;
+  
+  static deserialize(raw: Uint8Array, netid: NetworkId): Transaction;
+}
+```
+
+---
+
+### Transaction
+
+A Midnight transaction, consisting of a section of ContractActions, and a guaranteed and fallible Offer.
+
+```typescript
+class Transaction {
+  private constructor();
+  
+  readonly guaranteedCoins: undefined | Offer;          // Guaranteed Zswap offer
+  readonly fallibleCoins: undefined | Offer;            // Fallible Zswap offer
+  readonly contractCalls: ContractAction[];             // Contract interactions
+  readonly mint: undefined | AuthorizedMint;            // Mint (if applicable)
+  
+  // Transaction analysis
+  fees(params: LedgerParameters): bigint;
+  identifiers(): string[];
+  transactionHash(): string;
+  imbalances(guaranteed: boolean, fees?: bigint): Map<string, bigint>;
+  wellFormed(ref_state: LedgerState, strictness: WellFormedStrictness): void;
+  
+  // Transaction operations
+  merge(other: Transaction): Transaction;
+  eraseProofs(): ProofErasedTransaction;
+  
+  // Serialization
+  serialize(netid: NetworkId): Uint8Array;
+  toString(compact?: boolean): string;
+  
+  static deserialize(raw: Uint8Array, netid: NetworkId): Transaction;
+  static fromUnproven(prove: any, unproven: UnprovenTransaction): Promise<Transaction>;
+}
+```
+
+**Description**:
+The guaranteed section runs first, and fee payment is taken during this part. If it succeeds, the fallible section is also run, and atomically rolled back if it fails.
+
+**Properties**:
+- `guaranteedCoins`: The guaranteed Zswap offer
+- `fallibleCoins`: The fallible Zswap offer
+- `contractCalls`: The contract interactions contained in this transaction
+- `mint`: The mint this transaction represents, if applicable
+
+**Methods**:
+- `fees()`: The cost of this transaction in atomic units of the base token
+- `identifiers()`: Returns set of identifiers. Any may be used to watch for this transaction
+- `transactionHash()`: Returns the hash. Due to merge ability, shouldn't be used to watch for specific transaction
+- `imbalances()`: For given fees and section, the surplus or deficit in any token type
+- `wellFormed()`: Tests well-formedness criteria, optionally including balancing. Throws if not well-formed
+- `merge()`: Merges with another transaction. Throws if both have contract interactions or spend same coins
+- `eraseProofs()`: Erases proofs for testing
+- `fromUnproven()`: Type hint to use external proving function (e.g., proof server)
+
+---
+
+### TransactionContext
+
+The context against which a transaction is run.
+
+```typescript
+class TransactionContext {
+  constructor(
+    ref_state: LedgerState,        // Past ledger state as reference
+    block_context: BlockContext,   // Block information
+    whitelist?: Set<string>        // Tracked contracts (undefined = all)
+  );
+  
+  toString(compact?: boolean): string;
+}
+```
+
+**Parameters**:
+- `ref_state`: A past ledger state used as reference point for 'static' data
+- `block_context`: Information about the block this transaction is or will be contained in
+- `whitelist`: A list of contracts being tracked, or undefined to track all contracts
+
+---
+
+### TransactionCostModel
+
+Cost model for calculating transaction fees.
+
+```typescript
+class TransactionCostModel {
+  private constructor();
+  
+  readonly inputFeeOverhead: bigint;     // Fee increase for adding input
+  readonly outputFeeOverhead: bigint;    // Fee increase for adding output
+  
+  serialize(netid: NetworkId): Uint8Array;
+  toString(compact?: boolean): string;
+  
+  static deserialize(raw: Uint8Array, netid: NetworkId): TransactionCostModel;
+  static dummyTransactionCostModel(): TransactionCostModel;  // For testing
+}
+```
+
+**Properties**:
+- `inputFeeOverhead`: The increase in fees to expect from adding a new input to a transaction
+- `outputFeeOverhead`: The increase in fees to expect from adding a new output to a transaction
+
+---
+
+### TransactionResult
+
+The result status of applying a transaction.
+
+```typescript
+class TransactionResult {
+  private constructor();
+  
+  readonly type: "success" | "partialSuccess" | "failure";
+  readonly error?: string;  // Error message if failed or partially failed
+  
+  toString(compact?: boolean): string;
+}
+```
+
+**Properties**:
+- `type`: The result status
+- `error`: Error message if the transaction failed or partially failed
+
+---
+
+### Transient
+
+A shielded "transient"; an output that is immediately spent within the same transaction.
+
+```typescript
+class Transient {
+  private constructor();
+  
+  readonly commitment: string;                      // Commitment of the transient
+  readonly nullifier: string;                       // Nullifier of the transient
+  readonly contractAddress: undefined | string;     // Contract address (if applicable)
+  
+  serialize(netid: NetworkId): Uint8Array;
+  toString(compact?: boolean): string;
+  
+  static deserialize(raw: Uint8Array, netid: NetworkId): Transient;
+}
+```
+
+**Properties**:
+- `commitment`: The commitment of the transient
+- `nullifier`: The nullifier of the transient
+- `contractAddress`: The contract address creating the transient, if applicable
+
+---
+
+### UnprovenAuthorizedMint
+
+A request to mint a coin, authorized by the mint's recipient, without the proof for the authorization being generated.
+
+```typescript
+class UnprovenAuthorizedMint {
+  private constructor();
+  
+  readonly coin: CoinInfo;          // The coin to be minted
+  readonly recipient: string;        // The recipient of this mint
+  
+  erase_proof(): ProofErasedAuthorizedMint;
+  serialize(netid: NetworkId): Uint8Array;
+  toString(compact?: boolean): string;
+  
+  static deserialize(raw: Uint8Array, netid: NetworkId): UnprovenAuthorizedMint;
+}
+```
+
+---
+
 ### LocalState
 
 The local state of a user/wallet, consisting of their secret key and a set of unspent coins.
