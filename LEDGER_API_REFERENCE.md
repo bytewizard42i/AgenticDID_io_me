@@ -250,6 +250,141 @@ class ContractOperationVersion {
 
 ---
 
+### ContractOperationVersionedVerifierKey
+
+A versioned verifier key to be associated with a ContractOperation.
+
+```typescript
+class ContractOperationVersionedVerifierKey {
+  constructor(
+    version: "v1",
+    rawVk: Uint8Array
+  );
+  
+  readonly version: "v1";         // Version identifier
+  readonly rawVk: Uint8Array;     // Raw verifier key bytes
+  
+  toString(compact?: boolean): string;
+}
+```
+
+---
+
+### ContractState
+
+The state of a contract, consisting primarily of the data accessible directly to the contract, and the map of ContractOperations that can be called on it.
+
+```typescript
+class ContractState {
+  constructor();  // Creates a blank contract state
+  
+  data: StateValue;                                    // Contract's primary state
+  maintenanceAuthority: ContractMaintenanceAuthority;  // Maintenance authority
+  
+  // Query operations
+  operation(operation: string | Uint8Array): undefined | ContractOperation;
+  operations(): (string | Uint8Array)[];
+  query(query: Op<null>[], cost_model: CostModel): GatherResult[];
+  
+  // Modify operations
+  setOperation(operation: string | Uint8Array, value: ContractOperation): void;
+  
+  // Serialization
+  serialize(networkid: NetworkId): Uint8Array;
+  toString(compact?: boolean): string;
+  
+  static deserialize(raw: Uint8Array, networkid: NetworkId): ContractState;
+}
+```
+
+**Properties**:
+- `data`: The current value of the primary state of the contract
+- `maintenanceAuthority`: The maintenance authority associated with this contract
+
+**Methods**:
+- `operation()`: Get the operation at a specific entry point name
+- `operations()`: Return a list of the entry points currently registered on this contract
+- `query()`: Runs a series of operations against the current state, and returns the results
+- `setOperation()`: Set a specific entry point name to contain a given operation
+- `serialize()`: Serialize state for network transmission
+- `toString()`: Human-readable string representation
+- `deserialize()`: Deserialize from bytes
+
+---
+
+### CostModel
+
+A cost model for calculating transaction fees.
+
+```typescript
+class CostModel {
+  private constructor();
+  
+  toString(compact?: boolean): string;
+  
+  static dummyCostModel(): CostModel;  // For non-critical/testing contexts
+}
+```
+
+**Static Methods**:
+- `dummyCostModel()`: A cost model for use in non-critical contexts (testing)
+
+---
+
+### EncryptionSecretKey
+
+Holds the encryption secret key of a user, which may be used to determine if a given offer contains outputs addressed to this user.
+
+```typescript
+class EncryptionSecretKey {
+  private constructor();
+  
+  test(offer: Offer): boolean;  // Check if offer contains outputs for this user
+  
+  yesIKnowTheSecurityImplicationsOfThis_serialize(netid: NetworkId): Uint8Array;
+  
+  static deserialize(raw: Uint8Array, netid: NetworkId): EncryptionSecretKey;
+}
+```
+
+**Methods**:
+- `test()`: Check if an offer contains outputs addressed to this user
+- `yesIKnowTheSecurityImplicationsOfThis_serialize()`: Serialize secret key (⚠️ Security-sensitive!)
+- `deserialize()`: Deserialize from bytes
+
+⚠️ **Security Warning**: The serialization method has a deliberately long name to emphasize the security implications of serializing a secret key.
+
+---
+
+### Input
+
+A shielded transaction input (burns an existing coin).
+
+```typescript
+class Input {
+  private constructor();
+  
+  readonly nullifier: string;                      // Nullifier of the input
+  readonly contractAddress: undefined | string;    // Contract address (if sender is contract)
+  
+  serialize(netid: NetworkId): Uint8Array;
+  toString(compact?: boolean): string;
+  
+  static deserialize(raw: Uint8Array, netid: NetworkId): Input;
+}
+```
+
+**Properties**:
+- `nullifier`: The nullifier of the input (prevents double-spending)
+- `contractAddress`: The contract address receiving the input, if the sender is a contract (undefined for user inputs)
+
+**Methods**:
+- `serialize()`: Serialize for network transmission
+- `toString()`: Human-readable string representation
+- `deserialize()`: Deserialize from bytes
+
+---
+
 ## Network Configuration
 
 ### setNetworkId()
