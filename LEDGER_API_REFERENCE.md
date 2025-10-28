@@ -385,6 +385,45 @@ class Input {
 
 ---
 
+### LedgerParameters
+
+Parameters used by the Midnight ledger, including transaction fees and bounds.
+
+```typescript
+class LedgerParameters {
+  private constructor();
+  
+  readonly transactionCostModel: TransactionCostModel;  // Cost model for transaction fees
+  
+  serialize(netid: NetworkId): Uint8Array;
+  toString(compact?: boolean): string;
+  
+  static deserialize(raw: Uint8Array, netid: NetworkId): LedgerParameters;
+  static dummyParameters(): LedgerParameters;  // For testing
+}
+```
+
+**Properties**:
+- `transactionCostModel`: The cost model used for transaction fees contained in these parameters
+
+**Methods**:
+- `serialize()`: Serialize parameters for network transmission
+- `toString()`: Human-readable string representation
+- `deserialize()`: Deserialize from bytes
+- `dummyParameters()`: A dummy set of testing parameters
+
+**Usage**:
+```typescript
+// For testing
+const testParams = LedgerParameters.dummyParameters();
+
+// In production, deserialize from network
+const params = LedgerParameters.deserialize(rawBytes, NetworkId.TestNet);
+const costModel = params.transactionCostModel;
+```
+
+---
+
 ## Network Configuration
 
 ### setNetworkId()
