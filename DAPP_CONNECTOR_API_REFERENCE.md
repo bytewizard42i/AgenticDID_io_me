@@ -412,15 +412,214 @@ async function createAndSubmitTransactionWithCoins() {
 
 ---
 
-## Types
+## Complete API Reference
+
+### Classes
+
+#### APIError
+
+Whenever there's a function called that returns a promise, an error with this shape can be thrown.
+
+```typescript
+class APIError extends CustomError {
+  constructor(code: ErrorCode, reason: string);
+  
+  code: ErrorCode;      // The code of the error that's thrown
+  reason: string;       // The reason the error is thrown
+}
+```
+
+**Properties**:
+- `code`: The error code (see ErrorCodes below)
+- `reason`: Human-readable error description
+
+---
+
+### Interfaces
+
+#### DAppConnectorAPI
+
+DApp Connector API Definition. When errors occur in functions returning a promise, they should be thrown as `APIError`.
+
+```typescript
+interface DAppConnectorAPI {
+  // Properties
+  name: string;                    // The name of the wallet
+  apiVersion: string;              // Semver string (check compatibility)
+  
+  // Methods
+  enable: () => Promise<DAppConnectorWalletAPI>;
+  isEnabled: () => Promise<boolean>;
+  serviceUriConfig: () => Promise<ServiceUriConfig>;
+}
+```
+
+**Properties**:
+- `name`: The name of the wallet
+- `apiVersion`: Semver string. DApps are encouraged to check compatibility whenever this changes
+
+**Methods**:
+- `enable()`: Request access to the wallet, returns the wallet API on approval
+- `isEnabled()`: Check if the wallet has authorized the dapp
+- `serviceUriConfig()`: Request the services (indexer, node, and proof server) URIs
+
+---
+
+#### DAppConnectorWalletAPI
+
+Shape of the Wallet API in the DApp Connector.
+
+```typescript
+interface DAppConnectorWalletAPI {
+  // Current Methods
+  balanceAndProveTransaction: (
+    tx: Transaction, 
+    newCoins: CoinInfo[]
+  ) => Promise<Transaction>;
+  
+  state: () => Promise<DAppConnectorWalletState>;
+  
+  submitTransaction: (tx: Transaction) => Promise<string>;
+  
+  // Deprecated Methods
+  /** @deprecated Use balanceAndProveTransaction instead */
+  balanceTransaction: (
+    tx: Transaction, 
+    newCoins: CoinInfo[]
+  ) => Promise<BalanceTransactionToProve | NothingToProve>;
+  
+  /** @deprecated Use balanceAndProveTransaction instead */
+  proveTransaction: (recipe: ProvingRecipe) => Promise<Transaction>;
+}
+```
+
+**balanceAndProveTransaction()**:
+- Balances the given transaction and proves it
+- Parameters:
+  - `tx`: Transaction to balance
+  - `newCoins`: New coins created by transaction, which wallet will watch for
+- Returns: Proved transaction or error
+
+**state()**:
+- Returns a promise with the exposed wallet state
+- Returns: `Promise<DAppConnectorWalletState>`
+
+**submitTransaction()**:
+- Submits given transaction to the node
+- Parameters:
+  - `tx`: Transaction to submit
+- Returns: First transaction identifier from identifiers list or error
+
+**balanceTransaction()** (⚠️ Deprecated):
+- Deprecated since version 1.1.0, will be removed in 2.0.0
+- Use `balanceAndProveTransaction()` instead
+- Balances the provided transaction
+- The `newCoins` parameter should be used when a new coin is created (e.g., DApp mints a coin)
+- Returns: `BalanceTransactionToProve` or `NothingToProve` recipe
+
+**proveTransaction()** (⚠️ Deprecated):
+- Deprecated since version 1.1.0, will be removed in 2.0.0
+- Use `balanceAndProveTransaction()` instead
+- Calls proving server with proving recipe
+- Note: Proof generation is expensive and time-consuming
+
+---
+
+#### DAppConnectorWalletState
+
+The shape of the wallet state that must be exposed.
+
+```typescript
+interface DAppConnectorWalletState {
+  // Current (bech32m encoded)
+  address: string;                    // Bech32m encoded address
+  coinPublicKey: string;              // Bech32m encoded coin public key
+  encryptionPublicKey: string;        // Bech32m encoded encryption public key
+  
+  // Legacy (deprecated, hex encoded)
+  /** @deprecated Use address instead */
+  addressLegacy: string;              // Hex: coinPublicKey + encryptionPublicKey
+  /** @deprecated Use coinPublicKey instead */
+  coinPublicKeyLegacy: string;        // Hex encoded coin public key
+  /** @deprecated Use encryptionPublicKey instead */
+  encryptionPublicKeyLegacy: string;  // Hex encoded encryption public key
+}
+```
+
+**Properties**:
+- `address`: The bech32m encoded address (current)
+- `coinPublicKey`: The bech32m encoded coin public key (current)
+- `encryptionPublicKey`: The bech32m encoded encryption public key (current)
+- `addressLegacy`: ⚠️ Deprecated - concatenation of coinPublicKey and encryptionPublicKey (hex)
+- `coinPublicKeyLegacy`: ⚠️ Deprecated - hex encoded coin public key
+- `encryptionPublicKeyLegacy`: ⚠️ Deprecated - hex encoded encryption public key
+
+---
+
+#### ServiceUriConfig
+
+The services configuration.
+
+```typescript
+interface ServiceUriConfig {
+  substrateNodeUri: string;     // Substrate node URI
+  indexerUri: string;           // Indexer HTTP URI
+  indexerWsUri: string;         // Indexer WebSocket URI
+  proverServerUri: string;      // Prover server URI
+}
+```
+
+**Properties**:
+- `substrateNodeUri`: The substrate node URI
+- `indexerUri`: The indexer HTTP URI
+- `indexerWsUri`: The indexer WebSocket URI
+- `proverServerUri`: The proving server URI
+
+---
+
+### Type Aliases
+
+#### ErrorCode
+
+```typescript
+type ErrorCode = typeof ErrorCodes[keyof typeof ErrorCodes];
+```
+
+ErrorCode type definition extracted from ErrorCodes variable.
+
+---
+
+### Variables
+
+#### ErrorCodes
+
+The following error codes can be thrown by the dapp connector.
+
+```typescript
+const ErrorCodes = {
+  InternalError: 'InternalError',      // Connector couldn't process request
+  InvalidRequest: 'InvalidRequest',    // Malformed request (e.g., bad transaction)
+  Rejected: 'Rejected'                 // User rejected the request
+} as const;
+```
+
+**Error Codes**:
+- `InternalError`: The dapp connector wasn't able to process the request
+- `InvalidRequest`: Can be thrown in various circumstances, e.g. malformed transaction
+- `Rejected`: The user rejected the request
+
+---
+
+## Types (Detailed)
 
 ### ServiceUriConfig
 
 ```typescript
 interface ServiceUriConfig {
-  nodeUrl: string;         // The node URL
-  indexerUrl: string;      // The indexer URL
-  provingServerUrl: string; // The proving server URL
+  substrateNodeUri: string;     // Substrate node URI
+  indexerUri: string;           // Indexer HTTP URI
+  indexerWsUri: string;         // Indexer WebSocket URI
+  proverServerUri: string;      // Prover server URI
 }
 ```
 
@@ -428,13 +627,14 @@ interface ServiceUriConfig {
 
 ### DAppConnectorWalletState
 
-Wallet state information (structure may vary by implementation).
-
 ```typescript
 interface DAppConnectorWalletState {
-  address: string;
-  balance: bigint;
-  // Additional wallet-specific fields
+  address: string;                    // Bech32m encoded address
+  coinPublicKey: string;              // Bech32m encoded coin public key
+  encryptionPublicKey: string;        // Bech32m encoded encryption public key
+  addressLegacy: string;              // Deprecated: hex encoded
+  coinPublicKeyLegacy: string;        // Deprecated: hex encoded
+  encryptionPublicKeyLegacy: string;  // Deprecated: hex encoded
 }
 ```
 
