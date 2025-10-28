@@ -31,7 +31,7 @@ echo -e "${YELLOW}Creating output directory...${NC}"
 mkdir -p "$OUTPUT_DIR"
 
 # Compiler settings
-COMPILER_IMAGE="ghcr.io/midnightntwrk/compact:latest"
+COMPILER_IMAGE="midnightnetwork/compactc:latest"
 COMPILER_VERSION="0.26.0"
 LANGUAGE_VERSION="0.18"
 
@@ -56,7 +56,7 @@ compile_contract() {
         -v "$OUTPUT_DIR:/workspace/output" \
         -w /workspace \
         "$COMPILER_IMAGE" \
-        compactc "contracts/$contract_file" -o "output/${contract_name}/" \
+        compactc "contracts/$contract_file" "output/${contract_name}/" \
         || {
             echo -e "${RED}❌ Compilation failed for ${contract_name}${NC}"
             return 1
