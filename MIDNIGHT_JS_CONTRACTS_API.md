@@ -293,60 +293,109 @@ class ReplaceMaintenanceAuthorityTxFailedError extends TxFailedError {
 
 ### IncompleteCallTxPrivateStateConfig
 
-An error indicating incomplete private state configuration for a call transaction.
+An error indicating that a private state ID was specified for a call transaction while a private state provider was not.
 
 ```typescript
 class IncompleteCallTxPrivateStateConfig extends Error {
-  constructor(message: string)
+  constructor()
 }
 ```
 
-**When Thrown**: When calling a circuit that requires private state but configuration is missing or incomplete
+**Purpose**: Let the user know that the private state of a contract was NOT updated when they might expect it to be.
+
+**When Thrown**: When a private state ID is specified in call options but no private state provider is configured
+
+**Why This Matters**: Without a provider, the private state cannot be persisted, and the user needs to know their state wasn't actually saved.
 
 **Example**:
 ```typescript
 try {
   await call(address, 'circuit', {
-    // Missing privateState or witnesses!
     arguments: { value: 42 },
-    providers
+    witnesses: { secret: mySecret },
+    privateStateId: 'my-state',  // ❌ ID provided
+    providers: {
+      zkConfigProvider,
+      proofProvider,
+      indexer
+      // ❌ Missing privateStateProvider!
+    }
   });
 } catch (error) {
   if (error instanceof IncompleteCallTxPrivateStateConfig) {
-    console.error('Private state configuration missing');
-    console.error('Ensure witnesses or privateState is provided');
+    console.error('Private state ID provided without provider!');
+    console.error('Private state was NOT saved.');
+    console.error('Add privateStateProvider to providers object.');
   }
 }
+```
+
+**Fix**:
+```typescript
+// ✅ Correct: Provide both ID and provider
+await call(address, 'circuit', {
+  arguments: { value: 42 },
+  privateStateId: 'my-state',
+  providers: {
+    zkConfigProvider,
+    proofProvider,
+    indexer,
+    privateStateProvider  // ✅ Now included!
+  }
+});
 ```
 
 ---
 
 ### IncompleteFindContractPrivateStateConfig
 
-An error indicating incomplete private state configuration when finding a contract.
+An error indicating that an initial private state was specified for a contract find while a private state ID was not.
 
 ```typescript
 class IncompleteFindContractPrivateStateConfig extends Error {
-  constructor(message: string)
+  constructor()
 }
 ```
 
-**When Thrown**: When finding a contract that requires private state but configuration is missing
+**Purpose**: We can't store the initial private state if we don't have a private state ID. The user needs to know this.
+
+**When Thrown**: When finding a deployed contract with initial private state specified but no state ID to store it under
+
+**Why This Matters**: Without an ID, there's no way to persist the private state, so it will be lost.
 
 **Example**:
 ```typescript
 try {
   await findDeployedContract({
     contractAddress: '0x123...',
-    // Missing privateStateConfig!
+    privateStateConfig: {
+      store: true,
+      initialState: myPrivateState,  // ❌ State provided
+      // ❌ Missing stateId!
+    },
     providers
   });
 } catch (error) {
   if (error instanceof IncompleteFindContractPrivateStateConfig) {
-    console.error('Private state configuration missing');
-    console.error('Provide privateStateConfig with store/existing state options');
+    console.error('Initial private state provided without ID!');
+    console.error('Cannot store private state without an ID.');
+    console.error('Provide stateId in privateStateConfig.');
   }
 }
+```
+
+**Fix**:
+```typescript
+// ✅ Correct: Provide both initial state and ID
+await findDeployedContract({
+  contractAddress: '0x123...',
+  privateStateConfig: {
+    store: true,
+    stateId: 'my-contract-state',  // ✅ ID provided
+    initialState: myPrivateState
+  },
+  providers
+});
 ```
 
 ---
