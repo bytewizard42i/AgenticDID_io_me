@@ -3022,6 +3022,127 @@ const output = UnprovenOutput.new(coin, recipientPubKey);
 
 ---
 
+### partitionTranscripts()
+
+Finalizes a set of programs against their initial contexts, resulting in guaranteed and fallible Transcripts.
+
+```typescript
+function partitionTranscripts(
+  calls: PreTranscript[],
+  params: LedgerParameters
+): [Transcript<AlignedValue> | undefined, Transcript<AlignedValue> | undefined][]
+```
+
+**Parameters**:
+- `calls`: Array of PreTranscript (pre-finalized programs)
+- `params`: LedgerParameters for the current ledger state
+
+**Returns**: Array of tuples containing:
+- First element: Guaranteed transcript (or undefined)
+- Second element: Fallible transcript (or undefined)
+
+**Usage**: Advanced function for finalizing contract calls with optimal allocation and heuristic gas fee coverage. Used internally by the transaction building process.
+
+**Note**: This function optimally partitions contract operations into guaranteed (always executed) and fallible (may fail) sections, which is critical for proper transaction construction.
+
+---
+
+### persistentCommit()
+
+Internal implementation of the persistent commitment primitive.
+
+```typescript
+function persistentCommit(
+  align: Alignment,
+  val: Value,
+  opening: Value
+): Value
+```
+
+**Parameters**:
+- `align`: Alignment specification
+- `val`: Value to commit to
+- `opening`: Opening/randomness value (must encode a 32-byte bytestring)
+
+**Returns**: `Value` - The commitment
+
+**Throws**: If val does not have alignment align, opening does not encode a 32-byte bytestring, or any component has a compress alignment
+
+**Note**: Internal function - creates persistent commitments. See CompactStandardLibrary's `persistentCommit()` for the public API. Persistent commitments are used for commit-reveal schemes on the ledger.
+
+---
+
+### persistentHash()
+
+Internal implementation of the persistent hash primitive.
+
+```typescript
+function persistentHash(
+  align: Alignment,
+  val: Value
+): Value
+```
+
+**Parameters**:
+- `align`: Alignment specification
+- `val`: Value to hash
+
+**Returns**: `Value` - The hash (Bytes<32> representation)
+
+**Throws**: If val does not have alignment align, or any component has a compress alignment
+
+**Note**: Internal function - computes persistent hashes for ledger storage. See CompactStandardLibrary's `persistentHash()` for the public API. Used extensively in your fixed contracts for cryptographic security.
+
+**Important**: Persistent hashes are **automatically disclosed** - no `disclose()` wrapper needed! This is because hash preimage resistance provides privacy protection.
+
+---
+
+### runProgram()
+
+Runs a VM program against an initial stack, with an optional gas limit.
+
+```typescript
+function runProgram(
+  initial: VmStack,
+  ops: Op<null>[],
+  cost_model: CostModel,
+  gas_limit?: bigint
+): VmResults
+```
+
+**Parameters**:
+- `initial`: VmStack representing the starting stack state
+- `ops`: Array of operations to execute
+- `cost_model`: CostModel for gas calculation
+- `gas_limit`: Optional gas limit (bigint)
+
+**Returns**: `VmResults` containing:
+- Final stack state
+- Events emitted
+- Gas cost consumed
+
+**Usage**: Advanced function for executing VM programs. Used internally for contract execution and testing.
+
+```typescript
+// Example: Running a program with gas limit
+const initialStack = new VmStack();
+initialStack.push(someValue, true);
+
+const result = runProgram(
+  initialStack,
+  operations,
+  costModel,
+  1000000n  // Gas limit
+);
+
+console.log(`Gas used: ${result.gasCost}`);
+console.log(`Final stack size: ${result.stack.length()}`);
+```
+
+**Note**: This is a low-level function typically used for contract testing and internal ledger operations.
+
+---
+
 ## Encode/Decode Functions Summary
 
 The encode and decode functions provide essential bidirectional bridges between Compact contract representations and Ledger API representations:
