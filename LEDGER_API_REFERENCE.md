@@ -3697,6 +3697,134 @@ await contract.processCoin(compactCoin);
 
 ---
 
+## Type Aliases
+
+The Ledger API defines several important type aliases for working with aligned values, alignments, and blockchain context.
+
+### AlignedValue
+
+An onchain data value, in field-aligned binary format, annotated with its alignment.
+
+```typescript
+type AlignedValue = {
+  alignment: Alignment;
+  value: Value;
+};
+```
+
+**Properties**:
+- `alignment`: Alignment specification for the value
+- `value`: The actual value in field-aligned binary format
+
+**Usage**: Used throughout the API for type-safe handling of on-chain data with known alignment.
+
+---
+
+### Alignment
+
+The alignment of an onchain field-aligned binary data value.
+
+```typescript
+type Alignment = AlignmentSegment[];
+```
+
+**Description**: An array of alignment segments that describe the structure and alignment requirements of on-chain data.
+
+**Usage**: Specifies how data should be aligned when stored on-chain or processed by the VM.
+
+---
+
+### AlignmentAtom
+
+An atom in a larger Alignment.
+
+```typescript
+type AlignmentAtom = 
+  | { tag: "compress"; }
+  | { tag: "field"; }
+  | { tag: "bytes"; length: number; };
+```
+
+**Variants**:
+- `{ tag: "compress" }` - Compressed alignment
+- `{ tag: "field" }` - Field element alignment
+- `{ tag: "bytes"; length: number }` - Byte array alignment with specified length
+
+**Description**: The atomic unit of alignment specification. Multiple atoms can be combined into alignment segments.
+
+---
+
+### AlignmentSegment
+
+A segment in a larger Alignment.
+
+```typescript
+type AlignmentSegment = 
+  | { tag: "option"; value: Alignment[]; }
+  | { tag: "atom"; value: AlignmentAtom; };
+```
+
+**Variants**:
+- `{ tag: "option"; value: Alignment[] }` - Optional alignment (for Maybe types)
+- `{ tag: "atom"; value: AlignmentAtom }` - Atomic alignment segment
+
+**Description**: Segments combine to form complete alignment specifications for complex data structures.
+
+---
+
+### BlockContext
+
+The context information about a block available inside the VM.
+
+```typescript
+type BlockContext = {
+  blockHash: string;
+  secondsSinceEpoch: bigint;
+  secondsSinceEpochErr: number;
+};
+```
+
+**Properties**:
+- `blockHash`: The hash of the block prior to this transaction (hex-encoded string)
+- `secondsSinceEpoch`: The seconds since the UNIX epoch that have elapsed
+- `secondsSinceEpochErr`: The maximum error on secondsSinceEpoch (positive seconds value)
+
+**Usage**: Provides blockchain context information during VM execution, useful for time-based conditions and block identification.
+
+```typescript
+// Example usage in contract execution
+const context = getBlockContext();
+console.log(`Block hash: ${context.blockHash}`);
+console.log(`Timestamp: ${context.secondsSinceEpoch}`);
+console.log(`Time accuracy: ±${context.secondsSinceEpochErr}s`);
+```
+
+---
+
+### CoinCommitment
+
+A Zswap coin commitment, as a hex-encoded 256-bit bitstring.
+
+```typescript
+type CoinCommitment = string;
+```
+
+**Description**: Represents a cryptographic commitment to a coin in the Zswap shielded pool. The commitment hides the coin details while allowing verification.
+
+**Format**: Hex-encoded string representing a 256-bit value
+
+**Usage**: Used in shielded transactions to commit to coins without revealing their details.
+
+```typescript
+// Coin commitments appear in outputs
+const output = UnprovenOutput.new(coin, recipientPubKey);
+console.log(`Commitment: ${output.commitment}`);
+```
+
+**Security**: The commitment cryptographically binds to the coin details without revealing them, providing privacy while ensuring integrity.
+
+---
+
 ## Related Documentation
 
 - **[i_am_Midnight_LLM_ref.md](i_am_Midnight_LLM_ref.md)** - Compact runtime API
