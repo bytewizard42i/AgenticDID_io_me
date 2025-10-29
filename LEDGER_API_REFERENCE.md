@@ -4380,6 +4380,113 @@ const result = runProgram(initialStack, ops, costModel);
 
 ---
 
+### QualifiedCoinInfo
+
+Information required to spend an existing coin, alongside authorization of the owner.
+
+```typescript
+type QualifiedCoinInfo = {
+  nonce: Nonce;
+  type: TokenType;
+  value: bigint;
+  mt_index: bigint;
+};
+```
+
+**Properties**:
+- `nonce`: The coin's randomness (Nonce), preventing it from colliding with other coins
+- `type`: The coin's type (TokenType), identifying the currency it represents
+- `value`: The coin's value in atomic units (bigint), bounded to be a non-negative 64-bit integer
+- `mt_index`: The coin's location in the chain's Merkle tree of coin commitments (bigint), bounded to be a non-negative 64-bit integer
+
+**Description**: Extends CoinInfo with the Merkle tree index, which is required to spend an existing coin. The index proves the coin exists in the global Merkle tree of commitments.
+
+**Comparison with CoinInfo**:
+- `CoinInfo` - For creating **new** coins
+- `QualifiedCoinInfo` - For spending **existing** coins (includes `mt_index`)
+
+**Usage**: Used when creating inputs from existing coins.
+
+```typescript
+import { 
+  UnprovenInput, 
+  decodeQualifiedCoinInfo, 
+  encodeQualifiedCoinInfo 
+} from '@midnight-ntwrk/ledger';
+
+// From LocalState tracking
+const qualifiedCoin: QualifiedCoinInfo = localState.unspentCoins[0];
+
+// Create input to spend the coin
+const input = UnprovenInput.newContractOwned(
+  qualifiedCoin,
+  contractAddress,
+  zswapState
+);
+
+// Convert between formats
+const compactCoin = encodeQualifiedCoinInfo(qualifiedCoin);
+const ledgerCoin = decodeQualifiedCoinInfo(compactCoin);
+```
+
+**Important**: The `mt_index` is the coin's position in the global Merkle tree and is crucial for generating the Merkle proof that the coin exists.
+
+**Related**:
+- Used by `UnprovenInput.newContractOwned()`
+- Tracked in `LocalState.unspentCoins`
+- Encode/decode functions: `encodeQualifiedCoinInfo()` / `decodeQualifiedCoinInfo()`
+
+---
+
+### Signature
+
+A hex-encoded BIP-340 signature, with a 3-byte version prefix.
+
+```typescript
+type Signature = string;
+```
+
+**Format**: Hex-encoded BIP-340 signature with 3-byte version prefix
+
+**Description**: Represents a cryptographic signature used for transaction authorization and data verification.
+
+**Usage**: Created with `signData()` and verified with `verifySignature()`.
+
+```typescript
+import { 
+  sampleSigningKey, 
+  signData, 
+  signatureVerifyingKey, 
+  verifySignature 
+} from '@midnight-ntwrk/ledger';
+
+// Sign data
+const signingKey = sampleSigningKey();
+const data = new Uint8Array([1, 2, 3, 4]);
+const signature: Signature = signData(signingKey, data);
+
+// Verify signature
+const verifyingKey = signatureVerifyingKey(signingKey);
+const isValid = verifySignature(verifyingKey, data, signature);
+console.log(`Valid: ${isValid}`);  // true
+```
+
+**BIP-340**: Bitcoin Improvement Proposal 340 defines Schnorr signatures for Bitcoin. Midnight uses the same signature scheme for compatibility and proven security.
+
+**Version Prefix**: The 3-byte prefix allows for future signature algorithm upgrades while maintaining backward compatibility.
+
+**Security**: 
+- Never reuse signatures across different contexts
+- Always verify signatures before trusting signed data
+- Keep signing keys secure and never share them
+
+**Related**:
+- Created by `signData()` function
+- Verified by `verifySignature()` function
+- Public key derived with `signatureVerifyingKey()`
+
+---
+
 ## Related Documentation
 
 - **[i_am_Midnight_LLM_ref.md](i_am_Midnight_LLM_ref.md)** - Compact runtime API
