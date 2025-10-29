@@ -2343,6 +2343,216 @@ try {
 
 ---
 
+## Utility Functions
+
+The Ledger API provides several utility functions for working with proofs, coins, and cryptographic operations.
+
+### bigIntModFr()
+
+Takes a bigint modulus the proof system's scalar field.
+
+```typescript
+function bigIntModFr(x: bigint): bigint
+```
+
+**Parameters**:
+- `x`: bigint to reduce modulo the scalar field
+
+**Returns**: bigint reduced modulo the proof system's scalar field
+
+**Usage**: Ensures bigint values are valid within the proof system's field.
+
+---
+
+### bigIntToValue()
+
+Internal conversion between bigints and their field-aligned binary representation.
+
+```typescript
+function bigIntToValue(x: bigint): Value
+```
+
+**Parameters**:
+- `x`: bigint to convert
+
+**Returns**: `Value` - Field-aligned binary representation
+
+**Note**: Internal function - typically used by the ledger implementation itself.
+
+---
+
+### checkProofData()
+
+Internal implementation of proof dry runs.
+
+```typescript
+function checkProofData(
+  zkir: string,
+  input: AlignedValue,
+  output: AlignedValue,
+  public_transcript: Op<AlignedValue>[],
+  private_transcript_outputs: AlignedValue[]
+): void
+```
+
+**Parameters**:
+- `zkir`: Zero-knowledge intermediate representation
+- `input`: Aligned input value
+- `output`: Aligned output value
+- `public_transcript`: Array of public operations
+- `private_transcript_outputs`: Array of private transcript outputs
+
+**Returns**: void
+
+**Throws**: If the proof would not hold
+
+**Usage**: Used internally to validate proofs before submission.
+
+---
+
+### coinCommitment()
+
+Internal implementation of the coin commitment primitive.
+
+```typescript
+function coinCommitment(
+  coin: AlignedValue,
+  recipient: AlignedValue
+): AlignedValue
+```
+
+**Parameters**:
+- `coin`: Aligned coin value
+- `recipient`: Aligned recipient value
+
+**Returns**: `AlignedValue` - The coin commitment
+
+**Note**: Internal cryptographic primitive used in coin creation.
+
+---
+
+### communicationCommitment()
+
+Computes the communication commitment corresponding to an input/output pair and randomness.
+
+```typescript
+function communicationCommitment(
+  input: AlignedValue,
+  output: AlignedValue,
+  rand: string
+): CommunicationCommitment
+```
+
+**Parameters**:
+- `input`: Aligned input value
+- `output`: Aligned output value
+- `rand`: Randomness string
+
+**Returns**: `CommunicationCommitment`
+
+**Usage**: Used for cross-contract communication commitments to ensure message integrity.
+
+---
+
+### communicationCommitmentRandomness()
+
+Samples a new CommunicationCommitmentRand uniformly.
+
+```typescript
+function communicationCommitmentRandomness(): CommunicationCommitmentRand
+```
+
+**Returns**: `CommunicationCommitmentRand` - Uniformly sampled randomness
+
+**Usage**: Generate fresh randomness for communication commitments.
+
+```typescript
+const rand = communicationCommitmentRandomness();
+const commitment = communicationCommitment(input, output, rand);
+```
+
+---
+
+### createCoinInfo()
+
+Creates a new CoinInfo, sampling a uniform nonce.
+
+```typescript
+function createCoinInfo(type_: string, value: bigint): CoinInfo
+```
+
+**Parameters**:
+- `type_`: Token type identifier (string)
+- `value`: Coin value (bigint)
+
+**Returns**: `CoinInfo` with randomly sampled nonce
+
+**Usage**: Primary way to create new coin information for transactions.
+
+```typescript
+const coin = createCoinInfo('DUST', 1000n);
+```
+
+---
+
+### decodeCoinInfo()
+
+Decode a CoinInfo from Compact's CoinInfo TypeScript representation.
+
+```typescript
+function decodeCoinInfo(coin: {
+  color: Uint8Array;
+  nonce: Uint8Array;
+  value: bigint;
+}): CoinInfo
+```
+
+**Parameters**:
+- `coin`: Object with Compact's CoinInfo structure
+  - `color`: Uint8Array representing token type
+  - `nonce`: Uint8Array random nonce
+  - `value`: bigint coin value
+
+**Returns**: `CoinInfo` in Ledger API format
+
+**Usage**: Convert between Compact contract representation and Ledger API representation.
+
+```typescript
+// From Compact contract
+const compactCoin = {
+  color: new Uint8Array([/* ... */]),
+  nonce: new Uint8Array([/* ... */]),
+  value: 1000n
+};
+
+const ledgerCoin = decodeCoinInfo(compactCoin);
+```
+
+---
+
+### decodeCoinPublicKey()
+
+Decode a CoinPublicKey from a Uint8Array originating from Compact's CoinPublicKey type.
+
+```typescript
+function decodeCoinPublicKey(pk: Uint8Array): CoinPublicKey
+```
+
+**Parameters**:
+- `pk`: Uint8Array containing the coin public key bytes
+
+**Returns**: `CoinPublicKey` in Ledger API format
+
+**Usage**: Convert Compact contract public keys to Ledger API format.
+
+```typescript
+// From Compact contract
+const compactPubKey = new Uint8Array([/* 32 bytes */]);
+const ledgerPubKey = decodeCoinPublicKey(compactPubKey);
+```
+
+---
+
 ## Related Documentation
 
 - **[i_am_Midnight_LLM_ref.md](i_am_Midnight_LLM_ref.md)** - Compact runtime API
