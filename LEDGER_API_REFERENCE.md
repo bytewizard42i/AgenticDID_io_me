@@ -2671,19 +2671,264 @@ function degradeToTransient(persistent: Value): Value
 
 ---
 
-## Decode Functions Summary
+### dummyContractAddress()
 
-The decode functions provide essential bridges between Compact contract representations and Ledger API representations:
+A sample contract address, guaranteed to be the same for a given network ID.
 
-| Function | Converts From | Converts To | Common Use Case |
-|----------|--------------|-------------|-----------------|
-| `decodeCoinInfo()` | Compact CoinInfo | Ledger CoinInfo | Creating outputs from contract coins |
-| `decodeCoinPublicKey()` | Compact bytes | Ledger CoinPublicKey | User public key handling |
-| `decodeContractAddress()` | Compact bytes | Ledger ContractAddress | Contract-owned outputs/inputs |
-| `decodeQualifiedCoinInfo()` | Compact QualifiedCoinInfo | Ledger QualifiedCoinInfo | Spending contract coins |
-| `decodeTokenType()` | Compact bytes | Ledger TokenType (string) | Token type handling |
+```typescript
+function dummyContractAddress(): string
+```
 
-**Best Practice**: Always use these decode functions when working with data from Compact contracts to ensure proper type compatibility with the Ledger API.
+**Returns**: string - A consistent dummy contract address
+
+**Usage**: For use in testing scenarios where you need a valid contract address format but don't have an actual deployed contract.
+
+```typescript
+import { dummyContractAddress, setNetworkId, NetworkId } from '@midnight-ntwrk/ledger';
+
+setNetworkId(NetworkId.TestNet);
+const testAddress = dummyContractAddress();
+
+// Use in tests
+const output = UnprovenOutput.newContractOwned(coin, testAddress);
+```
+
+---
+
+### ecAdd()
+
+Internal implementation of the elliptic curve addition primitive.
+
+```typescript
+function ecAdd(a: Value, b: Value): Value
+```
+
+**Parameters**:
+- `a`: Value encoding an elliptic curve point
+- `b`: Value encoding an elliptic curve point
+
+**Returns**: `Value` - The sum of the two curve points
+
+**Throws**: If either input does not encode an elliptic curve point
+
+**Note**: Internal function - performs elliptic curve point addition. See CompactStandardLibrary's `ecAdd()` for the public API.
+
+---
+
+### ecMul()
+
+Internal implementation of the elliptic curve multiplication primitive.
+
+```typescript
+function ecMul(a: Value, b: Value): Value
+```
+
+**Parameters**:
+- `a`: Value encoding an elliptic curve point
+- `b`: Value encoding a field element (scalar)
+
+**Returns**: `Value` - The scalar multiplication result
+
+**Throws**: If a does not encode an elliptic curve point or b does not encode a field element
+
+**Note**: Internal function - performs elliptic curve scalar multiplication. See CompactStandardLibrary's `ecMul()` for the public API.
+
+---
+
+### ecMulGenerator()
+
+Internal implementation of the elliptic curve generator multiplication primitive.
+
+```typescript
+function ecMulGenerator(val: Value): Value
+```
+
+**Parameters**:
+- `val`: Value encoding a field element (scalar)
+
+**Returns**: `Value` - Generator multiplied by the scalar
+
+**Throws**: If val does not encode a field element
+
+**Note**: Internal function - multiplies the curve generator by a scalar. See CompactStandardLibrary's `ecMulGenerator()` for the public API.
+
+---
+
+### encodeCoinInfo()
+
+Encode a CoinInfo into Compact's CoinInfo TypeScript representation.
+
+```typescript
+function encodeCoinInfo(coin: CoinInfo): {
+  color: Uint8Array;
+  nonce: Uint8Array;
+  value: bigint;
+}
+```
+
+**Parameters**:
+- `coin`: CoinInfo in Ledger API format
+
+**Returns**: Object with Compact's CoinInfo structure
+- `color`: Uint8Array representing token type
+- `nonce`: Uint8Array random nonce
+- `value`: bigint coin value
+
+**Usage**: Convert from Ledger API format to Compact contract format. The inverse of `decodeCoinInfo()`.
+
+```typescript
+// Ledger API coin
+const ledgerCoin: CoinInfo = createCoinInfo('DUST', 1000n);
+
+// Convert for Compact contract
+const compactCoin = encodeCoinInfo(ledgerCoin);
+
+// Now usable in Compact contract calls
+await contract.someCircuit(compactCoin);
+```
+
+---
+
+### encodeCoinPublicKey()
+
+Encode a CoinPublicKey into a Uint8Array for use in Compact's CoinPublicKey type.
+
+```typescript
+function encodeCoinPublicKey(pk: string): Uint8Array
+```
+
+**Parameters**:
+- `pk`: CoinPublicKey as string (Ledger API format)
+
+**Returns**: Uint8Array suitable for Compact's CoinPublicKey type
+
+**Usage**: Convert public keys from Ledger API format to Compact contract format. The inverse of `decodeCoinPublicKey()`.
+
+```typescript
+// From LocalState
+const localState = new LocalState();
+const ledgerPubKey = localState.coinPublicKey;
+
+// Convert for Compact contract
+const compactPubKey = encodeCoinPublicKey(ledgerPubKey);
+
+// Use in contract call
+await contract.registerUser(compactPubKey);
+```
+
+---
+
+### encodeContractAddress()
+
+Encode a ContractAddress into a Uint8Array for use in Compact's ContractAddress type.
+
+```typescript
+function encodeContractAddress(addr: string): Uint8Array
+```
+
+**Parameters**:
+- `addr`: ContractAddress as string (Ledger API format)
+
+**Returns**: Uint8Array suitable for Compact's ContractAddress type
+
+**Usage**: Convert contract addresses from Ledger API format to Compact contract format. The inverse of `decodeContractAddress()`.
+
+```typescript
+// Ledger API address
+const contractAddr = '0x123...';
+
+// Convert for Compact contract
+const compactAddr = encodeContractAddress(contractAddr);
+
+// Use in contract call
+await contract.setTargetContract(compactAddr);
+```
+
+---
+
+### encodeQualifiedCoinInfo()
+
+Encode a QualifiedCoinInfo into Compact's QualifiedCoinInfo TypeScript representation.
+
+```typescript
+function encodeQualifiedCoinInfo(coin: QualifiedCoinInfo): {
+  color: Uint8Array;
+  nonce: Uint8Array;
+  value: bigint;
+  mt_index: bigint;
+}
+```
+
+**Parameters**:
+- `coin`: QualifiedCoinInfo in Ledger API format
+
+**Returns**: Object with Compact's QualifiedCoinInfo structure
+- `color`: Uint8Array representing token type
+- `nonce`: Uint8Array random nonce
+- `value`: bigint coin value
+- `mt_index`: bigint Merkle tree index
+
+**Usage**: Convert from Ledger API format to Compact contract format. The inverse of `decodeQualifiedCoinInfo()`.
+
+```typescript
+// From LocalState coin tracking
+const ledgerQualifiedCoin = localState.unspentCoins[0];
+
+// Convert for Compact contract
+const compactQualifiedCoin = encodeQualifiedCoinInfo(ledgerQualifiedCoin);
+
+// Use in contract call
+await contract.spendCoin(compactQualifiedCoin);
+```
+
+---
+
+## Encode/Decode Functions Summary
+
+The encode and decode functions provide essential bidirectional bridges between Compact contract representations and Ledger API representations:
+
+### Complete Conversion Table
+
+| Type | Decode (Compact → Ledger) | Encode (Ledger → Compact) | Use Case |
+|------|---------------------------|---------------------------|----------|
+| **CoinInfo** | `decodeCoinInfo()` | `encodeCoinInfo()` | Basic coin data exchange |
+| **QualifiedCoinInfo** | `decodeQualifiedCoinInfo()` | `encodeQualifiedCoinInfo()` | Spending contract coins with Merkle index |
+| **CoinPublicKey** | `decodeCoinPublicKey()` | `encodeCoinPublicKey()` | User identity in shielded transactions |
+| **ContractAddress** | `decodeContractAddress()` | `encodeContractAddress()` | Contract-to-contract interactions |
+| **TokenType** | `decodeTokenType()` | N/A | Token type string conversion |
+
+### When to Use Each Direction
+
+**Decode (Compact → Ledger)**: Use when receiving data FROM a Compact contract
+```typescript
+// Contract returns coin data
+const compactCoin = await contract.getCoin();
+const ledgerCoin = decodeCoinInfo(compactCoin);
+
+// Use in Ledger API
+const output = UnprovenOutput.new(ledgerCoin, recipientPubKey);
+```
+
+**Encode (Ledger → Compact)**: Use when passing data TO a Compact contract
+```typescript
+// Create coin in Ledger API
+const ledgerCoin = createCoinInfo('DUST', 1000n);
+
+// Pass to contract
+const compactCoin = encodeCoinInfo(ledgerCoin);
+await contract.processCoin(compactCoin);
+```
+
+### Best Practices
+
+1. **Always convert at boundaries**: Never mix Compact and Ledger representations
+2. **Use TypeScript types**: Let the compiler catch conversion errors
+3. **Consistent direction**: Decode for reads, encode for writes
+4. **Testing**: Use `dummyContractAddress()` for consistent test data
+
+**Memory Aid**: 
+- **decode** = Compact **OUT** → Ledger API (data coming out of contract)
+- **encode** = Ledger API **IN** → Compact (data going into contract)
 
 ---
 
