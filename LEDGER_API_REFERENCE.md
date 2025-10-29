@@ -2883,6 +2883,145 @@ await contract.spendCoin(compactQualifiedCoin);
 
 ---
 
+### encodeTokenType()
+
+Encode a TokenType into a Uint8Array for use in Compact's TokenType type.
+
+```typescript
+function encodeTokenType(tt: string): Uint8Array
+```
+
+**Parameters**:
+- `tt`: TokenType as string (Ledger API format)
+
+**Returns**: Uint8Array suitable for Compact's TokenType type
+
+**Usage**: Convert token types from Ledger API string format to Compact contract format. Completes the encode/decode pair with `decodeTokenType()`.
+
+```typescript
+// Ledger API token type
+const ledgerTokenType = 'DUST';
+
+// Convert for Compact contract
+const compactTokenType = encodeTokenType(ledgerTokenType);
+
+// Use in contract call
+await contract.processToken(compactTokenType);
+
+// Or use native token
+const nativeType = nativeToken();
+const compactNative = encodeTokenType(nativeType);
+```
+
+---
+
+### hashToCurve()
+
+Internal implementation of the hash to curve primitive.
+
+```typescript
+function hashToCurve(align: Alignment, val: Value): Value
+```
+
+**Parameters**:
+- `align`: Alignment specification
+- `val`: Value to hash to curve
+
+**Returns**: `Value` - Elliptic curve point
+
+**Throws**: If val does not have alignment align
+
+**Note**: Internal function - hashes arbitrary values to elliptic curve points. See CompactStandardLibrary's `hashToCurve()` for the public API.
+
+---
+
+### leafHash()
+
+Internal implementation of the Merkle tree leaf hash primitive.
+
+```typescript
+function leafHash(value: AlignedValue): AlignedValue
+```
+
+**Parameters**:
+- `value`: AlignedValue to hash as Merkle tree leaf
+
+**Returns**: `AlignedValue` - The leaf hash
+
+**Note**: Internal function - computes Merkle tree leaf hashes. Used by MerkleTree and HistoricMerkleTree internally.
+
+---
+
+### maxAlignedSize()
+
+Internal implementation of the max aligned size primitive.
+
+```typescript
+function maxAlignedSize(alignment: Alignment): bigint
+```
+
+**Parameters**:
+- `alignment`: Alignment specification
+
+**Returns**: bigint - Maximum size for the given alignment
+
+**Note**: Internal function - computes the maximum aligned size for a given alignment specification. Used for internal memory management and validation.
+
+---
+
+### maxField()
+
+Returns the maximum representable value in the proof system's scalar field.
+
+```typescript
+function maxField(): bigint
+```
+
+**Returns**: bigint - Maximum field value (1 less than the prime modulus)
+
+**Usage**: Useful for validation and range checks when working with field elements.
+
+```typescript
+const max = maxField();
+
+// Validate field element
+if (value > max) {
+  throw new Error('Value exceeds field maximum');
+}
+
+// Or use with bigIntModFr() to ensure validity
+const validValue = bigIntModFr(rawValue);
+```
+
+---
+
+### nativeToken()
+
+Returns the base/system token type.
+
+```typescript
+function nativeToken(): TokenType
+```
+
+**Returns**: `TokenType` (string) - The native/base token type identifier
+
+**Usage**: Get the identifier for Midnight's native token (analogous to ETH on Ethereum or DUST on Midnight).
+
+```typescript
+import { nativeToken, createCoinInfo } from '@midnight-ntwrk/ledger';
+
+// Create coin with native token
+const nativeType = nativeToken();
+const coin = createCoinInfo(nativeType, 1000n);
+
+// Use in transactions
+const output = UnprovenOutput.new(coin, recipientPubKey);
+```
+
+**Important**: Always use `nativeToken()` rather than hardcoding token type strings for native tokens to ensure compatibility across different network configurations.
+
+---
+
 ## Encode/Decode Functions Summary
 
 The encode and decode functions provide essential bidirectional bridges between Compact contract representations and Ledger API representations:
@@ -2895,7 +3034,7 @@ The encode and decode functions provide essential bidirectional bridges between 
 | **QualifiedCoinInfo** | `decodeQualifiedCoinInfo()` | `encodeQualifiedCoinInfo()` | Spending contract coins with Merkle index |
 | **CoinPublicKey** | `decodeCoinPublicKey()` | `encodeCoinPublicKey()` | User identity in shielded transactions |
 | **ContractAddress** | `decodeContractAddress()` | `encodeContractAddress()` | Contract-to-contract interactions |
-| **TokenType** | `decodeTokenType()` | N/A | Token type string conversion |
+| **TokenType** | `decodeTokenType()` | `encodeTokenType()` | Token type conversion (use with `nativeToken()`) |
 
 ### When to Use Each Direction
 
