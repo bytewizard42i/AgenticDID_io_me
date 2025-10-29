@@ -4257,6 +4257,129 @@ const spentCoins: Nullifier[] = effects.claimedNullifiers;
 
 ---
 
+### Op
+
+An individual operation in the onchain VM.
+
+```typescript
+type Op<R> = 
+  // Control flow
+  | { noop: { n: number; }; }
+  | { branch: { skip: number; }; }
+  | { jmp: { skip: number; }; }
+  | "ckpt"
+  
+  // Stack operations
+  | "pop"
+  | { popeq: { cached: boolean; result: R; }; }
+  | { push: { storage: boolean; value: EncodedStateValue; }; }
+  | { dup: { n: number; }; }
+  | { swap: { n: number; }; }
+  
+  // Arithmetic
+  | "add"
+  | "sub"
+  | { addi: { immediate: number; }; }
+  | { subi: { immediate: number; }; }
+  
+  // Comparison
+  | "lt"
+  | "eq"
+  
+  // Logical
+  | "and"
+  | "or"
+  | "neg"
+  
+  // Data operations
+  | "type"
+  | "size"
+  | "new"
+  | { concat: { cached: boolean; n: number; }; }
+  | { idx: { cached: boolean; path: Key[]; pushPath: boolean; }; }
+  | { ins: { cached: boolean; n: number; }; }
+  | { rem: { cached: boolean; }; }
+  | "member"
+  
+  // Tree operations
+  | "root"
+  
+  // Debugging
+  | "log";
+```
+
+**Type Parameter**:
+- `R`: `null` (for gathering mode) or `AlignedValue` (for verifying mode)
+
+**Operation Categories**:
+
+**Control Flow**:
+- `noop` - No operation, skip n instructions
+- `branch` - Conditional branch, skip n instructions if top of stack is false
+- `jmp` - Unconditional jump, skip n instructions
+- `ckpt` - Checkpoint, marks an atomic execution unit
+
+**Stack Management**:
+- `pop` - Remove top of stack
+- `popeq` - Pop and check equality with result
+- `push` - Push encoded state value onto stack
+- `dup` - Duplicate stack element at position n
+- `swap` - Swap top of stack with element at position n
+
+**Arithmetic Operations**:
+- `add` - Add top two stack elements
+- `sub` - Subtract top stack element from second
+- `addi` - Add immediate value to top of stack
+- `subi` - Subtract immediate value from top of stack
+
+**Comparison Operations**:
+- `lt` - Less than comparison
+- `eq` - Equality comparison
+
+**Logical Operations**:
+- `and` - Logical AND
+- `or` - Logical OR
+- `neg` - Logical negation
+
+**Data Operations**:
+- `type` - Get type of value
+- `size` - Get size of value
+- `new` - Create new value
+- `concat` - Concatenate n values from stack
+- `idx` - Index into data structure following path
+- `ins` - Insert n values
+- `rem` - Remove value
+- `member` - Check membership
+
+**Tree Operations**:
+- `root` - Get Merkle tree root
+
+**Debugging**:
+- `log` - Log current stack state
+
+**Usage**: Used in `runProgram()` to execute VM programs.
+
+```typescript
+// Example: Simple VM program
+const ops: Op<null>[] = [
+  { push: { storage: false, value: { tag: "null" } } },
+  { addi: { immediate: 42 } },
+  "log",
+  "pop"
+];
+
+const result = runProgram(initialStack, ops, costModel);
+```
+
+**Note**: Low-level type used for VM implementation. Most developers work with higher-level contract abstractions.
+
+**Related**: 
+- Used by `runProgram()` function
+- Results captured in `GatherResult[]` via `VmResults.events`
+- `cached` flags optimize repeated operations
+
+---
+
 ## Related Documentation
 
 - **[i_am_Midnight_LLM_ref.md](i_am_Midnight_LLM_ref.md)** - Compact runtime API
