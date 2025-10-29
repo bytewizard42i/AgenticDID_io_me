@@ -2553,6 +2553,140 @@ const ledgerPubKey = decodeCoinPublicKey(compactPubKey);
 
 ---
 
+### decodeContractAddress()
+
+Decode a ContractAddress from a Uint8Array originating from Compact's ContractAddress type.
+
+```typescript
+function decodeContractAddress(addr: Uint8Array): ContractAddress
+```
+
+**Parameters**:
+- `addr`: Uint8Array containing the contract address bytes
+
+**Returns**: `ContractAddress` in Ledger API format
+
+**Usage**: Convert Compact contract addresses to Ledger API format for use in transactions.
+
+```typescript
+// From Compact contract
+const compactAddress = new Uint8Array([/* address bytes */]);
+const ledgerAddress = decodeContractAddress(compactAddress);
+
+// Use in transaction
+const output = UnprovenOutput.newContractOwned(coin, ledgerAddress);
+```
+
+---
+
+### decodeQualifiedCoinInfo()
+
+Decode a QualifiedCoinInfo from Compact's QualifiedCoinInfo TypeScript representation.
+
+```typescript
+function decodeQualifiedCoinInfo(coin: {
+  color: Uint8Array;
+  nonce: Uint8Array;
+  value: bigint;
+  mt_index: bigint;
+}): QualifiedCoinInfo
+```
+
+**Parameters**:
+- `coin`: Object with Compact's QualifiedCoinInfo structure
+  - `color`: Uint8Array representing token type
+  - `nonce`: Uint8Array random nonce
+  - `value`: bigint coin value
+  - `mt_index`: bigint Merkle tree index
+
+**Returns**: `QualifiedCoinInfo` in Ledger API format
+
+**Usage**: Convert qualified coins from Compact contracts to Ledger API format.
+
+```typescript
+// From Compact contract
+const compactQualifiedCoin = {
+  color: new Uint8Array([/* ... */]),
+  nonce: new Uint8Array([/* ... */]),
+  value: 1000n,
+  mt_index: 42n
+};
+
+const ledgerQualifiedCoin = decodeQualifiedCoinInfo(compactQualifiedCoin);
+
+// Use to create input
+const input = UnprovenInput.newContractOwned(
+  ledgerQualifiedCoin,
+  contractAddress,
+  zswapState
+);
+```
+
+---
+
+### decodeTokenType()
+
+Decode a TokenType from a Uint8Array originating from Compact's TokenType type.
+
+```typescript
+function decodeTokenType(tt: Uint8Array): TokenType
+```
+
+**Parameters**:
+- `tt`: Uint8Array containing the token type bytes
+
+**Returns**: `TokenType` (string) in Ledger API format
+
+**Usage**: Convert token types from Compact format to Ledger API string format.
+
+```typescript
+// From Compact contract
+const compactTokenType = new Uint8Array([/* token type bytes */]);
+const ledgerTokenType = decodeTokenType(compactTokenType);
+
+// Use to create coin
+const coin = createCoinInfo(ledgerTokenType, 1000n);
+```
+
+---
+
+### degradeToTransient()
+
+Internal implementation of the degrade to transient primitive.
+
+```typescript
+function degradeToTransient(persistent: Value): Value
+```
+
+**Parameters**:
+- `persistent`: Value representing persistent data
+
+**Returns**: `Value` in transient format
+
+**Throws**: If persistent does not encode a 32-byte bytestring
+
+**Note**: Internal function - converts persistent (Bytes<32>) values to transient (Field) values. This is the inverse of the `upgradeFromTransient` operation in CompactStandardLibrary.
+
+**Usage**: Used internally by the ledger for type conversions between persistent and transient contexts.
+
+---
+
+## Decode Functions Summary
+
+The decode functions provide essential bridges between Compact contract representations and Ledger API representations:
+
+| Function | Converts From | Converts To | Common Use Case |
+|----------|--------------|-------------|-----------------|
+| `decodeCoinInfo()` | Compact CoinInfo | Ledger CoinInfo | Creating outputs from contract coins |
+| `decodeCoinPublicKey()` | Compact bytes | Ledger CoinPublicKey | User public key handling |
+| `decodeContractAddress()` | Compact bytes | Ledger ContractAddress | Contract-owned outputs/inputs |
+| `decodeQualifiedCoinInfo()` | Compact QualifiedCoinInfo | Ledger QualifiedCoinInfo | Spending contract coins |
+| `decodeTokenType()` | Compact bytes | Ledger TokenType (string) | Token type handling |
+
+**Best Practice**: Always use these decode functions when working with data from Compact contracts to ensure proper type compatibility with the Ledger API.
+
+---
+
 ## Related Documentation
 
 - **[i_am_Midnight_LLM_ref.md](i_am_Midnight_LLM_ref.md)** - Compact runtime API
