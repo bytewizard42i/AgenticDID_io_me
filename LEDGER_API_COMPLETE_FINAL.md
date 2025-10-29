@@ -12,18 +12,18 @@
 - ✅ **52 Classes** - Complete transaction lifecycle, state management, contract operations
 - ✅ **1 Enumeration** - NetworkId (Undeployed, DevNet, TestNet, MainNet)
 
-### Utility Functions: **40 Items!** 🎉
+### Utility Functions: **43 Items!** 🎉
 - ✅ **10 Encode/Decode** - Bidirectional Compact ↔ Ledger conversion
 - ✅ **9 Cryptographic** - Hashes, commitments, EC operations (persistent & transient)
 - ✅ **6 Token/Coin** - Creation, derivation, native token, sampling
 - ✅ **5 Testing/Sampling** - Dummy + random test data generation
 - ✅ **4 VM/Advanced** - Program execution, transcript partitioning
-- ✅ **3 Signing/Verification** - Data signing, key derivation
-- ✅ **3 Internal** - Conversions, alignment, validation
+- ✅ **4 Signing/Verification** - Data signing, key derivation, verification
+- ✅ **5 Internal** - Conversions, alignment, validation, transient/persistent upgrades
 
 ---
 
-## 📊 GRAND TOTAL: **93 DOCUMENTED ITEMS!**
+## 📊 GRAND TOTAL: **96 DOCUMENTED ITEMS!**
 
 ```
 ╔══════════════════════════════════════════════════════════╗
@@ -32,9 +32,9 @@
 ║                                                          ║
 ║  Classes:           52  [████████████████████] 100%     ║
 ║  Enumeration:       1   [█████               ] 100%     ║
-║  Utility Functions: 40  [████████████████████] 100%     ║
+║  Utility Functions: 43  [████████████████████] 100%     ║
 ║                                                          ║
-║  TOTAL: 93 ITEMS FULLY DOCUMENTED!                      ║
+║  TOTAL: 96 ITEMS FULLY DOCUMENTED!                      ║
 ║                                                          ║
 ║  Plus:                                                   ║
 ║  - 3 Complete Working Examples                          ║
@@ -173,12 +173,15 @@
 36. **checkProofData()** - Validate proof (dry run)
 37. **hashToCurve()** - Hash to elliptic curve point
 
-### Internal & Utility (6 Functions)
+### Internal & Utility (5 Functions)
 38. **bigIntToValue()** - Convert bigint to Value
-39. **degradeToTransient()** - Persistent → transient conversion
-40. **leafHash()** - Merkle tree leaf hash
-41. **maxAlignedSize()** - Max size for alignment
-42. **maxField()** - Maximum field value
+39. **valueToBigInt()** - Convert Value to bigint
+40. **degradeToTransient()** - Persistent → transient conversion
+41. **upgradeFromTransient()** - Transient → persistent conversion
+42. **maxAlignedSize()** - Max size for alignment
+
+### Signature Verification (1 Function)
+43. **verifySignature()** - Verify data signatures
 
 ---
 
