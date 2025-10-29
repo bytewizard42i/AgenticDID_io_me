@@ -3245,6 +3245,221 @@ const signers = Array.from({ length: 3 }, () => sampleSigningKey());
 
 ---
 
+### sampleTokenType()
+
+Samples a uniform token type for use in testing.
+
+```typescript
+function sampleTokenType(): TokenType
+```
+
+**Returns**: `TokenType` (string) - A uniformly sampled token type
+
+**Usage**: Generate random token types for testing multi-token scenarios.
+
+```typescript
+import { sampleTokenType, createCoinInfo } from '@midnight-ntwrk/ledger';
+
+// Create coin with random token type
+const tokenType = sampleTokenType();
+const coin = createCoinInfo(tokenType, 1000n);
+
+// Test multi-token transfers
+const tokens = [
+  sampleTokenType(),
+  sampleTokenType(),
+  nativeToken()
+];
+
+describe('Multi-token Tests', () => {
+  it('should handle different token types', () => {
+    const type1 = sampleTokenType();
+    const type2 = sampleTokenType();
+    
+    expect(type1).not.toBe(type2);  // Should be different
+  });
+});
+```
+
+---
+
+### signData()
+
+Signs arbitrary data with the given signing key.
+
+```typescript
+function signData(key: string, data: Uint8Array): Signature
+```
+
+**Parameters**:
+- `key`: Signing key (string)
+- `data`: Arbitrary data to sign (Uint8Array)
+
+**Returns**: `Signature` - The signature over the data
+
+**⚠️ WARNING**: Do not expose access to this function for valuable keys for data that is not strictly controlled!
+
+**Usage**: Sign arbitrary data for verification purposes.
+
+```typescript
+import { signData, sampleSigningKey } from '@midnight-ntwrk/ledger';
+
+// Create signature
+const signingKey = sampleSigningKey();
+const data = new Uint8Array([1, 2, 3, 4]);
+const signature = signData(signingKey, data);
+
+// Use in authentication
+const message = encoder.encode('verify me');
+const sig = signData(userKey, message);
+```
+
+**Security Critical**:
+- Only sign data you fully control and understand
+- Never expose this to untrusted input
+- Prefer higher-level transaction signing when possible
+- Use `signatureVerifyingKey()` to get the public verifying key
+
+---
+
+### signatureVerifyingKey()
+
+Returns the verifying key for a given signing key.
+
+```typescript
+function signatureVerifyingKey(sk: string): SignatureVerifyingKey
+```
+
+**Parameters**:
+- `sk`: Signing key (string)
+
+**Returns**: `SignatureVerifyingKey` - The corresponding public verifying key
+
+**Usage**: Derive the public key from a signing key for signature verification.
+
+```typescript
+import { sampleSigningKey, signatureVerifyingKey, signData } from '@midnight-ntwrk/ledger';
+
+// Generate keypair
+const signingKey = sampleSigningKey();
+const verifyingKey = signatureVerifyingKey(signingKey);
+
+// Sign and verify workflow
+const data = new Uint8Array([1, 2, 3]);
+const signature = signData(signingKey, data);
+
+// Share verifyingKey publicly for verification
+console.log(`Public key: ${verifyingKey}`);
+
+// Verify signature (with verification function)
+const isValid = verifySignature(verifyingKey, data, signature);
+```
+
+**Pattern**: Always derive the verifying key from the signing key, never hardcode or store it separately.
+
+---
+
+### tokenType()
+
+Derives the TokenType associated with a particular DomainSeparator and contract.
+
+```typescript
+function tokenType(
+  domain_sep: Uint8Array,
+  contract: string
+): TokenType
+```
+
+**Parameters**:
+- `domain_sep`: Domain separator (Uint8Array)
+- `contract`: Contract address (string)
+
+**Returns**: `TokenType` (string) - The derived token type
+
+**Usage**: Derive deterministic token types for contract-specific tokens.
+
+```typescript
+import { tokenType } from '@midnight-ntwrk/ledger';
+
+// Derive contract-specific token type
+const domainSep = new Uint8Array([0x01, 0x02, 0x03, 0x04]);
+const contractAddr = '0x123...';
+const derivedTokenType = tokenType(domainSep, contractAddr);
+
+// Create coin with derived type
+const coin = createCoinInfo(derivedTokenType, 1000n);
+
+// Each contract + domain_sep combination creates unique token type
+const token1 = tokenType(domainSep, contractA);
+const token2 = tokenType(domainSep, contractB);
+// token1 !== token2 (different contracts)
+```
+
+**Use Cases**:
+- Contract-specific tokens (each contract has its own token space)
+- Domain-separated token types (avoid collisions)
+- Deterministic token derivation (same inputs = same token type)
+
+---
+
+### transientCommit()
+
+Internal implementation of the transient commitment primitive.
+
+```typescript
+function transientCommit(
+  align: Alignment,
+  val: Value,
+  opening: Value
+): Value
+```
+
+**Parameters**:
+- `align`: Alignment specification
+- `val`: Value to commit to
+- `opening`: Opening/randomness value (must encode a field element)
+
+**Returns**: `Value` - The commitment (Field representation)
+
+**Throws**: If val does not have alignment align, or opening does not encode a field element
+
+**Note**: Internal function - creates transient commitments for non-ledger data. See CompactStandardLibrary's `transientCommit()` for the public API. Transient commitments use Field elements (vs Bytes<32> for persistent).
+
+**Comparison**:
+- `transientCommit()`: Field-based, for non-ledger/circuit-local data
+- `persistentCommit()`: Bytes<32>-based, for ledger storage
+
+---
+
+### transientHash()
+
+Internal implementation of the transient hash primitive.
+
+```typescript
+function transientHash(
+  align: Alignment,
+  val: Value
+): Value
+```
+
+**Parameters**:
+- `align`: Alignment specification
+- `val`: Value to hash
+
+**Returns**: `Value` - The hash (Field representation)
+
+**Throws**: If val does not have alignment align
+
+**Note**: Internal function - computes transient hashes for non-ledger data. See CompactStandardLibrary's `transientHash()` for the public API.
+
+**Important**: Like `persistentHash()`, transient hashes are **automatically disclosed** - no `disclose()` wrapper needed!
+
+**Comparison**:
+- `transientHash()`: Returns Field, for non-ledger/circuit-local data
+- `persistentHash()`: Returns Bytes<32>, for ledger storage
+
+---
+
 ## Testing Utilities Summary
 
 The Ledger API provides comprehensive testing utilities to facilitate unit and integration testing:
@@ -3257,6 +3472,7 @@ The Ledger API provides comprehensive testing utilities to facilitate unit and i
 | `sampleContractAddress()` | ContractAddress | Random contract addresses | Uniform random |
 | `sampleCoinPublicKey()` | CoinPublicKey | Random user public keys | Uniform random |
 | `sampleSigningKey()` | SigningKey | Random signing keys | Uniform random |
+| `sampleTokenType()` | TokenType | Random token types | Uniform random |
 
 ### Testing Best Practices
 
