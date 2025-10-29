@@ -3460,6 +3460,126 @@ function transientHash(
 
 ---
 
+### upgradeFromTransient()
+
+Internal implementation of the upgrade from transient primitive.
+
+```typescript
+function upgradeFromTransient(transient: Value): Value
+```
+
+**Parameters**:
+- `transient`: Value encoding a field element (transient data)
+
+**Returns**: `Value` - The upgraded persistent representation (Bytes<32>)
+
+**Throws**: If transient does not encode a field element
+
+**Note**: Internal function - converts transient (Field) values to persistent (Bytes<32>) values. This is the inverse of `degradeToTransient()`. See CompactStandardLibrary's `upgradeFromTransient()` for the public API.
+
+**Usage**: Used internally by the ledger for type conversions between transient and persistent contexts.
+
+**Conversion Pair**:
+- `degradeToTransient()`: Bytes<32> → Field (persistent to transient)
+- `upgradeFromTransient()`: Field → Bytes<32> (transient to persistent)
+
+---
+
+### valueToBigInt()
+
+Internal conversion between field-aligned binary values and bigints within the scalar field.
+
+```typescript
+function valueToBigInt(x: Value): bigint
+```
+
+**Parameters**:
+- `x`: Value to convert
+
+**Returns**: bigint within the scalar field
+
+**Throws**: If the value does not encode a field element
+
+**Note**: Internal function - converts Values to bigints. The inverse of `bigIntToValue()`.
+
+**Conversion Pair**:
+- `bigIntToValue()`: bigint → Value
+- `valueToBigInt()`: Value → bigint
+
+---
+
+### verifySignature()
+
+Verifies if a signature is correct.
+
+```typescript
+function verifySignature(
+  vk: string,
+  data: Uint8Array,
+  signature: string
+): boolean
+```
+
+**Parameters**:
+- `vk`: Signature verifying key (public key, string)
+- `data`: Data that was signed (Uint8Array)
+- `signature`: Signature to verify (string)
+
+**Returns**: boolean - `true` if signature is valid, `false` otherwise
+
+**Usage**: Verify signatures created with `signData()`.
+
+```typescript
+import { 
+  sampleSigningKey, 
+  signatureVerifyingKey, 
+  signData, 
+  verifySignature 
+} from '@midnight-ntwrk/ledger';
+
+// Complete sign and verify workflow
+const signingKey = sampleSigningKey();
+const verifyingKey = signatureVerifyingKey(signingKey);
+
+const data = new Uint8Array([1, 2, 3, 4]);
+const signature = signData(signingKey, data);
+
+// Verify signature
+const isValid = verifySignature(verifyingKey, data, signature);
+console.log(`Signature valid: ${isValid}`);  // true
+
+// Wrong data fails verification
+const wrongData = new Uint8Array([5, 6, 7, 8]);
+const isInvalid = verifySignature(verifyingKey, wrongData, signature);
+console.log(`Wrong data valid: ${isInvalid}`);  // false
+```
+
+**Complete Signing Pattern**:
+```typescript
+// 1. Generate or load signing key
+const signingKey = sampleSigningKey();  // Testing only!
+
+// 2. Derive public verifying key
+const verifyingKey = signatureVerifyingKey(signingKey);
+
+// 3. Sign data
+const message = encoder.encode('Important message');
+const signature = signData(signingKey, message);
+
+// 4. Share signature + verifying key (not signing key!)
+// Send to other party: { verifyingKey, message, signature }
+
+// 5. Verify signature
+const isAuthentic = verifySignature(verifyingKey, message, signature);
+```
+
+**Security Notes**:
+- Never share the signing key - only the verifying key
+- Always verify signatures before trusting data
+- Use proper key derivation in production (not `sampleSigningKey()`)
+
+---
+
 ## Testing Utilities Summary
 
 The Ledger API provides comprehensive testing utilities to facilitate unit and integration testing:
