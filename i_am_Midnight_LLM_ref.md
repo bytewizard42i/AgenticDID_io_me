@@ -8,6 +8,50 @@
 
 ---
 
+## 📚 Complete Documentation Suite
+
+**This document is part of the comprehensive Midnight documentation (60+ documents, 250+ API items).**
+
+### 🎯 Essential Documentation Links
+
+#### For AI Assistants (Start Here!)
+- **[MIDNIGHT_COMPLETE_REFERENCE_FOR_AI.md](MIDNIGHT_COMPLETE_REFERENCE_FOR_AI.md)** - Quick reference for NightAgent and AI assistants
+- **[MIDNIGHT_DOCUMENTATION_MASTER_INDEX.md](MIDNIGHT_DOCUMENTATION_MASTER_INDEX.md)** - Complete navigation for all 60+ documents
+
+#### Core API References
+- **[LEDGER_API_REFERENCE.md](LEDGER_API_REFERENCE.md)** - @midnight-ntwrk/ledger v3.0.2 (129 items: 52 classes, 43 functions, 33 types, 1 enum)
+- **[MIDNIGHT_JS_API_REFERENCE.md](MIDNIGHT_JS_API_REFERENCE.md)** - Midnight.js v2.0.2 framework (8 packages)
+- **[MIDNIGHT_JS_CONTRACTS_API.md](MIDNIGHT_JS_CONTRACTS_API.md)** - Contract interaction layer (20+ functions, 9 error classes)
+- **[DAPP_CONNECTOR_API_REFERENCE.md](DAPP_CONNECTOR_API_REFERENCE.md)** - Wallet integration API
+
+#### Language & Compiler
+- **[MINOKAWA_LANGUAGE_REFERENCE.md](MINOKAWA_LANGUAGE_REFERENCE.md)** - Minokawa v0.18.0 language guide
+- **[COMPACT_STANDARD_LIBRARY.md](COMPACT_STANDARD_LIBRARY.md)** - Standard library complete reference
+- **[MINOKAWA_WITNESS_PROTECTION_DISCLOSURE.md](MINOKAWA_WITNESS_PROTECTION_DISCLOSURE.md)** - `disclose()` and privacy
+- **[MINOKAWA_LEDGER_DATA_TYPES.md](MINOKAWA_LEDGER_DATA_TYPES.md)** - Ledger ADT types
+- **[COMPACTC_MANUAL.md](COMPACTC_MANUAL.md)** - Compiler manual
+
+#### Architecture & Concepts
+- **[HOW_MIDNIGHT_WORKS.md](HOW_MIDNIGHT_WORKS.md)** - Platform architecture and selective disclosure
+- **[PRIVACY_ARCHITECTURE.md](PRIVACY_ARCHITECTURE.md)** - Privacy model
+- **[MIDNIGHT_TRANSACTION_STRUCTURE.md](MIDNIGHT_TRANSACTION_STRUCTURE.md)** - Transaction details
+- **[ZSWAP_SHIELDED_TOKENS.md](ZSWAP_SHIELDED_TOKENS.md)** - Shielded pool mechanism
+
+### 💡 Quick Facts for AI
+
+**This document covers**: Compact Runtime API (70+ functions)
+- Network configuration (`setNetworkId()`)
+- Cryptographic primitives (`persistentHash()`, auto-disclosed!)
+- State management (Cell, Map, Set, Counter, MerkleTree)
+- Zswap operations (shielded tokens)
+- Type conversions
+
+**Key Insight**: Hash functions (`persistentHash()`, `transientHash()`) are **auto-disclosed** - no `disclose()` wrapper needed because hash preimage resistance protects privacy!
+
+**Critical Pattern**: Always call `setNetworkId()` before any other Midnight operations.
+
+---
+
 ## Table of Contents
 
 1. [API Overview](#api-overview)
