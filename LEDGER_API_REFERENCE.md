@@ -3945,6 +3945,193 @@ const commitment = communicationCommitment(input, output, rand);
 
 ---
 
+### ContractAction
+
+An interaction with a contract.
+
+```typescript
+type ContractAction = ContractCall | ContractDeploy | MaintenanceUpdate;
+```
+
+**Description**: Union type representing the three types of contract interactions possible in a transaction.
+
+**Variants**:
+- `ContractCall` - Call an existing contract's circuit
+- `ContractDeploy` - Deploy a new contract
+- `MaintenanceUpdate` - Update a contract's verifier keys or authority
+
+**Usage**: Used in transactions to specify contract interactions.
+
+```typescript
+// Contract actions appear in transactions
+const tx: UnprovenTransaction = /* ... */;
+const actions: ContractAction[] = tx.contractCalls;
+```
+
+---
+
+### ContractAddress
+
+A contract address.
+
+```typescript
+type ContractAddress = string;
+```
+
+**Format**: Hex-encoded 35-byte string
+
+**Description**: Uniquely identifies a deployed contract on the Midnight network.
+
+**Usage**: Used throughout the API for contract identification and targeting.
+
+```typescript
+import { sampleContractAddress, dummyContractAddress } from '@midnight-ntwrk/ledger';
+
+// Random contract address (testing)
+const randomAddr: ContractAddress = sampleContractAddress();
+
+// Deterministic dummy address (testing)
+const dummyAddr: ContractAddress = dummyContractAddress();
+
+// Use in contract-owned output
+const output = UnprovenOutput.newContractOwned(coin, randomAddr);
+```
+
+---
+
+### DomainSeperator
+
+A token domain separator, the pre-stage of TokenType.
+
+```typescript
+type DomainSeperator = Uint8Array;
+```
+
+**Format**: 32-byte bytearray
+
+**Description**: Used with contract addresses to derive token types. Provides namespace separation for contract-specific tokens.
+
+**Usage**: Combined with contract address to create deterministic token types.
+
+```typescript
+import { tokenType } from '@midnight-ntwrk/ledger';
+
+// Create domain separator
+const domainSep: DomainSeperator = new Uint8Array([
+  0x01, 0x02, 0x03, 0x04, /* ... 32 bytes total */
+]);
+
+// Derive token type from domain separator + contract
+const myTokenType = tokenType(domainSep, contractAddress);
+```
+
+**Purpose**: Ensures token types are unique per contract and domain, preventing accidental collisions.
+
+---
+
+### Effects
+
+The contract-external effects of a transcript.
+
+```typescript
+type Effects = {
+  claimedContractCalls: [bigint, ContractAddress, string, Fr][];
+  claimedNullifiers: Nullifier[];
+  claimedReceives: CoinCommitment[];
+  claimedSpends: CoinCommitment[];
+  mints: Map<string, bigint>;
+};
+```
+
+**Properties**:
+- `claimedContractCalls`: Array of contract calls, each tuple containing:
+  - Sequence number of the call (bigint)
+  - Contract being called (ContractAddress)
+  - Entry point being called (string)
+  - Communications commitment (Fr)
+- `claimedNullifiers`: Nullifiers (spends) required by this contract call
+- `claimedReceives`: Coin commitments (outputs) required as coins received
+- `claimedSpends`: Coin commitments (outputs) required as coins sent
+- `mints`: Tokens minted, map from hex-encoded 256-bit domain separators to non-negative 64-bit integers
+
+**Description**: Represents the external effects of contract execution - what the contract claims to do in terms of contract calls, coin movements, and token minting.
+
+**Usage**: Used internally to track and verify contract execution effects.
+
+---
+
+### EncPublicKey
+
+An encryption public key, used to inform users of new coins sent to them.
+
+```typescript
+type EncPublicKey = string;
+```
+
+**Description**: Public key used for encrypting coin information so recipients can decrypt and learn about coins sent to them.
+
+**Usage**: Part of the user's key material, paired with CoinPublicKey.
+
+```typescript
+// From LocalState
+const localState = new LocalState();
+const encPubKey: EncPublicKey = localState.encryptionPublicKey;
+const coinPubKey: CoinPublicKey = localState.coinPublicKey;
+
+// Create output with optional encryption
+const output = UnprovenOutput.new(
+  coin,
+  coinPubKey,
+  encPubKey  // Optional: allows recipient to learn about the coin
+);
+```
+
+**Privacy**: The encryption ensures only the intended recipient can learn about the coin details.
+
+---
+
+### EncodedStateValue
+
+An alternative encoding of StateValue for use in Op for technical reasons.
+
+```typescript
+type EncodedStateValue = 
+  | { tag: "null"; }
+  | { tag: "cell"; content: EncodedStateValue; }
+  | { tag: "map"; content: Map<AlignedValue, EncodedStateValue>; }
+  | { tag: "array"; content: EncodedStateValue[]; }
+  | { tag: "boundedMerkleTree"; content: [number, Map<bigint, [Uint8Array, undefined]>]; };
+```
+
+**Variants**:
+- `{ tag: "null" }` - Null/empty value
+- `{ tag: "cell"; content: EncodedStateValue }` - Cell containing a value
+- `{ tag: "map"; content: Map<AlignedValue, EncodedStateValue> }` - Map of aligned values
+- `{ tag: "array"; content: EncodedStateValue[] }` - Array of values
+- `{ tag: "boundedMerkleTree"; content: [number, Map<bigint, [Uint8Array, undefined]>] }` - Bounded Merkle tree
+
+**Description**: Alternative encoding used in VM operations for technical reasons. Mirrors the StateValue structure but optimized for operation serialization.
+
+**Note**: Internal type - typically you'll work with StateValue directly unless implementing low-level VM operations.
+
+---
+
+### Fr
+
+An internal encoding of a value of the proof system's scalar field.
+
+```typescript
+type Fr = Uint8Array;
+```
+
+**Description**: Represents a field element in the proof system's scalar field. Used internally for cryptographic operations.
+
+**Usage**: Internal type used by the proof system. Most developers will work with higher-level abstractions.
+
+**Related**: Used in Effects for communications commitments and in various internal cryptographic operations.
+
+---
+
 ## Related Documentation
 
 - **[i_am_Midnight_LLM_ref.md](i_am_Midnight_LLM_ref.md)** - Compact runtime API
