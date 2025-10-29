@@ -4487,6 +4487,209 @@ console.log(`Valid: ${isValid}`);  // true
 
 ---
 
+### SignatureVerifyingKey
+
+A hex-encoded BIP-340 verifying key, with a 3-byte version prefix.
+
+```typescript
+type SignatureVerifyingKey = string;
+```
+
+**Format**: Hex-encoded BIP-340 public key with 3-byte version prefix
+
+**Description**: The public key corresponding to a SigningKey. Used to verify signatures without revealing the private signing key.
+
+**Usage**: Derived from a signing key using `signatureVerifyingKey()`.
+
+```typescript
+import { sampleSigningKey, signatureVerifyingKey } from '@midnight-ntwrk/ledger';
+
+// Generate keypair
+const signingKey: SigningKey = sampleSigningKey();
+const verifyingKey: SignatureVerifyingKey = signatureVerifyingKey(signingKey);
+
+// Share verifying key publicly (safe!)
+console.log(`Public key: ${verifyingKey}`);
+```
+
+**Security**: Safe to share publicly. Allows others to verify your signatures without compromising your signing key.
+
+**Related**: Used by `verifySignature()` function
+
+---
+
+### SigningKey
+
+A hex-encoded BIP-340 signing key, with a 3-byte version prefix.
+
+```typescript
+type SigningKey = string;
+```
+
+**Format**: Hex-encoded BIP-340 private key with 3-byte version prefix
+
+**Description**: The private key used to create signatures. Must be kept secret.
+
+**Usage**: Used with `signData()` to create signatures.
+
+```typescript
+import { sampleSigningKey, signData } from '@midnight-ntwrk/ledger';
+
+// Generate or load signing key
+const signingKey: SigningKey = sampleSigningKey();
+
+// Sign data
+const data = new Uint8Array([1, 2, 3, 4]);
+const signature = signData(signingKey, data);
+```
+
+**⚠️ CRITICAL SECURITY**:
+- **NEVER** share or expose signing keys
+- **NEVER** hardcode in source code
+- Store securely (encrypted storage, hardware wallets)
+- Use `sampleSigningKey()` for testing ONLY
+
+**Related**: Paired with SignatureVerifyingKey via `signatureVerifyingKey()`
+
+---
+
+### SingleUpdate
+
+A single update instruction in a MaintenanceUpdate.
+
+```typescript
+type SingleUpdate = ReplaceAuthority | VerifierKeyRemove | VerifierKeyInsert;
+```
+
+**Variants**:
+- `ReplaceAuthority` - Replace the contract's maintenance authority
+- `VerifierKeyRemove` - Remove a verifier key for a specific operation/version
+- `VerifierKeyInsert` - Insert a verifier key for a specific operation/version
+
+**Description**: Union type representing the three types of contract maintenance operations.
+
+**Usage**: Used in MaintenanceUpdate to specify contract upgrades.
+
+**Related**: See MaintenanceUpdate, ReplaceAuthority, VerifierKeyInsert, VerifierKeyRemove classes
+
+---
+
+### TokenType
+
+A token type (or color).
+
+```typescript
+type TokenType = string;
+```
+
+**Format**: Hex-encoded 35-byte string
+
+**Description**: Uniquely identifies a token/currency type in the Zswap shielded pool. Often called "color" in the codebase.
+
+**Usage**: Used throughout coin and transaction operations.
+
+```typescript
+import { nativeToken, tokenType, sampleTokenType } from '@midnight-ntwrk/ledger';
+
+// Get native token type
+const native: TokenType = nativeToken();
+
+// Derive contract-specific token
+const domainSep = new Uint8Array(32);
+const contractToken: TokenType = tokenType(domainSep, contractAddress);
+
+// Sample random token (testing)
+const testToken: TokenType = sampleTokenType();
+```
+
+**Related**:
+- Get native: `nativeToken()`
+- Derive: `tokenType(domainSep, contract)`
+- Sample: `sampleTokenType()`
+- Used in: CoinInfo, QualifiedCoinInfo
+
+---
+
+### TransactionHash
+
+The hash of a transaction.
+
+```typescript
+type TransactionHash = string;
+```
+
+**Format**: Hex-encoded 256-bit bytestring
+
+**Description**: Cryptographic hash uniquely identifying a transaction.
+
+**Usage**: Used to reference and track transactions.
+
+---
+
+### TransactionId
+
+A transaction identifier, used to index merged transactions.
+
+```typescript
+type TransactionId = string;
+```
+
+**Description**: Identifier for indexing transactions, especially in merged transaction scenarios.
+
+**Usage**: Used internally for transaction tracking and retrieval.
+
+---
+
+### Transcript
+
+A transcript of operations, to be recorded in a transaction.
+
+```typescript
+type Transcript<R> = {
+  effects: Effects;
+  gas: bigint;
+  program: Op<R>[];
+};
+```
+
+**Type Parameter**:
+- `R`: `null` (gathering mode) or `AlignedValue` (verifying mode)
+
+**Properties**:
+- `effects`: The effects of the transcript (checked before execution, must match those constructed by program)
+- `gas`: The execution budget for this transcript (program must not exceed)
+- `program`: The sequence of operations that this transcript captured
+
+**Description**: Represents a complete record of VM operations with their effects and gas cost. Used to package contract execution for inclusion in transactions.
+
+**Usage**: Created by `partitionTranscripts()` and included in transactions.
+
+**Related**: 
+- Created by `partitionTranscripts()` function
+- Contains `Op<R>[]` operations
+- Includes `Effects` for verification
+
+---
+
+### Value
+
+An onchain data value, in field-aligned binary format.
+
+```typescript
+type Value = Uint8Array[];
+```
+
+**Description**: Represents raw on-chain data as an array of byte arrays. The fundamental data representation in the VM.
+
+**Usage**: Used throughout VM operations and state management.
+
+**Related**: 
+- Paired with Alignment in `AlignedValue`
+- Converted to/from bigint with `bigIntToValue()` / `valueToBigInt()`
+- Used in Fr (field element representation)
+
+---
+
 ## Related Documentation
 
 - **[i_am_Midnight_LLM_ref.md](i_am_Midnight_LLM_ref.md)** - Compact runtime API
