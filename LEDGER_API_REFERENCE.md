@@ -3825,6 +3825,126 @@ console.log(`Commitment: ${output.commitment}`);
 
 ---
 
+### CoinInfo
+
+Information required to create a new coin, alongside details about the recipient.
+
+```typescript
+type CoinInfo = {
+  nonce: Nonce;
+  type: TokenType;
+  value: bigint;
+};
+```
+
+**Properties**:
+- `nonce`: The coin's randomness (Nonce), preventing it from colliding with other coins
+- `type`: The coin's type (TokenType), identifying the currency it represents
+- `value`: The coin's value in atomic units (bigint), bounded to be a non-negative 64-bit integer
+
+**Usage**: Used throughout the API for creating and managing coins.
+
+```typescript
+import { createCoinInfo, nativeToken } from '@midnight-ntwrk/ledger';
+
+// Create coin with native token
+const coin: CoinInfo = createCoinInfo(nativeToken(), 1000n);
+
+// Access coin properties
+console.log(`Type: ${coin.type}`);
+console.log(`Value: ${coin.value}`);
+console.log(`Nonce: ${coin.nonce}`);
+```
+
+**Important**: The `value` must be a non-negative 64-bit integer. The `nonce` ensures each coin is unique even with identical type and value.
+
+---
+
+### CoinPublicKey
+
+A user public key capable of receiving Zswap coins.
+
+```typescript
+type CoinPublicKey = string;
+```
+
+**Format**: Hex-encoded 35-byte string
+
+**Description**: Represents a user's public key for receiving shielded coins in the Zswap protocol.
+
+**Usage**: Used when creating outputs targeted to users.
+
+```typescript
+import { sampleCoinPublicKey, UnprovenOutput, createCoinInfo } from '@midnight-ntwrk/ledger';
+
+// Get user's public key
+const recipientPubKey: CoinPublicKey = sampleCoinPublicKey();
+
+// Create output for user
+const coin = createCoinInfo('DUST', 1000n);
+const output = UnprovenOutput.new(coin, recipientPubKey);
+```
+
+**Security**: Public keys can be safely shared. They allow others to send you coins without revealing your identity.
+
+---
+
+### CommunicationCommitment
+
+A hex-encoded commitment of data shared between two contracts in a call.
+
+```typescript
+type CommunicationCommitment = string;
+```
+
+**Description**: Used for cross-contract communication to ensure data integrity. The commitment binds to the data without revealing it until the appropriate time.
+
+**Usage**: Created with `communicationCommitment()` function.
+
+```typescript
+import { communicationCommitment, communicationCommitmentRandomness } from '@midnight-ntwrk/ledger';
+
+// Create commitment for cross-contract call
+const rand = communicationCommitmentRandomness();
+const commitment: CommunicationCommitment = communicationCommitment(
+  input,
+  output,
+  rand
+);
+```
+
+**Purpose**: Enables contracts to verifiably share data while maintaining privacy and integrity guarantees.
+
+---
+
+### CommunicationCommitmentRand
+
+The hex-encoded randomness to CommunicationCommitment.
+
+```typescript
+type CommunicationCommitmentRand = string;
+```
+
+**Description**: The randomness value used when creating a CommunicationCommitment. Must be kept secret until the commitment is revealed.
+
+**Usage**: Generated with `communicationCommitmentRandomness()` function.
+
+```typescript
+import { communicationCommitmentRandomness } from '@midnight-ntwrk/ledger';
+
+// Sample fresh randomness
+const rand: CommunicationCommitmentRand = communicationCommitmentRandomness();
+
+// Use in commitment
+const commitment = communicationCommitment(input, output, rand);
+
+// Later, reveal the randomness to open the commitment
+```
+
+**Security**: The randomness must be uniformly sampled and kept secret. Revealing it prematurely compromises the commitment scheme.
+
+---
+
 ## Related Documentation
 
 - **[i_am_Midnight_LLM_ref.md](i_am_Midnight_LLM_ref.md)** - Compact runtime API
