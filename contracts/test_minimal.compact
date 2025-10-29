@@ -4,9 +4,9 @@ import CompactStandardLibrary;
 ledger owner: ContractAddress;
 
 constructor(addr: ContractAddress) {
-  owner = addr;
+  owner = disclose(addr);
 }
 
 export circuit testOne(param: ContractAddress): [] {
-  owner = param;
+  owner = disclose(param);
 }

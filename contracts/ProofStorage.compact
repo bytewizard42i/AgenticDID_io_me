@@ -73,7 +73,7 @@ struct Receipt {
  * Constructor - initialize proof storage
  */
 constructor(owner: ContractAddress) {
-  contractOwner = owner;
+  contractOwner = disclose(owner);
   totalProofs = 0;
   totalActions = 0;
   currentMerkleRoot = default<Bytes<32>>;
@@ -113,7 +113,7 @@ export circuit storeProof(
   const proofId = hashProofId(agentDID, proofType, currentTime);
   
   // Check proof doesn't already exist
-  assert(!proofRecords.member(proofId), "Proof already exists");
+  assert(!proofRecords.member(disclose(proofId)), "Proof already exists");
   
   // Create metadata
   const metadata = ProofMetadata {
@@ -138,13 +138,13 @@ export circuit storeProof(
   };
   
   // Store proof
-  proofRecords.insert(proofId, record);
+  proofRecords.insert(disclose(proofId), disclose(record));
   
   // Update merkle root
   currentMerkleRoot = updateMerkleRoot(currentMerkleRoot, proofId);
   
   // Update counter
-  totalProofs = totalProofs + 1 as Uint<64>;
+  totalProofs = (totalProofs + 1) as Uint<64>;
   
   return proofId;
 }
@@ -158,9 +158,9 @@ export circuit getProof(
   proofId: Bytes<32>
 ): ProofRecord {
   
-  assert(proofRecords.member(proofId), "Proof not found");
+  assert(proofRecords.member(disclose(proofId)), "Proof not found");
   
-  const record = proofRecords.lookup(proofId);
+  const record = proofRecords.lookup(disclose(proofId));
   
   // Check authorization (simplified)
   assert(
@@ -179,12 +179,14 @@ export circuit verifyProof(
   proofId: Bytes<32>,
   currentTime: Uint<64>
 ): Boolean {
+  // Disclose currentTime since it's used in conditionals affecting ledger ops
+  const disclosedTime = disclose(currentTime);
   
-  if (!proofRecords.member(proofId)) {
+  if (!proofRecords.member(disclose(proofId))) {
     return false;
   }
   
-  const record = proofRecords.lookup(proofId);
+  const record = proofRecords.lookup(disclose(proofId));
   
   // Check revocation
   if (record.metadata.isRevoked) {
@@ -192,7 +194,7 @@ export circuit verifyProof(
   }
   
   // Check expiration
-  if (record.metadata.expiresAt < currentTime) {
+  if (record.metadata.expiresAt < disclosedTime) {
     return false;
   }
   
@@ -237,10 +239,10 @@ export circuit logAction(
   };
   
   // Store action
-  agentActions.insert(actionId, action);
+  agentActions.insert(disclose(actionId), disclose(action));
   
   // Update counter
-  totalActions = totalActions + 1 as Uint<64>;
+  totalActions = (totalActions + 1) as Uint<64>;
   
   return actionId;
 }
@@ -249,8 +251,8 @@ export circuit logAction(
  * Get action log for audit
  */
 export circuit getActionLog(actionId: Bytes<32>): ActionLog {
-  assert(agentActions.member(actionId), "Action not found");
-  return agentActions.lookup(actionId);
+  assert(agentActions.member(disclose(actionId)), "Action not found");
+  return agentActions.lookup(disclose(actionId));
 }
   
   // ============================================================================
@@ -268,7 +270,7 @@ export circuit generateReceipt(
   txHash: Bytes<32>
 ): Receipt {
   
-  assert(proofRecords.member(proofId), "Proof not found");
+  assert(proofRecords.member(disclose(proofId)), "Proof not found");
   
   // Generate receipt ID
   const receiptId = hashReceiptId(proofId, blockNumber);
@@ -297,9 +299,9 @@ export circuit revokeProof(
   proofId: Bytes<32>
 ): [] {
   
-  assert(proofRecords.member(proofId), "Proof not found");
+  assert(proofRecords.member(disclose(proofId)), "Proof not found");
   
-  const record = proofRecords.lookup(proofId);
+  const record = proofRecords.lookup(disclose(proofId));
   
   // Only issuer can revoke
   assert(caller == record.metadata.issuer, "Not authorized");
@@ -323,7 +325,7 @@ export circuit revokeProof(
     merkleProof: record.merkleProof
   };
   
-  proofRecords.insert(proofId, updatedRecord);
+  proofRecords.insert(disclose(proofId), disclose(updatedRecord));
 }
   
 /**
@@ -335,9 +337,9 @@ export circuit setVerifier(
   newVerifier: ContractAddress
 ): [] {
   
-  assert(proofRecords.member(proofId), "Proof not found");
+  assert(proofRecords.member(disclose(proofId)), "Proof not found");
   
-  const record = proofRecords.lookup(proofId);
+  const record = proofRecords.lookup(disclose(proofId));
   
   assert(caller == record.metadata.issuer, "Not authorized");
   
@@ -360,7 +362,7 @@ export circuit setVerifier(
     merkleProof: record.merkleProof
   };
   
-  proofRecords.insert(proofId, updatedRecord);
+  proofRecords.insert(disclose(proofId), disclose(updatedRecord));
 }
   
   // ============================================================================

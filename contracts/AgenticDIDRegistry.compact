@@ -50,6 +50,17 @@ struct Delegation {
   expiresAt: Uint<64>;      // When delegation expires
   isRevoked: Boolean;          // Revocation status
 }
+
+struct ProofHashInput {
+  key: Bytes<64>;
+  time: Uint<64>;
+}
+
+struct DelegationHashInput {
+  user: Bytes<32>;
+  agent: Bytes<32>;
+  time: Uint<64>;
+}
   
   // ============================================================================
   // INITIALIZATION
@@ -62,7 +73,7 @@ struct Delegation {
 constructor(caller: ContractAddress) {
   totalAgents = 0;
   totalDelegations = 0;
-  contractOwner = caller;
+  contractOwner = disclose(caller);
   revocationBitmap = 0;
 }
   
@@ -94,7 +105,7 @@ export circuit registerAgent(
 ): [] {
   
   // Security checks (using assert instead of require)
-  assert(!agentCredentials.member(did), "Agent already registered");
+  assert(!agentCredentials.member(disclose(did)), "Agent already registered");
   assert(expiresAt > currentTime, "Invalid expiration time");
   assert(verifyProofOfOwnership(did, publicKey, zkProof), "Invalid proof");
   
@@ -111,10 +122,10 @@ export circuit registerAgent(
   };
   
   // Store in ledger (with disclose() for witness data)
-  agentCredentials.insert(disclose(did), credential);
+  agentCredentials.insert(disclose(did), disclose(credential));
   
-  // Update counter (Uint arithmetic works directly)
-  totalAgents = totalAgents + 1;
+  // Update counter (cast result to match Uint<64> type)
+  totalAgents = (totalAgents + 1) as Uint<64>;
 }
   
   // ============================================================================
@@ -136,11 +147,11 @@ export circuit verifyAgent(
 ): Boolean {
     
     // Check if agent exists (safe map access)
-    if (!agentCredentials.member(agentDID)) {
+    if (!agentCredentials.member(disclose(agentDID))) {
       return false;
     }
     
-    const credential = agentCredentials.lookup(agentDID);
+    const credential = agentCredentials.lookup(disclose(agentDID));
     
     // Check expiration
     if (credential.expiresAt < currentTime) {
@@ -166,8 +177,8 @@ export circuit verifyAgent(
  * This is public information needed for ZKP verification
  */
 export circuit getAgentPublicKey(agentDID: Bytes<32>): Bytes<64> {
-  assert(agentCredentials.member(agentDID), "Agent not found");
-  return agentCredentials.lookup(agentDID).publicKey;
+  assert(agentCredentials.member(disclose(agentDID)), "Agent not found");
+  return agentCredentials.lookup(disclose(agentDID)).publicKey;
 }
   
   // ============================================================================
@@ -195,15 +206,15 @@ export circuit createDelegation(
 ): Bytes<32> {
   
   // Verify agent exists and is active
-  assert(agentCredentials.member(agentDID), "Agent not found");
-  const agentCred = agentCredentials.lookup(agentDID);
+  assert(agentCredentials.member(disclose(agentDID)), "Agent not found");
+  const agentCred = agentCredentials.lookup(disclose(agentDID));
   assert(agentCred.isActive, "Agent is revoked");
   
   // Verify scopes are subset of agent's scopes
   assert(scopesAreSubset(scopes, agentCred.scopes), "Invalid scopes");
   
   // Create unique delegation ID
-  const delegationId = hashDelegation(userDID, agentDID, currentTime);
+  const delegationId = hashDelegation(disclose(userDID), disclose(agentDID), disclose(currentTime));
   
   // Create delegation record
   const delegation = Delegation {
@@ -217,10 +228,10 @@ export circuit createDelegation(
   };
   
   // Store delegation (with disclose() for witness data)
-  delegations.insert(disclose(delegationId), delegation);
+  delegations.insert(disclose(delegationId), disclose(delegation));
   
-  // Update counter (Uint arithmetic works directly)
-  totalDelegations = totalDelegations + 1;
+  // Update counter (cast result to match Uint<64> type)
+  totalDelegations = (totalDelegations + 1) as Uint<64>;
   
   // Return with disclose() (witness-derived value)
   return disclose(delegationId);
@@ -234,12 +245,14 @@ export circuit checkDelegation(
   delegationId: Bytes<32>,
   currentTime: Uint<64>
 ): Boolean {
+    // Disclose currentTime since it's used in conditionals affecting ledger ops
+    const disclosedTime = disclose(currentTime);
     
-    if (!delegations.member(delegationId)) {
+    if (!delegations.member(disclose(delegationId))) {
       return false;
     }
     
-    const delegation = delegations.lookup(delegationId);
+    const delegation = delegations.lookup(disclose(delegationId));
     
     // Check revocation
     if (delegation.isRevoked) {
@@ -247,7 +260,7 @@ export circuit checkDelegation(
     }
     
     // Check expiration
-    if (delegation.expiresAt < currentTime) {
+    if (delegation.expiresAt < disclosedTime) {
       return false;
     }
     
@@ -273,9 +286,9 @@ export circuit revokeDelegation(
   delegationId: Bytes<32>
 ): [] {
   
-  assert(delegations.member(delegationId), "Delegation not found");
+  assert(delegations.member(disclose(delegationId)), "Delegation not found");
   
-  const delegation = delegations.lookup(delegationId);
+  const delegation = delegations.lookup(disclose(delegationId));
   assert(!delegation.isRevoked, "Already revoked");
   
   // Update delegation
@@ -290,7 +303,7 @@ export circuit revokeDelegation(
   };
   
   // Update with disclose() wrapper
-  delegations.insert(disclose(delegationId), updatedDelegation);
+  delegations.insert(disclose(delegationId), disclose(updatedDelegation));
 }
   
 // ============================================================================
@@ -306,9 +319,9 @@ export circuit revokeAgent(
   agentDID: Bytes<32>
 ): [] {
   
-  assert(agentCredentials.member(agentDID), "Agent not found");
+  assert(agentCredentials.member(disclose(agentDID)), "Agent not found");
   
-  const credential = agentCredentials.lookup(agentDID);
+  const credential = agentCredentials.lookup(disclose(agentDID));
   
   // Only owner or issuer can revoke
   assert(
@@ -329,7 +342,7 @@ export circuit revokeAgent(
   };
   
   // Update with disclose() wrapper
-  agentCredentials.insert(disclose(agentDID), updatedCred);
+  agentCredentials.insert(disclose(agentDID), disclose(updatedCred));
 }
   
   // ============================================================================
@@ -360,11 +373,6 @@ circuit hashProof(
   timestamp: Uint<64>
 ): Bytes<32> {
   // Create structured input for type-safe hashing
-  struct ProofHashInput {
-    key: Bytes<64>;
-    time: Uint<64>;
-  }
-  
   const input = ProofHashInput {
     key: publicKey,
     time: timestamp
@@ -384,12 +392,6 @@ circuit hashDelegation(
   timestamp: Uint<64>
 ): Bytes<32> {
   // Create structured input for type-safe hashing
-  struct DelegationHashInput {
-    user: Bytes<32>;
-    agent: Bytes<32>;
-    time: Uint<64>;
-  }
-  
   const input = DelegationHashInput {
     user: userDID,
     agent: agentDID,
@@ -449,9 +451,9 @@ export circuit checkCredential(
   currentTime: Uint<64>
 ): [] {
   // Check if agent exists
-  assert(agentCredentials.member(agentDID), "Agent not found");
+  assert(agentCredentials.member(disclose(agentDID)), "Agent not found");
   
-  const credential = agentCredentials.lookup(agentDID);
+  const credential = agentCredentials.lookup(disclose(agentDID));
   
   // Validation chain using assert
   assert(credential.isActive, "Agent not active");
@@ -475,12 +477,12 @@ export circuit isDelegationValid(
   currentTime: Uint<64>
 ): [] {
   // Generate delegation ID
-  const delegationId = hashDelegation(userDID, agentDID, currentTime);
+  const delegationId = hashDelegation(disclose(userDID), disclose(agentDID), disclose(currentTime));
   
   // Check if delegation exists
-  assert(delegations.member(delegationId), "Delegation not found");
+  assert(delegations.member(disclose(delegationId)), "Delegation not found");
   
-  const delegation = delegations.lookup(delegationId);
+  const delegation = delegations.lookup(disclose(delegationId));
   
   // Validation chain
   assert(!delegation.isRevoked, "Delegation not active");
