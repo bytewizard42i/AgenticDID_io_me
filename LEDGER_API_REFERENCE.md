@@ -3143,6 +3143,175 @@ console.log(`Final stack size: ${result.stack.length()}`);
 
 ---
 
+### sampleCoinPublicKey()
+
+Samples a dummy user coin public key for use in testing.
+
+```typescript
+function sampleCoinPublicKey(): CoinPublicKey
+```
+
+**Returns**: `CoinPublicKey` - A randomly sampled coin public key
+
+**Usage**: Generate test public keys without needing a real LocalState.
+
+```typescript
+import { sampleCoinPublicKey, UnprovenOutput, createCoinInfo } from '@midnight-ntwrk/ledger';
+
+// Create test output
+const testRecipient = sampleCoinPublicKey();
+const coin = createCoinInfo('DUST', 1000n);
+const output = UnprovenOutput.new(coin, testRecipient);
+
+// Use in unit tests
+describe('Transaction Tests', () => {
+  it('should create valid output', () => {
+    const recipient = sampleCoinPublicKey();
+    expect(recipient).toBeDefined();
+  });
+});
+```
+
+**Best Practice**: Use this instead of hardcoded public keys in tests to avoid test brittleness and ensure randomness.
+
+---
+
+### sampleContractAddress()
+
+Samples a uniform contract address for use in testing.
+
+```typescript
+function sampleContractAddress(): ContractAddress
+```
+
+**Returns**: `ContractAddress` - A uniformly sampled contract address
+
+**Usage**: Generate random contract addresses for testing. Different from `dummyContractAddress()` which returns a consistent address for a given network.
+
+```typescript
+import { sampleContractAddress, UnprovenOutput, createCoinInfo } from '@midnight-ntwrk/ledger';
+
+// Create contract-owned output with random address
+const randomContract = sampleContractAddress();
+const coin = createCoinInfo('DUST', 1000n);
+const output = UnprovenOutput.newContractOwned(coin, randomContract);
+
+// Test multiple contracts
+const contracts = [
+  sampleContractAddress(),
+  sampleContractAddress(),
+  sampleContractAddress()
+];
+```
+
+**Comparison**:
+- `dummyContractAddress()`: Same address every time (for a given network) - good for consistent tests
+- `sampleContractAddress()`: Different address each time - good for randomized tests
+
+---
+
+### sampleSigningKey()
+
+Randomly samples a SigningKey.
+
+```typescript
+function sampleSigningKey(): SigningKey
+```
+
+**Returns**: `SigningKey` - A randomly sampled signing key
+
+**Usage**: Generate test signing keys for transaction authorization and testing.
+
+```typescript
+import { sampleSigningKey } from '@midnight-ntwrk/ledger';
+
+// Create test signing key
+const signingKey = sampleSigningKey();
+
+// Use in transaction signing tests
+describe('Transaction Signing', () => {
+  it('should sign transaction', () => {
+    const key = sampleSigningKey();
+    const signature = signTransaction(transaction, key);
+    expect(signature).toBeDefined();
+  });
+});
+
+// Test multiple signers
+const signers = Array.from({ length: 3 }, () => sampleSigningKey());
+```
+
+**Security Note**: These are randomly generated keys for **testing only**. Never use sampled keys in production - use proper key derivation from secure sources.
+
+---
+
+## Testing Utilities Summary
+
+The Ledger API provides comprehensive testing utilities to facilitate unit and integration testing:
+
+### Sampling Functions
+
+| Function | Returns | Use Case | Randomness |
+|----------|---------|----------|------------|
+| `dummyContractAddress()` | ContractAddress | Consistent test address | Deterministic (per network) |
+| `sampleContractAddress()` | ContractAddress | Random contract addresses | Uniform random |
+| `sampleCoinPublicKey()` | CoinPublicKey | Random user public keys | Uniform random |
+| `sampleSigningKey()` | SigningKey | Random signing keys | Uniform random |
+
+### Testing Best Practices
+
+1. **Use sampling functions** instead of hardcoded values
+2. **Deterministic tests**: Use `dummyContractAddress()` for reproducible results
+3. **Randomized tests**: Use `sample*()` functions for property-based testing
+4. **Never in production**: Sampling functions are for testing only
+
+### Example Test Suite
+
+```typescript
+import {
+  sampleCoinPublicKey,
+  sampleContractAddress,
+  sampleSigningKey,
+  createCoinInfo,
+  UnprovenOutput,
+  UnprovenTransaction
+} from '@midnight-ntwrk/ledger';
+
+describe('Transaction Building', () => {
+  it('should create user-to-user transfer', () => {
+    const sender = sampleCoinPublicKey();
+    const recipient = sampleCoinPublicKey();
+    const coin = createCoinInfo('DUST', 1000n);
+    
+    const output = UnprovenOutput.new(coin, recipient);
+    expect(output).toBeDefined();
+  });
+  
+  it('should create contract interaction', () => {
+    const contract = sampleContractAddress();
+    const coin = createCoinInfo('DUST', 500n);
+    
+    const output = UnprovenOutput.newContractOwned(coin, contract);
+    expect(output.contractAddress).toBe(contract);
+  });
+  
+  it('should handle multiple signers', () => {
+    const signers = [
+      sampleSigningKey(),
+      sampleSigningKey(),
+      sampleSigningKey()
+    ];
+    
+    expect(signers).toHaveLength(3);
+    // Each should be unique
+    const unique = new Set(signers);
+    expect(unique.size).toBe(3);
+  });
+});
+```
+
+---
+
 ## Encode/Decode Functions Summary
 
 The encode and decode functions provide essential bidirectional bridges between Compact contract representations and Ledger API representations:
