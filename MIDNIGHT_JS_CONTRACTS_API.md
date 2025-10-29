@@ -26,7 +26,7 @@ The `@midnight-ntwrk/midnight-js-contracts` package provides the primary interfa
 
 ### Classes (10 Error Classes)
 
-All error classes extend the base `TxFailedError`:
+All error classes extend the base `TxFailedError` (except `ContractTypeError` which extends `TypeError`):
 
 1. **TxFailedError** - Base error for transaction failures
 2. **CallTxFailedError** - Circuit call transaction failed
@@ -37,7 +37,317 @@ All error classes extend the base `TxFailedError`:
 7. **ContractTypeError** - Contract type mismatch
 8. **IncompleteCallTxPrivateStateConfig** - Missing private state for call
 9. **IncompleteFindContractPrivateStateConfig** - Missing private state for discovery
-10. **TxFailedError** - Generic transaction failure
+
+---
+
+## 📋 Error Classes (Detailed)
+
+### TxFailedError
+
+Base error class for all transaction failures.
+
+```typescript
+class TxFailedError extends Error {
+  constructor(finalizedTxData: FinalizedTxData, circuitId?: string)
+  
+  readonly finalizedTxData: FinalizedTxData;
+  readonly circuitId?: string;
+}
+```
+
+**Properties**:
+- `finalizedTxData`: The finalization data of the transaction that failed
+- `circuitId`: The name of the circuit (only defined for call transactions)
+
+**Usage**: Base class for all transaction-related errors.
+
+---
+
+### CallTxFailedError
+
+An error indicating that a call transaction was not successfully applied by the consensus node.
+
+```typescript
+class CallTxFailedError extends TxFailedError {
+  constructor(finalizedTxData: FinalizedTxData, circuitId: string)
+  
+  readonly finalizedTxData: FinalizedTxData;
+  readonly circuitId: string;
+}
+```
+
+**Parameters**:
+- `finalizedTxData`: The finalization data of the call transaction that failed
+- `circuitId`: The name of the circuit that was called to build the transaction
+
+**Properties**:
+- `finalizedTxData`: Transaction data that failed (inherited)
+- `circuitId`: Circuit name that was called (always defined for call errors)
+
+**When Thrown**: When a circuit call transaction is rejected by the consensus node
+
+**Example**:
+```typescript
+import { call, CallTxFailedError } from '@midnight-ntwrk/midnight-js-contracts';
+
+try {
+  const result = await call(contractAddress, 'myCircuit', options);
+} catch (error) {
+  if (error instanceof CallTxFailedError) {
+    console.error(`Circuit ${error.circuitId} call failed`);
+    console.error(`Transaction hash: ${error.finalizedTxData.transactionHash}`);
+    console.error(`Reason: ${error.message}`);
+    
+    // Access finalized transaction data
+    const txHash = error.finalizedTxData.transactionHash;
+    const proof = error.finalizedTxData.proof;
+  }
+}
+```
+
+**Common Causes**:
+- Invalid proof
+- Gas limit exceeded
+- Contract state mismatch
+- Insufficient balance
+- Contract logic rejection
+
+---
+
+### DeployTxFailedError
+
+An error indicating that a deploy transaction was not successfully applied by the consensus node.
+
+```typescript
+class DeployTxFailedError extends TxFailedError {
+  constructor(finalizedTxData: FinalizedTxData)
+  
+  readonly finalizedTxData: FinalizedTxData;
+  readonly circuitId?: string; // Inherited but undefined for deploy errors
+}
+```
+
+**Parameters**:
+- `finalizedTxData`: The finalization data of the deployment transaction that failed
+
+**Properties**:
+- `finalizedTxData`: Transaction data that failed
+- `circuitId`: undefined for deployment errors (inherited but not used)
+
+**When Thrown**: When a contract deployment transaction is rejected by the consensus node
+
+**Example**:
+```typescript
+import { deployContract, DeployTxFailedError } from '@midnight-ntwrk/midnight-js-contracts';
+
+try {
+  const deployed = await deployContract(options);
+} catch (error) {
+  if (error instanceof DeployTxFailedError) {
+    console.error('Contract deployment failed');
+    console.error(`Transaction hash: ${error.finalizedTxData.transactionHash}`);
+    console.error(`Reason: ${error.message}`);
+    
+    // Inspect failed deployment
+    const txData = error.finalizedTxData;
+    console.error(`Initial state: ${JSON.stringify(txData.initialState)}`);
+  }
+}
+```
+
+**Common Causes**:
+- Invalid contract bytecode
+- Constructor proof verification failed
+- Insufficient deployment fee
+- Network congestion
+- Invalid initial state
+
+---
+
+### ContractTypeError
+
+The error that is thrown when there is a contract type mismatch between a given contract type, and the initial state that is deployed at a given contract address.
+
+```typescript
+class ContractTypeError extends TypeError {
+  constructor(contractState: ContractState, circuitIds: string[])
+  
+  readonly contractState: ContractState;
+  readonly circuitIds: string[];
+}
+```
+
+**Parameters**:
+- `contractState`: The initial deployed contract state
+- `circuitIds`: The circuits that are undefined, or have a verifier key mismatch with the key present in contractState
+
+**Properties**:
+- `contractState`: The actual contract state found at the address
+- `circuitIds`: List of circuits with mismatches or undefined
+
+**When Thrown**: Typically during `findDeployedContract()` when the supplied contract address represents a different type of contract than expected
+
+**Example**:
+```typescript
+import { findDeployedContract, ContractTypeError } from '@midnight-ntwrk/midnight-js-contracts';
+
+try {
+  const contract = await findDeployedContract({
+    contractAddress: '0x123...',
+    contractType: MyContractType,
+    providers
+  });
+} catch (error) {
+  if (error instanceof ContractTypeError) {
+    console.error('Contract type mismatch!');
+    console.error(`Expected circuits: ${expectedCircuits.join(', ')}`);
+    console.error(`Mismatched circuits: ${error.circuitIds.join(', ')}`);
+    console.error(`Actual state: ${JSON.stringify(error.contractState)}`);
+    
+    // Check which circuits don't match
+    error.circuitIds.forEach(circuitId => {
+      console.error(`Circuit ${circuitId}: verifier key mismatch or undefined`);
+    });
+  }
+}
+```
+
+**Common Causes**:
+- Wrong contract address
+- Contract was upgraded (verifier keys changed)
+- Using wrong compiled contract code
+- Contract type definition mismatch
+
+**Recovery**:
+- Verify contract address is correct
+- Check if contract was upgraded
+- Ensure you have the correct contract type definition
+- Update your compiled contract if needed
+
+---
+
+### InsertVerifierKeyTxFailedError
+
+An error indicating that a verifier key insertion transaction failed.
+
+```typescript
+class InsertVerifierKeyTxFailedError extends TxFailedError {
+  constructor(finalizedTxData: FinalizedTxData)
+  
+  readonly finalizedTxData: FinalizedTxData;
+}
+```
+
+**When Thrown**: When attempting to insert a new verifier key (contract upgrade) and the transaction is rejected
+
+**Common Causes**:
+- Not authorized to update contract
+- Invalid verifier key format
+- Circuit version already exists
+- Incorrect maintenance authority
+
+---
+
+### RemoveVerifierKeyTxFailedError
+
+An error indicating that a verifier key removal transaction failed.
+
+```typescript
+class RemoveVerifierKeyTxFailedError extends TxFailedError {
+  constructor(finalizedTxData: FinalizedTxData)
+  
+  readonly finalizedTxData: FinalizedTxData;
+}
+```
+
+**When Thrown**: When attempting to remove a verifier key and the transaction is rejected
+
+**Common Causes**:
+- Not authorized to update contract
+- Verifier key doesn't exist
+- Cannot remove last verifier key
+- Incorrect maintenance authority
+
+---
+
+### ReplaceMaintenanceAuthorityTxFailedError
+
+An error indicating that a maintenance authority replacement transaction failed.
+
+```typescript
+class ReplaceMaintenanceAuthorityTxFailedError extends TxFailedError {
+  constructor(finalizedTxData: FinalizedTxData)
+  
+  readonly finalizedTxData: FinalizedTxData;
+}
+```
+
+**When Thrown**: When attempting to replace the contract's maintenance authority and the transaction is rejected
+
+**Common Causes**:
+- Not current authority
+- Invalid new authority format
+- Authority transfer not allowed by contract
+
+---
+
+### IncompleteCallTxPrivateStateConfig
+
+An error indicating incomplete private state configuration for a call transaction.
+
+```typescript
+class IncompleteCallTxPrivateStateConfig extends Error {
+  constructor(message: string)
+}
+```
+
+**When Thrown**: When calling a circuit that requires private state but configuration is missing or incomplete
+
+**Example**:
+```typescript
+try {
+  await call(address, 'circuit', {
+    // Missing privateState or witnesses!
+    arguments: { value: 42 },
+    providers
+  });
+} catch (error) {
+  if (error instanceof IncompleteCallTxPrivateStateConfig) {
+    console.error('Private state configuration missing');
+    console.error('Ensure witnesses or privateState is provided');
+  }
+}
+```
+
+---
+
+### IncompleteFindContractPrivateStateConfig
+
+An error indicating incomplete private state configuration when finding a contract.
+
+```typescript
+class IncompleteFindContractPrivateStateConfig extends Error {
+  constructor(message: string)
+}
+```
+
+**When Thrown**: When finding a contract that requires private state but configuration is missing
+
+**Example**:
+```typescript
+try {
+  await findDeployedContract({
+    contractAddress: '0x123...',
+    // Missing privateStateConfig!
+    providers
+  });
+} catch (error) {
+  if (error instanceof IncompleteFindContractPrivateStateConfig) {
+    console.error('Private state configuration missing');
+    console.error('Provide privateStateConfig with store/existing state options');
+  }
+}
+```
 
 ---
 
