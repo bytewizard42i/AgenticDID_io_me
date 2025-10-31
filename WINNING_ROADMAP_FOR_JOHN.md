@@ -1,7 +1,9 @@
 # 🏆 AgenticDID Winning Roadmap - For John
-**Mission:** Win the Midnight Network Hackathon  
+**Mission:** Win the Google Cloud Run Hackathon ($50,000+ Prize Pool)  
+**Target Category:** Best of AI Agents ($8,000) + Best of AI Studio ($8,000)  
+**Required Platform:** Google Cloud Run (Frontend + Backend Services)  
 **Your Style:** Vibe Coder (AI-assisted, results-focused, non-traditional dev)  
-**Deadline:** Hackathon submission date  
+**Deadline:** November 2025 (check run.devpost.com for exact date)  
 **Created by:** CARA, 2025-10-31
 
 ---
@@ -19,12 +21,14 @@
 
 ### What You Need to Win
 - ✅ Working demo (YOU HAVE THIS - Phase 1 MVP)
-- 🔜 Real Midnight integration (Phase 2 - THIS IS THE GAP)
-- 🔜 Deployed & accessible (judges can try it)
+- 🚨 **CRITICAL: Deploy to Google Cloud Run** (Frontend + Backend) - REQUIRED
+- ✅ Docker containers ready (you have this)
+- 🔜 Google ADK integration (for AI Agents category)
+- 🔜 AI Studio prompts (for AI Studio category)
 - ✅ Clear presentation (you're good at this)
 - ✅ Unique value prop (you have multiple)
 
-**Bottom Line:** You're 70% there. Focus on Phase 2 integration to seal the deal.
+**Bottom Line:** You're 70% there. The #1 priority is **deploying to Google Cloud Run** - it's literally the hackathon requirement. Then polish your demo and presentation. Midnight integration is secondary (nice-to-have, not required).
 
 ---
 
@@ -221,6 +225,23 @@ docker run --rm -v "$(pwd):/work" \
 
 ## 🗺️ Winning Roadmap (Vibe Coder Style)
 
+### ⚠️ CRITICAL REQUIREMENT: Google Cloud Run Deployment
+
+**YOU MUST DEPLOY TO CLOUD RUN TO QUALIFY!**
+
+The hackathon is called "Cloud Run Hackathon" - judges need to see your app running on Google Cloud Run. This is non-negotiable.
+
+**What you need:**
+1. Google Cloud account (free $300 credits included)
+2. Both services deployed:
+   - Frontend → Cloud Run Service
+   - Backend → Cloud Run Service
+3. Live URLs for judges to test
+
+**Good news:** Your Docker setup makes this easy!
+
+---
+
 ### PHASE 0: Prep (Now - 2 hours)
 
 #### ✅ Already Done (Celebrate This!)
@@ -291,11 +312,93 @@ Create a landing page hero section for AgenticDID:
 
 ---
 
-### PHASE 2: Midnight Integration (8-16 hours)
+### PHASE 2: Google Cloud Run Deployment (2-4 hours) 🚨 **PRIORITY #1**
 
-**Goal:** Get real ZK proofs working (THIS IS THE GAP TO WIN)
+**Goal:** Deploy both services to Cloud Run (REQUIRED TO WIN)
 
-#### Option A: Full Integration (If You Have Time)
+#### Step-by-Step Deployment
+
+**Prerequisites:**
+```bash
+# 1. Install Google Cloud SDK
+# Download from: https://cloud.google.com/sdk/docs/install
+
+# 2. Login and setup
+gcloud auth login
+gcloud config set project YOUR_PROJECT_ID
+
+# 3. Enable required APIs
+gcloud services enable run.googleapis.com
+gcloud services enable cloudbuild.googleapis.com
+```
+
+**Deploy Frontend:**
+```bash
+cd /home/js/utils_agenticdid/apps/web
+
+# Option A: Deploy from source (easiest)
+gcloud run deploy agenticdid-frontend \
+  --source . \
+  --platform managed \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --port 8080
+
+# Option B: Deploy from Docker
+docker build -t gcr.io/YOUR_PROJECT/agenticdid-frontend .
+docker push gcr.io/YOUR_PROJECT/agenticdid-frontend
+gcloud run deploy agenticdid-frontend \
+  --image gcr.io/YOUR_PROJECT/agenticdid-frontend \
+  --platform managed \
+  --region us-central1 \
+  --allow-unauthenticated
+```
+
+**Deploy Backend:**
+```bash
+cd /home/js/utils_agenticdid/apps/verifier-api
+
+gcloud run deploy agenticdid-api \
+  --source . \
+  --platform managed \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --port 8080 \
+  --set-env-vars="API_KEY=your-key-here"
+```
+
+**Test Deployment:**
+```bash
+# Get your URLs
+gcloud run services list
+
+# Test frontend
+curl https://agenticdid-frontend-xxxxx.run.app
+
+# Test backend
+curl https://agenticdid-api-xxxxx.run.app/health
+```
+
+**Update Frontend with Backend URL:**
+```bash
+# Set environment variable in Cloud Run
+gcloud run services update agenticdid-frontend \
+  --set-env-vars="VITE_API_BASE=https://agenticdid-api-xxxxx.run.app"
+```
+
+**Expected result:** Live URLs you can share with judges!
+
+**Time:** 2-4 hours (including troubleshooting)
+**Vibe coder friendly:** 7/10 (straightforward commands, some config needed)
+**Impact:** REQUIRED - you cannot win without this
+
+---
+
+### PHASE 2B: Midnight Integration (8-16 hours) - OPTIONAL
+
+**Note:** Midnight integration is impressive but NOT required for Cloud Run Hackathon. Prioritize Cloud Run deployment first!
+
+#### Option A: Full Integration (If You Have Time After Cloud Run)
 **Steps:**
 1. Compile contracts
 2. Deploy to Midnight testnet
@@ -307,7 +410,7 @@ Create a landing page hero section for AgenticDID:
 **Time:** 16+ hours  
 **Vibe coder friendly:** 4/10
 
-#### Option B: Hybrid Approach (RECOMMENDED)
+#### Option B: Hybrid Approach (RECOMMENDED if time permits)
 **Steps:**
 1. Keep mock verification for main demo
 2. Create "Phase 2 Preview" separate page
@@ -320,7 +423,8 @@ Create a landing page hero section for AgenticDID:
 **Vibe coder friendly:** 7/10  
 **Impact:** 80% of full integration credit
 
-#### Option C: Strategic Positioning (If Short on Time)
+#### Option C: Strategic Positioning (RECOMMENDED for hackathon)
+**This is your best path if time is limited!**
 **Steps:**
 1. Perfect the MVP demo
 2. Emphasize "Phase 1 Complete, Phase 2 Architecture Ready"
@@ -335,34 +439,89 @@ Create a landing page hero section for AgenticDID:
 
 ---
 
-### PHASE 3: Deployment (2-4 hours)
+### PHASE 3: Google ADK Integration (4-8 hours) - For AI Agents Category
 
-**Goal:** Judges can access it remotely
+**Goal:** Show multi-agent orchestration with Google's tools
 
-#### Quick Deploy Stack (KISS Principle)
+#### What Judges Want to See:
+1. Multiple agents working together
+2. MCP (Model Context Protocol) communication
+3. Google ADK usage documented
+4. Gemini API for intelligence
+
+#### Quick Integration:
 ```bash
-# Frontend → Vercel
-cd apps/web
-vercel deploy --prod
+# Install Google ADK
+npm install @google-cloud/agent-development-kit
 
-# Backend → Railway.app
-# (Connect GitHub, click deploy button)
-
-# Contracts → Show GitHub repo
-# (Judges can review code)
+# Convert your existing agents to ADK format
+# (Ask Windsurf/Claude to help with this)
 ```
 
-**Result:** Live URLs:
-- Demo: https://agenticdid.vercel.app
-- API: https://agenticdid-api.up.railway.app
-- Repo: https://github.com/bytewizard42i/AgenticDID_io_me
+#### Vibe Coder Approach:
+**Use AI to do the heavy lifting:**
 
-**Vibe coder friendly:** 10/10  
-**Time:** 1-2 hours actual work
+Prompt for Windsurf/Claude:
+```
+I have 4 agents (Comet, Banker, Shopper, Traveler) in TypeScript.
+Help me integrate them with Google Agent Development Kit (ADK).
+
+Requirements:
+- Use MCP for agent communication
+- Comet orchestrates the other 3
+- Show multi-agent collaboration
+- Keep it simple and production-ready
+
+Here's my current agent code:
+[paste your agents.ts file]
+```
+
+**Time:** 4-8 hours (with AI assistance)
+**Vibe coder friendly:** 8/10 (AI does most work)
+**Impact:** HIGH - this is a major category!
 
 ---
 
-### PHASE 4: Presentation Prep (4-6 hours)
+### PHASE 4: AI Studio Integration (2-3 hours) - For AI Studio Category
+
+**Goal:** Show you used AI Studio for development
+
+#### Easy Steps:
+1. Go to https://aistudio.google.com
+2. Create prompt for each agent:
+   - Comet Orchestrator prompt
+   - Banker Agent prompt  
+   - Shopper Agent prompt
+   - Traveler Agent prompt
+3. Test prompts with sample queries
+4. Click "Share App" for each
+5. Save share links for submission
+
+**Example Prompt (Banker Agent):**
+```
+You are a Banker AI agent responsible for financial operations.
+
+Capabilities:
+- Check account balances
+- Transfer funds (with authorization)
+- Review transaction history
+- Block suspicious activity
+
+Security:
+- Require zero-knowledge proof verification
+- Check delegation scope before actions
+- Log all operations
+
+Respond professionally and securely.
+```
+
+**Time:** 2-3 hours
+**Vibe coder friendly:** 10/10 (just prompts!)
+**Impact:** HIGH - dedicated $8,000 category!
+
+---
+
+### PHASE 5: Presentation Prep (4-6 hours)
 
 **Goal:** Knock judges' socks off
 
@@ -560,32 +719,39 @@ Assume I'm a vibe coder - make it dead simple.
 
 ## 🚀 Action Plan (Next 48 Hours)
 
-### Hour 0-2: Prep & Polish
-- [ ] Test MVP demo end-to-end
-- [ ] Record backup demo video
-- [ ] Write 2-minute pitch script
-- [ ] Create simple slide deck (8-10 slides)
+### Hour 0-4: 🚨 CLOUD RUN DEPLOYMENT (DO THIS FIRST!)
+- [ ] Setup Google Cloud account
+- [ ] Deploy frontend to Cloud Run
+- [ ] Deploy backend to Cloud Run  
+- [ ] Test both services live
+- [ ] Get URLs for submission
+- [ ] Update frontend with backend URL
 
-### Hour 2-6: Visual Polish
-- [ ] Use v0.dev for hero section
-- [ ] Use v0.dev for timeline component
-- [ ] Polish UI/UX rough edges
+### Hour 4-8: Google ADK & AI Studio Integration
+- [ ] Install Google ADK
+- [ ] Convert agents to ADK format (use AI assistant)
+- [ ] Create AI Studio prompts for each agent
+- [ ] Test and get share links
+- [ ] Document integration in README
+
+### Hour 8-12: Visual Polish & Testing
+- [ ] Test Cloud Run deployment thoroughly
+- [ ] Use v0.dev for any UI improvements
+- [ ] Ensure demo flows smoothly
 - [ ] Test on mobile (responsive)
+- [ ] Fix any Cloud Run issues
 
-### Hour 6-14: Midnight Integration (Pick approach based on time)
-- [ ] **Option B (Hybrid):** Compile contracts, show Phase 2 preview
-- [ ] **Option C (Strategic):** Perfect demo, strong architecture presentation
+### Hour 12-16: Optional Midnight Integration
+- [ ] IF TIME: Compile contracts
+- [ ] IF TIME: Show Phase 2 preview
+- [ ] OTHERWISE: Focus on presentation quality
 
-### Hour 14-18: Deployment
-- [ ] Deploy frontend to Vercel
-- [ ] Deploy backend to Railway
-- [ ] Test live URLs
-- [ ] Update README with links
-
-### Hour 18-24: Presentation Prep
+### Hour 16-24: Presentation & Submission Prep
+- [ ] Record 3-minute demo video
+- [ ] Write Devpost submission text
+- [ ] Create architecture diagram
+- [ ] Gather all required materials
 - [ ] Practice demo flow (10x)
-- [ ] Refine pitch script
-- [ ] Prepare for Q&A
 - [ ] Sleep! (judges notice energy levels)
 
 ### Hour 24-48: Buffer & Refinement
@@ -685,20 +851,28 @@ Assume I'm a vibe coder - make it dead simple.
 ## 🏆 You Can Win This
 
 **Why I believe in you:**
-1. Your idea is genuinely novel
-2. Your execution is already professional
+1. Your idea is genuinely novel (multi-party AI agent auth)
+2. Your execution is already professional (working MVP)
 3. Your unique features (Listen In Mode) will stand out
-4. Your documentation shows depth
+4. Your documentation shows depth (70+ pages)
 5. Your presentation skills are strong
-6. Your understanding of the problem is deep
+6. Your Docker setup makes Cloud Run deployment easy
 
 **What gives you the edge:**
-- Most teams will have incomplete demos
-- Most won't have contracts written
+- Most teams will struggle with Cloud Run deployment
+- Most won't have multi-agent systems
 - Most won't have unique UX innovations
 - Most won't have real use cases
+- Most won't target multiple categories
 
-**You're already ahead.** Now execute.
+**Critical success factors:**
+1. 🚨 **Deploy to Cloud Run** (non-negotiable requirement)
+2. 🎯 Show Google ADK integration (AI Agents category)
+3. 🎯 Show AI Studio usage (AI Studio category)  
+4. ✨ Polish your demo and presentation
+5. 📝 Submit all required materials
+
+**You're already ahead.** Now execute on Cloud Run deployment first, everything else second.
 
 ---
 
