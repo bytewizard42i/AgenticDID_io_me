@@ -19,21 +19,21 @@ type Verifier = {
 const VERIFIERS: Verifier[] = [
   {
     id: 'bank-verifier',
-    name: 'Bank Verifier',
+    name: 'My Bank Trusted Verifier',
     icon: '🏦',
     color: 'text-green-400',
     matchesAgent: ['banker'],
   },
   {
     id: 'airline-verifier',
-    name: 'Airline Verifier',
+    name: 'My Airline Trusted Verifier',
     icon: '✈️',
     color: 'text-blue-400',
     matchesAgent: ['traveler'],
   },
   {
     id: 'retail-verifier',
-    name: 'Retail Verifier',
+    name: 'Amazon Trusted Verifier',
     icon: '🛒',
     color: 'text-purple-400',
     matchesAgent: ['shopper'],
