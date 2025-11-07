@@ -56,16 +56,17 @@ export default function VerifierDisplay({ selectedAgent, isProcessing, isVerifie
   // Find the matching verifier
   const activeVerifier = VERIFIERS.find(v => v.matchesAgent.includes(selectedAgent));
 
-  // Announce verifier selection when processing starts
-  useEffect(() => {
-    if (isProcessing && activeVerifier && listenInMode && !hasAnnouncedVerifying.current) {
-      hasAnnouncedVerifying.current = true;
-      speak(`${activeVerifier.name} is now verifying the zero-knowledge proof.`, { rate: 1.1, pitch: 0.9 });
-    }
-    if (!isProcessing) {
-      hasAnnouncedVerifying.current = false;
-    }
-  }, [isProcessing, activeVerifier, speak, listenInMode]);
+  // Note: Verifier TTS is now called directly in App.tsx at the right moment
+  // This useEffect is disabled to prevent timing conflicts
+  // useEffect(() => {
+  //   if (isProcessing && activeVerifier && listenInMode && !hasAnnouncedVerifying.current) {
+  //     hasAnnouncedVerifying.current = true;
+  //     speak(`${activeVerifier.name} is now verifying the zero-knowledge proof.`, { rate: 1.1, pitch: 0.9 });
+  //   }
+  //   if (!isProcessing) {
+  //     hasAnnouncedVerifying.current = false;
+  //   }
+  // }, [isProcessing, activeVerifier, speak, listenInMode]);
 
   // Trigger confetti when verification succeeds
   useEffect(() => {

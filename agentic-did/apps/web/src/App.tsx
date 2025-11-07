@@ -234,6 +234,20 @@ export default function App() {
         message: 'Submitting proof bundle...',
       });
 
+      // Announce verifier is checking
+      if (listenInMode && appropriateAgent !== 'rogue') {
+        const verifierNames: Record<string, string> = {
+          'banker': 'My Bank Trusted Verifier',
+          'traveler': 'My Airline Trusted Verifier',
+          'shopper': 'Amazon Trusted Verifier',
+        };
+        const verifierName = verifierNames[appropriateAgent];
+        if (verifierName) {
+          await speak(`${verifierName} is now verifying the zero-knowledge proof.`, { rate: 1.1, pitch: 0.9 });
+          await sleep(1500);
+        }
+      }
+
       const presentation = await presentVP(vp, challenge.nonce);
 
       if (presentation.status === 200) {
