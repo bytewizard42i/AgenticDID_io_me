@@ -170,11 +170,12 @@ export default function App() {
       // Comet speaks: Analyzing request
       if (listenInMode) {
         await speak("Comet here. I'm analyzing your request and selecting the appropriate agent.", { rate: 1.1 });
+        await sleep(1500); // Wait for speech to complete
       }
     }
     
     // Give UI time to show the selected agent
-    await sleep(300);
+    await sleep(listenInMode ? 500 : 300);
 
     try {
       // Step 1: Request Challenge
