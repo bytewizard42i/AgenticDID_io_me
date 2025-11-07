@@ -24,6 +24,7 @@ import Header from './components/Header';
 import Hero from './components/Hero';
 import MutualAuth from './components/MutualAuth';
 import AgentSelector from './components/AgentSelector';
+import VerifierDisplay from './components/VerifierDisplay';
 import ActionPanel from './components/ActionPanel';
 import Timeline, { TimelineStep } from './components/Timeline';
 import ResultBanner from './components/ResultBanner';
@@ -75,6 +76,7 @@ export default function App() {
   const [executionTime, setExecutionTime] = useState<number | null>(null);
   const [rogueMode, setRogueMode] = useState(false);
   const [ipInfo, setIpInfo] = useState<any>(null);
+  const [isVerified, setIsVerified] = useState(false);
   const { speak, isSpeaking, isAvailable } = useSpeech();
 
   const addTimelineStep = (step: Omit<TimelineStep, 'timestamp'>) => {
@@ -102,6 +104,7 @@ export default function App() {
     setIpInfo(null);
     setExecutionTime(null);
     setRogueMode(false);
+    setIsVerified(false);
   };
 
   const handleAction = async (action: Action) => {
@@ -123,6 +126,7 @@ export default function App() {
     setTimeline([]);
     setExecutionTime(null);
     setIpInfo(null);
+    setIsVerified(false);
     
     // If rogue mode, show warning
     if (rogueMode) {
@@ -236,6 +240,9 @@ export default function App() {
           status: 'success',
           message: `Token issued: ${presentation.data.scopes?.join(', ')}`,
         });
+
+        // Mark as verified for confetti
+        setIsVerified(true);
 
         if (listenInMode) {
           await speak(`Verification successful! Credentials validated by the network.`, { rate: 1.1 });
@@ -432,6 +439,13 @@ export default function App() {
             selectedAgent={selectedAgent}
             onSelect={setSelectedAgent}
             isProcessing={isProcessing}
+          />
+
+          {/* Step 4: Verifier Display */}
+          <VerifierDisplay
+            selectedAgent={selectedAgent}
+            isProcessing={isProcessing}
+            isVerified={isVerified}
           />
 
           {result && (
