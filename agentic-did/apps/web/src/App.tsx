@@ -73,6 +73,8 @@ export default function App() {
   const [result, setResult] = useState<{ success: boolean; message: string } | null>(null);
   const [listenInMode, setListenInMode] = useState(true);
   const [executionTime, setExecutionTime] = useState<number | null>(null);
+  const [rogueMode, setRogueMode] = useState(false);
+  const [ipInfo, setIpInfo] = useState<any>(null);
   const { speak, isSpeaking, isAvailable } = useSpeech();
 
   const addTimelineStep = (step: Omit<TimelineStep, 'timestamp'>) => {
@@ -88,6 +90,12 @@ export default function App() {
     );
   };
 
+  const handleRogueAttempt = () => {
+    setRogueMode(true);
+    setResult(null);
+    setTimeline([]);
+  };
+
   const handleAction = async (action: Action) => {
     const startTime = Date.now();
     
@@ -98,17 +106,59 @@ export default function App() {
       'flight': 'traveler',
     };
     
-    const appropriateAgent = actionToAgent[action.id] || 'banker';
+    // If rogue mode is active, force rogue agent selection
+    const appropriateAgent = rogueMode ? 'rogue' : (actionToAgent[action.id] || 'banker');
     setSelectedAgent(appropriateAgent);
     
     setIsProcessing(true);
     setResult(null);
     setTimeline([]);
     setExecutionTime(null);
+    setIpInfo(null);
     
-    // Comet speaks: Analyzing request
-    if (listenInMode) {
-      await speak("Comet here. I'm analyzing your request and selecting the appropriate agent.", { rate: 1.1 });
+    // If rogue mode, show warning
+    if (rogueMode) {
+      addTimelineStep({
+        id: 'rogue-warning',
+        label: '⚠️ Bad Actor Detected',
+        status: 'error',
+        message: 'Bad Actor trying to connect',
+      });
+      
+      if (listenInMode) {
+        await speak("Alert! Bad actor attempting to connect. Initiating security protocol.", { rate: 1.2, pitch: 1.1 });
+      }
+      
+      await sleep(500);
+      
+      // Collect IP information
+      const mockIpInfo = {
+        ip: '192.168.1.' + Math.floor(Math.random() * 255),
+        userAgent: navigator.userAgent,
+        platform: navigator.platform,
+        language: navigator.language,
+        timestamp: new Date().toISOString(),
+        attemptedAction: action.label,
+      };
+      setIpInfo(mockIpInfo);
+      
+      addTimelineStep({
+        id: 'ip-collection',
+        label: '🔍 Collecting Evidence',
+        status: 'success',
+        message: `IP: ${mockIpInfo.ip} | Platform: ${mockIpInfo.platform}`,
+      });
+      
+      if (listenInMode) {
+        await speak("Reporting I.P. information to authorities.", { rate: 1.0, pitch: 0.9 });
+      }
+      
+      await sleep(1000);
+    } else {
+      // Comet speaks: Analyzing request
+      if (listenInMode) {
+        await speak("Comet here. I'm analyzing your request and selecting the appropriate agent.", { rate: 1.1 });
+      }
     }
     
     // Give UI time to show the selected agent
@@ -244,12 +294,20 @@ export default function App() {
           id: 'action',
           label: 'Execute Action',
           status: 'error',
-          message: 'Action blocked due to verification failure',
+          message: rogueMode ? '🚨 Rogue agent blocked and reported' : 'Action blocked due to verification failure',
         });
+
+        const endTime = Date.now();
+        const duration = (endTime - startTime) / 1000;
+        setExecutionTime(duration);
+
+        if (rogueMode && listenInMode) {
+          await speak("Security breach prevented. Bad actor has been blocked and authorities have been notified.", { rate: 1.0, pitch: 0.9 });
+        }
 
         setResult({
           success: false,
-          message: `Verification failed: ${presentation.data.error || 'Unknown error'}`,
+          message: rogueMode ? '🚨 Rogue agent blocked! IP information reported to authorities.' : `Verification failed: ${presentation.data.error || 'Unknown error'}`,
         });
       }
     } catch (error) {
@@ -260,6 +318,7 @@ export default function App() {
       });
     } finally {
       setIsProcessing(false);
+      setRogueMode(false); // Reset rogue mode after attempt
     }
   };
 
@@ -342,7 +401,12 @@ export default function App() {
           </div>
 
           {/* Step 2: Pick Action */}
-          <ActionPanel onAction={handleAction} disabled={isProcessing} />
+          <ActionPanel 
+            onAction={handleAction} 
+            onRogueAttempt={handleRogueAttempt}
+            disabled={isProcessing}
+            rogueMode={rogueMode}
+          />
           
           {/* Step 3: See Selected Agent */}
           <AgentSelector
@@ -361,6 +425,44 @@ export default function App() {
           <div className="border border-midnight-800 rounded-lg p-6 bg-midnight-950/30">
             <Timeline steps={timeline} />
           </div>
+
+          {/* IP Information Display (shown when rogue attempt detected) */}
+          {ipInfo && (
+            <div className="border border-red-700 rounded-lg p-6 bg-red-950/30">
+              <h3 className="text-lg font-semibold text-red-300 mb-4 flex items-center gap-2">
+                🚨 IP Information Reported to Authorities
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-red-400 font-medium">IP Address:</span>
+                  <span className="text-red-200 ml-2">{ipInfo.ip}</span>
+                </div>
+                <div>
+                  <span className="text-red-400 font-medium">Platform:</span>
+                  <span className="text-red-200 ml-2">{ipInfo.platform}</span>
+                </div>
+                <div className="md:col-span-2">
+                  <span className="text-red-400 font-medium">User Agent:</span>
+                  <span className="text-red-200 ml-2 text-xs break-all">{ipInfo.userAgent}</span>
+                </div>
+                <div>
+                  <span className="text-red-400 font-medium">Language:</span>
+                  <span className="text-red-200 ml-2">{ipInfo.language}</span>
+                </div>
+                <div>
+                  <span className="text-red-400 font-medium">Timestamp:</span>
+                  <span className="text-red-200 ml-2 text-xs">{ipInfo.timestamp}</span>
+                </div>
+                <div className="md:col-span-2">
+                  <span className="text-red-400 font-medium">Attempted Action:</span>
+                  <span className="text-red-200 ml-2">{ipInfo.attemptedAction}</span>
+                </div>
+              </div>
+              <div className="mt-4 p-3 bg-red-900/30 border border-red-700/50 rounded text-sm text-red-300">
+                ⚠️ This information has been logged and reported to system administrators.
+              </div>
+            </div>
+          )}
         </div>
       </main>
 
