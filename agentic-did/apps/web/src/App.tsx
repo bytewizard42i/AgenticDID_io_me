@@ -169,7 +169,7 @@ export default function App() {
     } else {
       // Comet speaks: Analyzing request
       if (listenInMode) {
-        await sleep(300); // Small delay to prevent cutoff
+        await sleep(800); // Longer delay to fully initialize speech and prevent cutoff
         await speak("Hi! I'm Comet, your local agent. I'm analyzing your request and selecting the appropriate agent.", { rate: 1.1 });
         await sleep(1500); // Wait for speech to complete
       }
