@@ -52,6 +52,8 @@ export async function verifyVP(vp: VP, challenge: Challenge): Promise<Verificati
       const policyRole = receiptResult.policy.role;
       const disclosedRole = vp.disclosed.role;
 
+      console.log('🔍 Role comparison:', { policyRole, disclosedRole, credHash: vp.receipt.cred_hash });
+
       if (policyRole !== disclosedRole) {
         return { valid: false, error: 'Role mismatch' };
       }

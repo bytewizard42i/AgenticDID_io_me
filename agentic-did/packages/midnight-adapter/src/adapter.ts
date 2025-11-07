@@ -69,16 +69,31 @@ export class MidnightAdapter {
    */
   private extractPolicyFromHash(cred_hash: string): any {
     // Simple mapping for demo
-    if (cred_hash.includes('banker')) {
+    console.log('🔍 Extracting policy from hash:', cred_hash.substring(0, 50));
+    
+    // Decode base64 to get the original content
+    let decodedHash = cred_hash;
+    try {
+      decodedHash = Buffer.from(cred_hash, 'base64').toString('utf-8');
+      console.log('📝 Decoded hash:', decodedHash.substring(0, 80));
+    } catch (e) {
+      console.log('⚠️ Could not decode hash, using as-is');
+    }
+    
+    if (decodedHash.includes('banker')) {
+      console.log('✅ Found banker in hash');
       return { role: 'Banker', scopes: ['bank:transfer', 'bank:balance'] };
     }
-    if (cred_hash.includes('traveler')) {
+    if (decodedHash.includes('traveler')) {
+      console.log('✅ Found traveler in hash');
       return { role: 'Traveler', scopes: ['travel:book', 'travel:cancel'] };
     }
-    if (cred_hash.includes('shopper')) {
+    if (decodedHash.includes('shopper')) {
+      console.log('✅ Found shopper in hash');
       return { role: 'Shopper', scopes: ['shop:purchase', 'shop:cart'] };
     }
     // Default
+    console.log('⚠️ No agent type found in hash, using default');
     return { role: 'Agent', scopes: ['read'] };
   }
 
