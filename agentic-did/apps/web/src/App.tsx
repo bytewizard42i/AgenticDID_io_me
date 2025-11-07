@@ -69,6 +69,7 @@ function createMockVP(credential: any, challenge: any, disclosed: any) {
 
 export default function App() {
   const [selectedAgent, setSelectedAgent] = useState<AgentType | null>(null);
+  const [selectedAction, setSelectedAction] = useState<Action | null>(null);
   const [timeline, setTimeline] = useState<TimelineStep[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSelectingAgent, setIsSelectingAgent] = useState(false);
@@ -108,12 +109,14 @@ export default function App() {
     setRogueMode(false);
     setIsVerified(false);
     setSelectedAgent(null);
+    setSelectedAction(null);
     setIsSelectingAgent(false);
     setIsVerifyingWithVerifier(false);
   };
 
   const handleAction = async (action: Action) => {
     const startTime = Date.now();
+    setSelectedAction(action);
 
     // Auto-select the appropriate agent based on action
     const actionToAgent: Record<string, AgentType> = {
@@ -466,6 +469,7 @@ export default function App() {
             onClearData={handleClearData}
             disabled={isProcessing}
             rogueMode={rogueMode}
+            selectedAction={selectedAction}
           />
 
           {/* Step 3: See Selected Agent */}

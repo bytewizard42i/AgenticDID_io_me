@@ -7,9 +7,10 @@ type Props = {
   onClearData: () => void;
   disabled: boolean;
   rogueMode: boolean;
+  selectedAction: Action | null;
 };
 
-export default function ActionPanel({ onAction, onRogueAttempt, onClearData, disabled, rogueMode }: Props) {
+export default function ActionPanel({ onAction, onRogueAttempt, onClearData, disabled, rogueMode, selectedAction }: Props) {
   return (
     <div className="space-y-3">
       <h3 className="text-lg font-semibold text-midnight-200">What do you want to do?</h3>
@@ -22,15 +23,25 @@ export default function ActionPanel({ onAction, onRogueAttempt, onClearData, dis
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        {ACTIONS.map((action) => (
+        {ACTIONS.map((action) => {
+          const isSelected = selectedAction?.id === action.id;
+          const isOtherSelected = selectedAction && selectedAction.id !== action.id;
+          
+          return (
           <button
             key={action.id}
             onClick={() => onAction(action)}
             disabled={disabled}
-            className={`p-6 rounded-lg border transition-all disabled:opacity-50 disabled:cursor-not-allowed text-left ${
-              rogueMode
-                ? 'border-red-700 bg-red-950/30 hover:bg-red-900/50 hover:border-red-600'
-                : 'border-midnight-700 bg-midnight-900/30 hover:bg-midnight-800/50 hover:border-midnight-600'
+            className={`p-6 rounded-lg border-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-left ${
+              isSelected
+                ? rogueMode
+                  ? 'border-red-500 bg-red-900/50 shadow-[0_0_30px_rgba(239,68,68,0.5)] scale-105'
+                  : 'border-midnight-400 bg-midnight-800/60 shadow-[0_0_30px_rgba(96,165,250,0.4)] scale-105'
+                : isOtherSelected
+                  ? 'opacity-40 blur-[1px] scale-95'
+                  : rogueMode
+                    ? 'border-red-700 bg-red-950/30 hover:bg-red-900/50 hover:border-red-600'
+                    : 'border-midnight-700 bg-midnight-900/30 hover:bg-midnight-800/50 hover:border-midnight-600'
             }`}
           >
             <div className="text-4xl mb-3">{action.icon}</div>
@@ -47,7 +58,7 @@ export default function ActionPanel({ onAction, onRogueAttempt, onClearData, dis
               </p>
             )}
           </button>
-        ))}
+        )})}
       </div>
       
       {/* Rogue Agent Button */}
