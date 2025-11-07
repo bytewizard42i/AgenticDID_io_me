@@ -23,7 +23,7 @@ ledger agentCredentials: Map<Bytes<32>, AgentCredential>;
 ledger delegations: Map<Bytes<32>, Delegation>;
 ledger totalAgents: Uint<64>;
 ledger totalDelegations: Uint<64>;
-ledger contractOwner: Address;
+ledger contractOwner: ContractAddress;
 ledger revocationBitmap: Uint<254>;  // Bitmap for revoked agents (max 256 agents)
   
   // ============================================================================
@@ -37,7 +37,7 @@ struct AgentCredential {
   scopes: Bytes<32>;        // Scope hash (bitfield of permissions)
   issuedAt: Uint<64>;       // Timestamp of credential issuance
   expiresAt: Uint<64>;      // Expiration timestamp
-  issuer: Address;          // Who issued this credential
+  issuer: ContractAddress;          // Who issued this credential
   isActive: Boolean;           // Quick active/revoked check
 }
   
@@ -70,7 +70,7 @@ struct DelegationHashInput {
  * Initialize the registry contract
  * Sets up the contract owner and initial state
  */
-constructor(caller: Address) {
+constructor(caller: ContractAddress) {
   totalAgents = 0;
   totalDelegations = 0;
   contractOwner = disclose(caller);
@@ -94,7 +94,7 @@ constructor(caller: Address) {
    * @param zkProof - Zero-knowledge proof of agent ownership
    */
 export circuit registerAgent(
-  caller: Address,
+  caller: ContractAddress,
   did: Bytes<32>,
   publicKey: Bytes<64>,
   role: Bytes<32>,
@@ -197,7 +197,7 @@ export circuit getAgentPublicKey(agentDID: Bytes<32>): Bytes<64> {
    * @param currentTime - Current timestamp
    */
 export circuit createDelegation(
-  caller: Address,
+  caller: ContractAddress,
   userDID: Bytes<32>,
   agentDID: Bytes<32>,
   scopes: Bytes<32>,
@@ -282,7 +282,7 @@ export circuit checkDelegation(
    * Only the user who created it can revoke
    */
 export circuit revokeDelegation(
-  caller: Address,
+  caller: ContractAddress,
   delegationId: Bytes<32>
 ): [] {
   
@@ -315,7 +315,7 @@ export circuit revokeDelegation(
  * Only contract owner or issuer can revoke
  */
 export circuit revokeAgent(
-  caller: Address,
+  caller: ContractAddress,
   agentDID: Bytes<32>
 ): [] {
   
