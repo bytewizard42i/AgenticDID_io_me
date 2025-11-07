@@ -42,10 +42,10 @@ function createMockCredential(agentType: AgentType) {
     scopes: agent.scopes,
     isRogue: agent.isRogue || false,
   });
-  
+
   // Simple hash for demo
   const hash = btoa(credContent);
-  
+
   return {
     pid: `pid:${agentType}:${Math.random().toString(36).slice(2, 10)}`,
     role: agent.role,
@@ -68,9 +68,11 @@ function createMockVP(credential: any, challenge: any, disclosed: any) {
 }
 
 export default function App() {
-  const [selectedAgent, setSelectedAgent] = useState<AgentType>('banker');
+  const [selectedAgent, setSelectedAgent] = useState<AgentType | null>(null);
   const [timeline, setTimeline] = useState<TimelineStep[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isSelectingAgent, setIsSelectingAgent] = useState(false);
+  const [isVerifyingWithVerifier, setIsVerifyingWithVerifier] = useState(false);
   const [result, setResult] = useState<{ success: boolean; message: string } | null>(null);
   const [listenInMode, setListenInMode] = useState(true);
   const [executionTime, setExecutionTime] = useState<number | null>(null);
@@ -105,21 +107,23 @@ export default function App() {
     setExecutionTime(null);
     setRogueMode(false);
     setIsVerified(false);
+    setSelectedAgent(null);
+    setIsSelectingAgent(false);
+    setIsVerifyingWithVerifier(false);
   };
 
   const handleAction = async (action: Action) => {
     const startTime = Date.now();
-    
+
     // Auto-select the appropriate agent based on action
     const actionToAgent: Record<string, AgentType> = {
       'transfer': 'banker',
       'shop': 'shopper',
       'flight': 'traveler',
     };
-    
+
     // If rogue mode is active, force rogue agent selection
     const appropriateAgent = rogueMode ? 'rogue' : (actionToAgent[action.id] || 'banker');
-    setSelectedAgent(appropriateAgent);
     
     setIsProcessing(true);
     setResult(null);
@@ -127,7 +131,10 @@ export default function App() {
     setExecutionTime(null);
     setIpInfo(null);
     setIsVerified(false);
-    
+    setIsSelectingAgent(true);
+    setIsVerifyingWithVerifier(false);
+    setSelectedAgent(appropriateAgent);
+
     // If rogue mode, show warning
     if (rogueMode) {
       addTimelineStep({
@@ -136,13 +143,13 @@ export default function App() {
         status: 'error',
         message: 'Bad Actor trying to connect',
       });
-      
+
       if (listenInMode) {
         await speak("Alert! Bad actor attempting to connect. Initiating security protocol.", { rate: 1.2, pitch: 1.1 });
       }
-      
+
       await sleep(500);
-      
+
       // Collect IP information
       const mockIpInfo = {
         ip: '192.168.1.' + Math.floor(Math.random() * 255),
@@ -153,18 +160,18 @@ export default function App() {
         attemptedAction: action.label,
       };
       setIpInfo(mockIpInfo);
-      
+
       addTimelineStep({
         id: 'ip-collection',
         label: '🔍 Collecting Evidence',
         status: 'success',
         message: `IP: ${mockIpInfo.ip} | Platform: ${mockIpInfo.platform}`,
       });
-      
+
       if (listenInMode) {
         await speak("Reporting I.P. information to authorities.", { rate: 1.0, pitch: 0.9 });
       }
-      
+
       await sleep(1000);
     } else {
       // Comet speaks: Analyzing request
@@ -174,7 +181,7 @@ export default function App() {
         await sleep(1500); // Wait for speech to complete
       }
     }
-    
+
     // Give UI time to show the selected agent
     await sleep(listenInMode ? 500 : 300);
 
@@ -188,7 +195,7 @@ export default function App() {
       });
 
       const challenge = await getChallenge();
-      
+
       updateTimelineStep('challenge', {
         status: 'success',
         message: `Nonce: ${challenge.nonce.slice(0, 16)}...`,
@@ -227,6 +234,10 @@ export default function App() {
 
       await sleep(listenInMode ? 1500 : 100);
 
+      // Agent selection complete - make solid
+      setIsSelectingAgent(false);
+      await sleep(300);
+
       // Step 3: Present VP
       addTimelineStep({
         id: 'present',
@@ -234,6 +245,9 @@ export default function App() {
         status: 'loading',
         message: 'Submitting proof bundle...',
       });
+
+      // Start verifier flashing
+      setIsVerifyingWithVerifier(true);
 
       // Announce verifier is checking
       if (listenInMode && appropriateAgent !== 'rogue') {
@@ -251,6 +265,9 @@ export default function App() {
 
       const presentation = await presentVP(vp, challenge.nonce);
 
+      // Verifier done - make solid
+      setIsVerifyingWithVerifier(false);
+
       if (presentation.status === 200) {
         updateTimelineStep('present', {
           status: 'success',
@@ -263,7 +280,7 @@ export default function App() {
         if (listenInMode) {
           await speak(`Verification successful! Credentials validated by the network.`, { rate: 1.1 });
           await sleep(1500); // Wait for verifier TTS to announce
-          
+
           // Agent-specific connection messages
           if (appropriateAgent === 'banker') {
             await speak(`Connected to your bank agent and verified.`, { rate: 1.1, pitch: 0.9 });
@@ -364,7 +381,7 @@ export default function App() {
   return (
     <div className="min-h-screen">
       <Header />
-      
+
       <main className="container mx-auto px-6 py-8">
         <Hero />
 
@@ -400,8 +417,8 @@ export default function App() {
                 className={
                   `px-6 py-3 rounded-lg font-medium transition-all duration-300 ` +
                   `${isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:scale-105'} ` +
-                  `${listenInMode 
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                  `${listenInMode
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
                     : 'bg-yellow-500 hover:bg-yellow-600 text-black'}`
                 }
               >
@@ -440,29 +457,33 @@ export default function App() {
           </div>
 
           {/* Step 2: Pick Action */}
-          <ActionPanel 
-            onAction={handleAction} 
+          <ActionPanel
+            onAction={handleAction}
             onRogueAttempt={handleRogueAttempt}
             onClearData={handleClearData}
             disabled={isProcessing}
             rogueMode={rogueMode}
           />
-          
+
           {/* Step 3: See Selected Agent */}
-          <AgentSelector
-            selectedAgent={selectedAgent}
-            onSelect={setSelectedAgent}
-            isProcessing={isProcessing}
-          />
+          {selectedAgent && (
+            <AgentSelector
+              selectedAgent={selectedAgent}
+              onSelect={setSelectedAgent}
+              isProcessing={isSelectingAgent}
+            />
+          )}
 
           {/* Step 4: Verifier Display */}
-          <VerifierDisplay
-            selectedAgent={selectedAgent}
-            isProcessing={isProcessing}
-            isVerified={isVerified}
-            speak={speak}
-            listenInMode={listenInMode}
-          />
+          {selectedAgent && (
+            <VerifierDisplay
+              selectedAgent={selectedAgent}
+              isProcessing={isVerifyingWithVerifier}
+              isVerified={isVerified}
+              speak={speak}
+              listenInMode={listenInMode}
+            />
+          )}
 
           {result && (
             <ResultBanner
