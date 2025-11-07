@@ -14,7 +14,8 @@ AgenticDID.io lets AI agents prove authenticity and authorization using **privac
 - **Midnight Network**: Zero-knowledge proof verification and privacy preservation
 - **World's First**: Integration of Google's Agent Development Kit with blockchain privacy layer
 
-> 📋 **For Hackathon Judges**: See [CLOUD_RUN_HACKATHON.md](./CLOUD_RUN_HACKATHON.md) for complete submission details
+> 📋 **For Hackathon Judges**: See [CLOUD_RUN_HACKATHON.md](./docs/CLOUD_RUN_HACKATHON.md) for complete submission details
+> 👋 **Get Started**: See [JOHN_START_HERE.md](./JOHN_START_HERE.md) for quick navigation
 
 ---
 
@@ -136,7 +137,7 @@ AgenticDID.io solves these with **multi-party mutual authentication** and **dele
                    └────────────────────────────┘
 ```
 
-**See [AGENT_DELEGATION_WORKFLOW.md](./AGENT_DELEGATION_WORKFLOW.md) for complete walkthrough**
+**See [AGENT_DELEGATION_WORKFLOW.md](./docs/AGENT_DELEGATION_WORKFLOW.md) for complete walkthrough**
 
 ### Proof Flow (Phase 1 MVP)
 
@@ -303,7 +304,7 @@ Instead of thinking in terms of tools and processes, users simply state their in
 
 For a complete walkthrough of the **User → Personal Agent (Comet) → Bank Agent (BOA)** delegation flow, see:
 
-**🎯 [AGENT_DELEGATION_WORKFLOW.md](./AGENT_DELEGATION_WORKFLOW.md)** - Multi-party authentication & delegation explained
+**🎯 [AGENT_DELEGATION_WORKFLOW.md](./docs/AGENT_DELEGATION_WORKFLOW.md)** - Multi-party authentication & delegation explained
 
 ---
 
@@ -492,29 +493,36 @@ VITE_API_BASE=http://localhost:8787
 
 ## 📚 Documentation
 
+### **Quick Start**
+- **[JOHN_START_HERE.md](./JOHN_START_HERE.md)** - 👋 **START HERE** - Your quick navigation guide
+- **[LINKS_TOOLS.md](./LINKS_TOOLS.md)** - 🔗 All resources organized by category
+- **[QUICKSTART.md](./docs/QUICKSTART.md)** - Get running in 2 minutes
+
 ### **For Hackathon Judges & Users**
-- **[AGENT_DELEGATION_WORKFLOW.md](./AGENT_DELEGATION_WORKFLOW.md)** - 🎯 **START HERE** - Real-world use case walkthrough
+- **[AGENT_DELEGATION_WORKFLOW.md](./docs/AGENT_DELEGATION_WORKFLOW.md)** - 🎯 Real-world use case walkthrough
   - Complete multi-party authentication flow
   - User ↔ Agent ↔ Service delegation chain
   - Security guarantees and privacy preservation
   - Step-up authentication and merchant protection
   - Technical implementation details
-- **[PRIVACY_ARCHITECTURE.md](./PRIVACY_ARCHITECTURE.md)** - 🔐 **Privacy-First Design**
+- **[PRIVACY_ARCHITECTURE.md](./docs/PRIVACY_ARCHITECTURE.md)** - 🔐 Privacy-First Design
   - Zero-knowledge verification (no tracking)
   - Spoof transaction system (white noise)
   - Selective disclosure proofs
   - AgenticDID.io as trusted issuer
   - Attack prevention strategies
+- **[CLOUD_RUN_HACKATHON.md](./docs/CLOUD_RUN_HACKATHON.md)** - Complete hackathon submission
 
 ### **Technical Documentation**
-- **[RESOURCES.md](./RESOURCES.md)** - Complete link collection for Midnight Network
-- **[MIDNIGHT_DEVELOPMENT_PRIMER.md](./MIDNIGHT_DEVELOPMENT_PRIMER.md)** - Coding guide for Compact and Midnight
-- **[MIDNIGHT_INTEGRATION_GUIDE.md](./MIDNIGHT_INTEGRATION_GUIDE.md)** - Phase 2 implementation blueprint
-- **[PHASE2_IMPLEMENTATION.md](./PHASE2_IMPLEMENTATION.md)** - Step-by-step integration guide
+- **[docs/reference/RESOURCES.md](./docs/reference/RESOURCES.md)** - Complete link collection for Midnight Network
+- **[docs/MIDNIGHT_INTEGRATION_PLAN.md](./docs/MIDNIGHT_INTEGRATION_PLAN.md)** - Phase 2 implementation blueprint
+- **[docs/PHASE2_IMPLEMENTATION.md](./docs/PHASE2_IMPLEMENTATION.md)** - Step-by-step integration guide
+- **[docs/reference/PROJECT_STRUCTURE.md](./docs/reference/PROJECT_STRUCTURE.md)** - Code organization
 
 ### **Development Logs**
-- **[AI-chat.md](./AI-chat.md)** - Development conversation log
-- **[AIsisters.md](./AIsisters.md)** - Notes for the Triplet AI team
+- **[docs/technical/AI-DEVELOPMENT-LOG.md](./docs/technical/AI-DEVELOPMENT-LOG.md)** - Development journey
+- **[docs/AIsisters.md](./docs/AIsisters.md)** - Notes for the AI team
+- **[archive/session-logs/](./archive/session-logs/)** - Session summaries
 
 ---
 
@@ -625,8 +633,9 @@ MIT License - see [LICENSE](./LICENSE) file for details
 
 For questions or issues:
 - Open an issue on GitHub
-- Check the [RESOURCES.md](./RESOURCES.md) for helpful links
-- Review the [MIDNIGHT_DEVELOPMENT_PRIMER.md](./MIDNIGHT_DEVELOPMENT_PRIMER.md) for coding help
+- Check [JOHN_START_HERE.md](./JOHN_START_HERE.md) for navigation
+- Check [LINKS_TOOLS.md](./LINKS_TOOLS.md) for all resources
+- Review [docs/reference/RESOURCES.md](./docs/reference/RESOURCES.md) for Midnight links
 
 ---
 
