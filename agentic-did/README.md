@@ -16,7 +16,7 @@ AgenticDID.io lets AI agents prove authenticity and authorization using **privac
 
 > 📋 **For Hackathon Judges**: See [CLOUD_RUN_HACKATHON.md](./docs/CLOUD_RUN_HACKATHON.md) for complete submission details
 > 🏆 **Submission Readiness**: See [HACKATHON_COMPLIANCE_REVIEW.md](./HACKATHON_COMPLIANCE_REVIEW.md) for compliance analysis
-> 👋 **Get Started**: See [JOHN_START_HERE.md](./JOHN_START_HERE.md) for quick navigation
+> 👋 **Get Started**: See [USER_START_HERE.md](./USER_START_HERE.md) for quick navigation
 
 ---
 
@@ -495,7 +495,7 @@ VITE_API_BASE=http://localhost:8787
 ## 📚 Documentation
 
 ### **Quick Start**
-- **[JOHN_START_HERE.md](./JOHN_START_HERE.md)** - 👋 **START HERE** - Your quick navigation guide
+- **[USER_START_HERE.md](./USER_START_HERE.md)** - 👋 **START HERE** - Your quick navigation guide
 - **[LINKS_TOOLS.md](./LINKS_TOOLS.md)** - 🔗 All resources organized by category
 - **[QUICKSTART.md](./docs/QUICKSTART.md)** - Get running in 2 minutes
 
@@ -634,7 +634,7 @@ MIT License - see [LICENSE](./LICENSE) file for details
 
 For questions or issues:
 - Open an issue on GitHub
-- Check [JOHN_START_HERE.md](./JOHN_START_HERE.md) for navigation
+- Check [USER_START_HERE.md](./USER_START_HERE.md) for navigation
 - Check [LINKS_TOOLS.md](./LINKS_TOOLS.md) for all resources
 - Review [docs/reference/RESOURCES.md](./docs/reference/RESOURCES.md) for Midnight links
 

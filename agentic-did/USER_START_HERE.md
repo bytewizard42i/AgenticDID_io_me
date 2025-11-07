@@ -1,4 +1,4 @@
-# 👋 John's Quick Start Guide - AgenticDID.io
+# 👋 User's Quick Start Guide - AgenticDID.io
 
 **Welcome!** This is your central control center for the AgenticDID.io project.
 
@@ -87,7 +87,7 @@ bun run dev          # Starts development servers
 ```
 agentic-did/
 ├── 📖 README.md                         # Project overview (read this first!)
-├── 👉 JOHN_START_HERE.md               # This file - your guide
+├── 👉 USER_START_HERE.md               # This file - your guide
 ├── 🏆 HACKATHON_COMPLIANCE_REVIEW.md   # What we need to win
 ├── 🔗 LINKS_TOOLS.md                   # All URLs in one place
 │
@@ -536,4 +536,4 @@ A: You can, but you won't qualify for those category prizes ($8,000 each).
 
 ---
 
-*Created with ❤️ by Penny for John - You've got this!* 🚀
+*Created with ❤️ by Penny - You've got this!* 🚀

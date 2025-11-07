@@ -2,7 +2,7 @@
 
 **All URLs and resources for AgenticDID.io development, organized by category**
 
-> **Referenced in**: [JOHN_START_HERE.md](./JOHN_START_HERE.md) and throughout documentation
+> **Referenced in**: [USER_START_HERE.md](./USER_START_HERE.md) and throughout documentation
 
 ---
 
@@ -176,7 +176,7 @@ bun add @meshsdk/midnight-setup
 
 ### Our Documentation
 - **[README.md](./README.md)** - Project overview
-- **[JOHN_START_HERE.md](./JOHN_START_HERE.md)** - Quick start guide
+- **[USER_START_HERE.md](./USER_START_HERE.md)** - Quick start guide
 - **[docs/AGENT_DELEGATION_WORKFLOW.md](./docs/AGENT_DELEGATION_WORKFLOW.md)** - Architecture
 - **[docs/PRIVACY_ARCHITECTURE.md](./docs/PRIVACY_ARCHITECTURE.md)** - Privacy design
 - **[docs/reference/RESOURCES.md](./docs/reference/RESOURCES.md)** - Midnight resources
@@ -331,7 +331,7 @@ bun add @meshsdk/midnight-setup
 → [Agent Delegation Workflow](./docs/AGENT_DELEGATION_WORKFLOW.md) → [Privacy Architecture](./docs/PRIVACY_ARCHITECTURE.md)
 
 ### I want to start developing:
-→ [JOHN_START_HERE.md](./JOHN_START_HERE.md) → [Quickstart](./docs/QUICKSTART.md)
+→ [USER_START_HERE.md](./USER_START_HERE.md) → [Quickstart](./docs/QUICKSTART.md)
 
 ---
 
@@ -366,4 +366,4 @@ curl -fsSL https://bun.sh/install | bash
 
 ---
 
-[👋 Start Here](./JOHN_START_HERE.md) • [📖 README](./README.md) • [🏗️ Architecture](./docs/AGENT_DELEGATION_WORKFLOW.md)
+[👋 Start Here](./USER_START_HERE.md) • [📖 README](./README.md) • [🏗️ Architecture](./docs/AGENT_DELEGATION_WORKFLOW.md)
