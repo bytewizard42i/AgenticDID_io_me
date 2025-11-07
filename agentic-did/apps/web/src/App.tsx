@@ -476,6 +476,7 @@ export default function App() {
                 <div className="md:col-span-2">
                   <span className="text-red-400 font-medium">Attempted Action:</span>
                   <span className="text-red-200 ml-2">{ipInfo.attemptedAction}</span>
+                  <span className="text-red-500 font-bold ml-3">- DENIED</span>
                 </div>
               </div>
               <div className="mt-4 p-3 bg-red-900/30 border border-red-700/50 rounded text-sm text-red-300">
