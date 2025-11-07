@@ -1,0 +1,5 @@
+{
+  "name": "Banker: Financial AI Agent",
+  "description": "An AI-powered financial agent that manages financial operations with a strong emphasis on privacy and security, featuring balance checks, fund transfers, and transaction reporting, all secured with simulated Zero-Knowledge Proofs and a cryptographic audit trail.",
+  "requestFramePermissions": []
+}

@@ -1,0 +1,15 @@
+{
+  "name": "@agenticdid/contracts",
+  "version": "1.0.0",
+  "description": "Minokawa contracts for AgenticDID credential state",
+  "type": "module",
+  "scripts": {
+    "build": "echo 'Contract compilation placeholder'",
+    "deploy": "node scripts/deploy.js",
+    "clean": "rm -rf build"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^20.11.5"
+  }
+}
