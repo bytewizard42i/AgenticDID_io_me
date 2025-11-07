@@ -196,7 +196,7 @@ export default function App() {
         await speak(`Challenge received. Nonce obtained from verifier.`, { rate: 1.1 });
       }
 
-      await sleep(listenInMode ? 500 : 100);
+      await sleep(listenInMode ? 1000 : 100);
 
       // Step 2: Build VP
       addTimelineStep({
@@ -223,7 +223,7 @@ export default function App() {
         await speak(`${agentName} agent: I've created my credential proof bundle with zero-knowledge proofs.`, { rate: 1.1, pitch: 0.9 });
       }
 
-      await sleep(listenInMode ? 500 : 100);
+      await sleep(listenInMode ? 1500 : 100);
 
       // Step 3: Present VP
       addTimelineStep({
@@ -246,6 +246,7 @@ export default function App() {
 
         if (listenInMode) {
           await speak(`Verification successful! Credentials validated by the network.`, { rate: 1.1 });
+          await sleep(1500); // Wait for verifier TTS to announce
           
           // Agent-specific connection messages
           if (appropriateAgent === 'banker') {
@@ -255,9 +256,10 @@ export default function App() {
           } else if (appropriateAgent === 'shopper') {
             await speak(`Connected to verified Amazon agent.`, { rate: 1.1, pitch: 0.9 });
           }
+          await sleep(2000); // Wait for verifier completion TTS
         }
 
-        await sleep(listenInMode ? 500 : 100);
+        await sleep(listenInMode ? 1000 : 100);
 
         // Step 4: Execute Action
         addTimelineStep({
