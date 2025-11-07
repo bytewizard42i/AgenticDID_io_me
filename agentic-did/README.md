@@ -15,6 +15,7 @@ AgenticDID.io lets AI agents prove authenticity and authorization using **privac
 - **World's First**: Integration of Google's Agent Development Kit with blockchain privacy layer
 
 > 📋 **For Hackathon Judges**: See [CLOUD_RUN_HACKATHON.md](./docs/CLOUD_RUN_HACKATHON.md) for complete submission details
+> 🏆 **Submission Readiness**: See [HACKATHON_COMPLIANCE_REVIEW.md](./HACKATHON_COMPLIANCE_REVIEW.md) for compliance analysis
 > 👋 **Get Started**: See [JOHN_START_HERE.md](./JOHN_START_HERE.md) for quick navigation
 
 ---
