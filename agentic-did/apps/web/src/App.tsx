@@ -231,6 +231,15 @@ export default function App() {
 
         if (listenInMode) {
           await speak(`Verification successful! Credentials validated by the network.`, { rate: 1.1 });
+          
+          // Agent-specific connection messages
+          if (appropriateAgent === 'banker') {
+            await speak(`Connected to your bank agent and verified.`, { rate: 1.1, pitch: 0.9 });
+          } else if (appropriateAgent === 'traveler') {
+            await speak(`Connected to your airline and verified.`, { rate: 1.1, pitch: 0.9 });
+          } else if (appropriateAgent === 'shopper') {
+            await speak(`Connected to verified Amazon agent.`, { rate: 1.1, pitch: 0.9 });
+          }
         }
 
         await sleep(listenInMode ? 500 : 100);
