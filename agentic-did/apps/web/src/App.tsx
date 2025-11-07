@@ -195,7 +195,7 @@ export default function App() {
       });
 
       if (listenInMode) {
-        await speak(`Challenge received. Nonce obtained from verifier.`, { rate: 1.1 });
+        await speak(`Requesting authorization code from Midnight Network security system.`, { rate: 1.1 });
       }
 
       await sleep(listenInMode ? 1000 : 100);
