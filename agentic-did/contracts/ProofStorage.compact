@@ -11,7 +11,7 @@
  * Compiler: compactc_v0.26.0_x86_64-unknown-linux-musl
  */
 
-pragma language_version >= 0.17.0;
+pragma language_version >= 0.16 && <= 0.18;
 import CompactStandardLibrary;
   
 // ============================================================================
@@ -23,7 +23,7 @@ ledger agentActions: Map<Bytes<32>, ActionLog>;
 ledger totalProofs: Uint<64>;
 ledger totalActions: Uint<64>;
 ledger currentMerkleRoot: Bytes<32>;
-ledger contractOwner: ContractAddress;
+ledger contractOwner: Address;
   
   // ============================================================================
   // DATA STRUCTURES
@@ -40,8 +40,8 @@ struct ProofRecord {
 }
   
 struct ProofMetadata {
-  issuer: ContractAddress;              // Who created the proof
-  verifier: ContractAddress;            // Who can verify
+  issuer: Address;              // Who created the proof
+  verifier: Address;            // Who can verify
   expiresAt: Uint<64>;          // Proof expiration
   isRevoked: Boolean;              // Revocation status
 }
@@ -72,7 +72,7 @@ struct Receipt {
 /**
  * Constructor - initialize proof storage
  */
-constructor(owner: ContractAddress) {
+constructor(owner: Address) {
   contractOwner = disclose(owner);
   totalProofs = 0;
   totalActions = 0;
@@ -96,7 +96,7 @@ constructor(owner: ContractAddress) {
    * @param blockNumber - Current block number
    */
 export circuit storeProof(
-  caller: ContractAddress,
+  caller: Address,
   agentDID: Bytes<32>,
   proofType: Bytes<32>,
   proofData: Bytes<256>,
@@ -154,7 +154,7 @@ export circuit storeProof(
  * Returns proof data if caller is authorized
  */
 export circuit getProof(
-  caller: ContractAddress,
+  caller: Address,
   proofId: Bytes<32>
 ): ProofRecord {
   
@@ -215,7 +215,7 @@ export circuit verifyProof(
  * Creates audit trail for compliance
  */
 export circuit logAction(
-  caller: ContractAddress,
+  caller: Address,
   agentDID: Bytes<32>,
   actionType: Bytes<32>,
   proofId: Bytes<32>,
@@ -295,7 +295,7 @@ export circuit generateReceipt(
  * Revoke a proof (only issuer)
  */
 export circuit revokeProof(
-  caller: ContractAddress,
+  caller: Address,
   proofId: Bytes<32>
 ): [] {
   
@@ -332,9 +332,9 @@ export circuit revokeProof(
  * Update proof verifier (only issuer)
  */
 export circuit setVerifier(
-  caller: ContractAddress,
+  caller: Address,
   proofId: Bytes<32>,
-  newVerifier: ContractAddress
+  newVerifier: Address
 ): [] {
   
   assert(proofRecords.member(disclose(proofId)), "Proof not found");
