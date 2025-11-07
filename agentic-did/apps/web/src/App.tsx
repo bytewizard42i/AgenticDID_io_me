@@ -169,6 +169,7 @@ export default function App() {
     } else {
       // Comet speaks: Analyzing request
       if (listenInMode) {
+        await sleep(300); // Small delay to prevent cutoff
         await speak("Hi! I'm Comet, your local agent. I'm analyzing your request and selecting the appropriate agent.", { rate: 1.1 });
         await sleep(1500); // Wait for speech to complete
       }
@@ -221,7 +222,7 @@ export default function App() {
 
       if (listenInMode) {
         const agentName = AGENTS[appropriateAgent].name;
-        await speak(`${agentName} agent: I've created my credential proof bundle with zero-knowledge proofs.`, { rate: 1.1, pitch: 0.9 });
+        await speak(`${agentName}: I've created my credential proof bundle with zero-knowledge proofs.`, { rate: 1.1, pitch: 0.9 });
       }
 
       await sleep(listenInMode ? 1500 : 100);
