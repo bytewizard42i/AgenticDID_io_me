@@ -18,7 +18,17 @@ type AuthStep = {
   message?: string;
 };
 
-export default function MutualAuth() {
+type SpeechOptions = {
+  rate?: number;
+  pitch?: number;
+};
+
+type Props = {
+  speak: (text: string, options?: SpeechOptions) => Promise<void>;
+  listenInMode: boolean;
+};
+
+export default function MutualAuth({ speak, listenInMode }: Props) {
   const [authState, setAuthState] = useState<'idle' | 'authenticating' | 'authenticated' | 'failed'>('idle');
   const [authSteps, setAuthSteps] = useState<AuthStep[]>([]);
   const [authMethod, setAuthMethod] = useState<'biometric' | 'totp' | null>(null);
@@ -50,12 +60,20 @@ export default function MutualAuth() {
         message: 'Agent proving its legitimacy...'
       });
 
+      if (listenInMode) {
+        await speak("Comet agent presenting credentials for verification.", { rate: 1.1, pitch: 0.9 });
+      }
+
       await sleep(800);
 
       updateStep('agent-credential', {
         status: 'success',
         message: 'Agent DID verified: did:midnight:comet:abc123...'
       });
+
+      if (listenInMode) {
+        await speak("Agent D.I.D. verified successfully.", { rate: 1.1 });
+      }
 
       await sleep(500);
 
@@ -68,6 +86,10 @@ export default function MutualAuth() {
         message: 'Checking agent hasn\'t been tampered with...'
       });
 
+      if (listenInMode) {
+        await speak("Running integrity check. Verifying code signature.", { rate: 1.1, pitch: 0.9 });
+      }
+
       await sleep(800);
 
       updateStep('agent-integrity', {
@@ -75,8 +97,16 @@ export default function MutualAuth() {
         message: 'Code signature valid, no tampering detected'
       });
 
+      if (listenInMode) {
+        await speak("Code signature valid. No tampering detected.", { rate: 1.1 });
+      }
+
       // Show ZKP proof popup
       setShowZkpProof(true);
+
+      if (listenInMode) {
+        await speak("Zero-knowledge proof verified. Agent identity confirmed.", { rate: 1.1 });
+      }
 
       await sleep(500);
 
@@ -88,6 +118,10 @@ export default function MutualAuth() {
         status: 'success',
         message: '✅ Comet is legitimate and ready for your authentication'
       });
+
+      if (listenInMode) {
+        await speak("Comet is legitimate and ready for your authentication.", { rate: 1.1 });
+      }
 
       setAuthState('authenticated');
     } catch (error) {
@@ -111,12 +145,20 @@ export default function MutualAuth() {
         message: 'Agent proving its legitimacy...'
       });
 
+      if (listenInMode) {
+        await speak("Comet agent presenting credentials for verification.", { rate: 1.1, pitch: 0.9 });
+      }
+
       await sleep(800);
 
       updateStep('agent-credential', {
         status: 'success',
         message: 'Agent DID verified: did:midnight:comet:abc123...'
       });
+
+      if (listenInMode) {
+        await speak("Agent D.I.D. verified successfully.", { rate: 1.1 });
+      }
 
       await sleep(500);
 
@@ -129,12 +171,20 @@ export default function MutualAuth() {
         message: 'Checking agent hasn\'t been tampered with...'
       });
 
+      if (listenInMode) {
+        await speak("Running integrity check. Verifying code signature.", { rate: 1.1, pitch: 0.9 });
+      }
+
       await sleep(800);
 
       updateStep('agent-integrity', {
         status: 'success',
         message: 'Code signature valid, no tampering detected'
       });
+
+      if (listenInMode) {
+        await speak("Code signature valid. No tampering detected.", { rate: 1.1 });
+      }
 
       await sleep(500);
 
@@ -149,6 +199,14 @@ export default function MutualAuth() {
           : 'Enter your authenticator code...'
       });
 
+      if (listenInMode) {
+        if (method === 'biometric') {
+          await speak("Waiting for biometric authentication. Place your finger on the sensor.", { rate: 1.1 });
+        } else {
+          await speak("Waiting for two factor authentication code from your authenticator app.", { rate: 1.1 });
+        }
+      }
+
       await sleep(1500);
 
       updateStep('user-auth', {
@@ -157,6 +215,14 @@ export default function MutualAuth() {
           ? 'Fingerprint verified ✓'
           : 'TOTP code verified ✓'
       });
+
+      if (listenInMode) {
+        if (method === 'biometric') {
+          await speak("Biometric authentication verified successfully.", { rate: 1.1 });
+        } else {
+          await speak("Two factor authentication code verified successfully.", { rate: 1.1 });
+        }
+      }
 
       await sleep(500);
 
@@ -169,12 +235,20 @@ export default function MutualAuth() {
         message: 'Creating delegation certificate...'
       });
 
+      if (listenInMode) {
+        await speak("Creating delegation certificate.", { rate: 1.1, pitch: 0.9 });
+      }
+
       await sleep(800);
 
       updateStep('delegation', {
         status: 'success',
         message: 'Delegation certificate signed and stored locally'
       });
+
+      if (listenInMode) {
+        await speak("Delegation certificate signed and stored locally. Trust established!", { rate: 1.1 });
+      }
 
       setAuthState('authenticated');
 

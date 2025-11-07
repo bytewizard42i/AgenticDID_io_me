@@ -96,6 +96,14 @@ export default function App() {
     setTimeline([]);
   };
 
+  const handleClearData = () => {
+    setTimeline([]);
+    setResult(null);
+    setIpInfo(null);
+    setExecutionTime(null);
+    setRogueMode(false);
+  };
+
   const handleAction = async (action: Action) => {
     const startTime = Date.now();
     
@@ -400,7 +408,7 @@ export default function App() {
         <div className="max-w-6xl mx-auto space-y-8 mt-12">
           {/* Step 1: Mutual Authentication */}
           <div className="border border-midnight-800 rounded-lg p-6 bg-midnight-950/30">
-            <MutualAuth />
+            <MutualAuth speak={speak} listenInMode={listenInMode} />
           </div>
 
           {/* Divider */}
@@ -414,6 +422,7 @@ export default function App() {
           <ActionPanel 
             onAction={handleAction} 
             onRogueAttempt={handleRogueAttempt}
+            onClearData={handleClearData}
             disabled={isProcessing}
             rogueMode={rogueMode}
           />

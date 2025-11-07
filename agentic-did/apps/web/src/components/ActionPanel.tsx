@@ -1,14 +1,15 @@
 import { ACTIONS, Action } from '../agents';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, RotateCcw } from 'lucide-react';
 
 type Props = {
   onAction: (action: Action) => void;
   onRogueAttempt: () => void;
+  onClearData: () => void;
   disabled: boolean;
   rogueMode: boolean;
 };
 
-export default function ActionPanel({ onAction, onRogueAttempt, disabled, rogueMode }: Props) {
+export default function ActionPanel({ onAction, onRogueAttempt, onClearData, disabled, rogueMode }: Props) {
   return (
     <div className="space-y-3">
       <h3 className="text-lg font-semibold text-midnight-200">What do you want to do?</h3>
@@ -69,6 +70,25 @@ export default function ActionPanel({ onAction, onRogueAttempt, disabled, rogueM
           </button>
         </div>
       )}
+
+      {/* Clear Verification Data Button */}
+      <div className="mt-3">
+        <button
+          onClick={onClearData}
+          disabled={disabled}
+          className="w-full p-3 rounded-lg border border-midnight-600 bg-midnight-900/30 hover:bg-midnight-800/50 hover:border-midnight-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-left"
+        >
+          <div className="flex items-center gap-3">
+            <RotateCcw className="w-6 h-6 text-midnight-400" />
+            <div>
+              <p className="font-semibold text-midnight-200 text-sm">Clear All Verification Data</p>
+              <p className="text-xs text-midnight-500">
+                Reset timeline and results
+              </p>
+            </div>
+          </div>
+        </button>
+      </div>
     </div>
   );
 }
