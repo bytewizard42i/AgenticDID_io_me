@@ -1,11 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { AgentType } from '../agents';
 import { Shield, CheckCircle } from 'lucide-react';
+
+type SpeechOptions = {
+  rate?: number;
+  pitch?: number;
+};
 
 type Props = {
   selectedAgent: AgentType;
   isProcessing: boolean;
   isVerified: boolean;
+  speak: (text: string, options?: SpeechOptions) => Promise<void>;
+  listenInMode: boolean;
 };
 
 type Verifier = {
@@ -40,12 +47,25 @@ const VERIFIERS: Verifier[] = [
   },
 ];
 
-export default function VerifierDisplay({ selectedAgent, isProcessing, isVerified }: Props) {
+export default function VerifierDisplay({ selectedAgent, isProcessing, isVerified, speak, listenInMode }: Props) {
   const [showConfetti, setShowConfetti] = useState(false);
   const [confettiPieces, setConfettiPieces] = useState<Array<{ id: number; left: number; delay: number; duration: number }>>([]);
+  const hasAnnouncedVerifying = useRef(false);
+  const hasAnnouncedVerified = useRef(false);
 
   // Find the matching verifier
   const activeVerifier = VERIFIERS.find(v => v.matchesAgent.includes(selectedAgent));
+
+  // Announce verifier selection when processing starts
+  useEffect(() => {
+    if (isProcessing && activeVerifier && listenInMode && !hasAnnouncedVerifying.current) {
+      hasAnnouncedVerifying.current = true;
+      speak(`${activeVerifier.name} is now verifying the zero-knowledge proof.`, { rate: 1.1, pitch: 0.9 });
+    }
+    if (!isProcessing) {
+      hasAnnouncedVerifying.current = false;
+    }
+  }, [isProcessing, activeVerifier, speak, listenInMode]);
 
   // Trigger confetti when verification succeeds
   useEffect(() => {
@@ -61,6 +81,12 @@ export default function VerifierDisplay({ selectedAgent, isProcessing, isVerifie
       }));
       setConfettiPieces(pieces);
 
+      // Announce verification success
+      if (activeVerifier && listenInMode && !hasAnnouncedVerified.current) {
+        hasAnnouncedVerified.current = true;
+        speak(`${activeVerifier.name} has confirmed the proof is valid. Agent verified successfully!`, { rate: 1.1 });
+      }
+
       // Clear confetti after animation
       const timer = setTimeout(() => {
         setShowConfetti(false);
@@ -68,7 +94,10 @@ export default function VerifierDisplay({ selectedAgent, isProcessing, isVerifie
 
       return () => clearTimeout(timer);
     }
-  }, [isVerified, isProcessing]);
+    if (!isVerified) {
+      hasAnnouncedVerified.current = false;
+    }
+  }, [isVerified, isProcessing, activeVerifier, speak, listenInMode]);
 
   if (selectedAgent === 'rogue') {
     return null; // Don't show verifiers for rogue agent

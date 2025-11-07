@@ -446,6 +446,8 @@ export default function App() {
             selectedAgent={selectedAgent}
             isProcessing={isProcessing}
             isVerified={isVerified}
+            speak={speak}
+            listenInMode={listenInMode}
           />
 
           {result && (
