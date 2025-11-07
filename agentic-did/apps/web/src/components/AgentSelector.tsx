@@ -59,8 +59,8 @@ export default function AgentSelector({ selectedAgent, onSelect, isProcessing }:
                 selectedAgent === key && isProcessing
                   ? {
                       animation: isRogue 
-                        ? 'blink-fast-red 0.4s ease-in-out infinite' 
-                        : 'blink-fast 0.4s ease-in-out infinite'
+                        ? 'blink-fast-red 0.5s ease-in-out infinite' 
+                        : 'blink-fast 0.5s ease-in-out infinite'
                     }
                   : undefined
               }
