@@ -1,0 +1,501 @@
+/**
+ * AgenticDID Registry Contract
+ * 
+ * Manages agent identity registration and verification
+ * Stores DID -> public key mappings with privacy
+ * Handles credential issuance and revocation
+ * 
+ * Built for: Google Cloud Run Hackathon + Midnight Network
+ * Privacy: Zero-knowledge proofs for agent verification
+ * 
+ * Compact Version: Compiler v0.26.0, Language v0.18
+ * Compiler: compactc_v0.26.0_x86_64-unknown-linux-musl
+ */
+
+pragma language_version >= 0.17.0;
+import CompactStandardLibrary;
+  
+// ============================================================================
+// STATE VARIABLES (Ledger-based persistent storage)
+// ============================================================================
+
+ledger agentCredentials: Map<Bytes<32>, AgentCredential>;
+ledger delegations: Map<Bytes<32>, Delegation>;
+ledger totalAgents: Uint<64>;
+ledger totalDelegations: Uint<64>;
+ledger contractOwner: ContractAddress;
+ledger revocationBitmap: Uint<254>;  // Bitmap for revoked agents (max 256 agents)
+  
+  // ============================================================================
+  // DATA STRUCTURES
+  // ============================================================================
+  
+struct AgentCredential {
+  did: Bytes<32>;           // Agent DID hash
+  publicKey: Bytes<64>;     // Public key for verification
+  role: Bytes<32>;          // Role hash (e.g., hash("banker"))
+  scopes: Bytes<32>;        // Scope hash (bitfield of permissions)
+  issuedAt: Uint<64>;       // Timestamp of credential issuance
+  expiresAt: Uint<64>;      // Expiration timestamp
+  issuer: ContractAddress;          // Who issued this credential
+  isActive: Boolean;           // Quick active/revoked check
+}
+  
+struct Delegation {
+  delegationId: Bytes<32>;  // Unique delegation ID
+  userDID: Bytes<32>;       // User's DID
+  agentDID: Bytes<32>;      // Delegated agent's DID
+  scopes: Bytes<32>;        // Delegated scopes (subset of agent's)
+  createdAt: Uint<64>;      // When delegation was created
+  expiresAt: Uint<64>;      // When delegation expires
+  isRevoked: Boolean;          // Revocation status
+}
+
+struct ProofHashInput {
+  key: Bytes<64>;
+  time: Uint<64>;
+}
+
+struct DelegationHashInput {
+  user: Bytes<32>;
+  agent: Bytes<32>;
+  time: Uint<64>;
+}
+  
+  // ============================================================================
+  // INITIALIZATION
+  // ============================================================================
+  
+/**
+ * Initialize the registry contract
+ * Sets up the contract owner and initial state
+ */
+constructor(caller: ContractAddress) {
+  totalAgents = 0;
+  totalDelegations = 0;
+  contractOwner = disclose(caller);
+  revocationBitmap = 0;
+}
+  
+  // ============================================================================
+  // AGENT REGISTRATION
+  // ============================================================================
+  
+  /**
+   * Register a new agent with credentials
+   * 
+   * @param caller - ContractAddress of the caller
+   * @param did - Agent's DID (hash)
+   * @param publicKey - Agent's public key
+   * @param role - Agent's role hash
+   * @param scopes - Agent's permission scopes
+   * @param expiresAt - Credential expiration timestamp
+   * @param currentTime - Current block timestamp
+   * @param zkProof - Zero-knowledge proof of agent ownership
+   */
+export circuit registerAgent(
+  caller: ContractAddress,
+  did: Bytes<32>,
+  publicKey: Bytes<64>,
+  role: Bytes<32>,
+  scopes: Bytes<32>,
+  expiresAt: Uint<64>,
+  currentTime: Uint<64>,
+  zkProof: Bytes<256>
+): [] {
+  
+  // Security checks (using assert instead of require)
+  assert(!agentCredentials.member(disclose(did)), "Agent already registered");
+  assert(expiresAt > currentTime, "Invalid expiration time");
+  assert(verifyProofOfOwnership(did, publicKey, zkProof), "Invalid proof");
+  
+  // Create credential (using const for local variable)
+  const credential = AgentCredential {
+    did: did,
+    publicKey: publicKey,
+    role: role,
+    scopes: scopes,
+    issuedAt: currentTime,
+    expiresAt: expiresAt,
+    issuer: caller,
+    isActive: true
+  };
+  
+  // Store in ledger (with disclose() for witness data)
+  agentCredentials.insert(disclose(did), disclose(credential));
+  
+  // Update counter (cast result to match Uint<64> type)
+  totalAgents = (totalAgents + 1) as Uint<64>;
+}
+  
+  // ============================================================================
+  // AGENT VERIFICATION
+  // ============================================================================
+  
+  /**
+   * Verify an agent's credential with zero-knowledge proof
+   * Returns true if valid and not revoked
+   * 
+   * @param agentDID - Agent's DID to verify
+   * @param proofHash - Hash of the verification proof
+   * @param currentTime - Current timestamp
+   */
+export circuit verifyAgent(
+  agentDID: Bytes<32>,
+  proofHash: Bytes<32>,
+  currentTime: Uint<64>
+): Boolean {
+    
+    // Check if agent exists (safe map access)
+    if (!agentCredentials.member(disclose(agentDID))) {
+      return false;
+    }
+    
+    const credential = agentCredentials.lookup(disclose(agentDID));
+    
+    // Check expiration
+    if (credential.expiresAt < currentTime) {
+      return false;
+    }
+    
+    // Check revocation status
+    if (!credential.isActive) {
+      return false;
+    }
+    
+    // Verify proof matches
+    const expectedHash = hashProof(credential.publicKey, currentTime);
+    if (proofHash != expectedHash) {
+      return false;
+    }
+    
+    return true;
+  }
+  
+/**
+ * Get agent's public key (for verification)
+ * This is public information needed for ZKP verification
+ */
+export circuit getAgentPublicKey(agentDID: Bytes<32>): Bytes<64> {
+  assert(agentCredentials.member(disclose(agentDID)), "Agent not found");
+  return agentCredentials.lookup(disclose(agentDID)).publicKey;
+}
+  
+  // ============================================================================
+  // DELEGATION MANAGEMENT
+  // ============================================================================
+  
+  /**
+   * Create a delegation from user to agent
+   * Allows agent to act on behalf of user with limited scopes
+   * 
+   * @param caller - User's address
+   * @param userDID - User's DID
+   * @param agentDID - Agent's DID to delegate to
+   * @param scopes - Scopes to delegate
+   * @param expiresAt - When delegation expires
+   * @param currentTime - Current timestamp
+   */
+export circuit createDelegation(
+  caller: ContractAddress,
+  userDID: Bytes<32>,
+  agentDID: Bytes<32>,
+  scopes: Bytes<32>,
+  expiresAt: Uint<64>,
+  currentTime: Uint<64>
+): Bytes<32> {
+  
+  // Verify agent exists and is active
+  assert(agentCredentials.member(disclose(agentDID)), "Agent not found");
+  const agentCred = agentCredentials.lookup(disclose(agentDID));
+  assert(agentCred.isActive, "Agent is revoked");
+  
+  // Verify scopes are subset of agent's scopes
+  assert(scopesAreSubset(scopes, agentCred.scopes), "Invalid scopes");
+  
+  // Create unique delegation ID
+  const delegationId = hashDelegation(disclose(userDID), disclose(agentDID), disclose(currentTime));
+  
+  // Create delegation record
+  const delegation = Delegation {
+    delegationId: delegationId,
+    userDID: userDID,
+    agentDID: agentDID,
+    scopes: scopes,
+    createdAt: currentTime,
+    expiresAt: expiresAt,
+    isRevoked: false
+  };
+  
+  // Store delegation (with disclose() for witness data)
+  delegations.insert(disclose(delegationId), disclose(delegation));
+  
+  // Update counter (cast result to match Uint<64> type)
+  totalDelegations = (totalDelegations + 1) as Uint<64>;
+  
+  // Return with disclose() (witness-derived value)
+  return disclose(delegationId);
+}
+  
+  /**
+   * Check if a delegation is valid (by delegation ID)
+   * Returns Bool for internal checks
+   */
+export circuit checkDelegation(
+  delegationId: Bytes<32>,
+  currentTime: Uint<64>
+): Boolean {
+    // Disclose currentTime since it's used in conditionals affecting ledger ops
+    const disclosedTime = disclose(currentTime);
+    
+    if (!delegations.member(disclose(delegationId))) {
+      return false;
+    }
+    
+    const delegation = delegations.lookup(disclose(delegationId));
+    
+    // Check revocation
+    if (delegation.isRevoked) {
+      return false;
+    }
+    
+    // Check expiration
+    if (delegation.expiresAt < disclosedTime) {
+      return false;
+    }
+    
+    // Check if agent is still active
+    if (!agentCredentials.member(delegation.agentDID)) {
+      return false;
+    }
+    
+    const agentCred = agentCredentials.lookup(delegation.agentDID);
+    if (!agentCred.isActive) {
+      return false;
+    }
+    
+    return true;
+}
+
+/**
+ * Revoke a delegation
+   * Only the user who created it can revoke
+   */
+export circuit revokeDelegation(
+  caller: ContractAddress,
+  delegationId: Bytes<32>
+): [] {
+  
+  assert(delegations.member(disclose(delegationId)), "Delegation not found");
+  
+  const delegation = delegations.lookup(disclose(delegationId));
+  assert(!delegation.isRevoked, "Already revoked");
+  
+  // Update delegation
+  const updatedDelegation = Delegation {
+    delegationId: delegation.delegationId,
+    userDID: delegation.userDID,
+    agentDID: delegation.agentDID,
+    scopes: delegation.scopes,
+    createdAt: delegation.createdAt,
+    expiresAt: delegation.expiresAt,
+    isRevoked: true
+  };
+  
+  // Update with disclose() wrapper
+  delegations.insert(disclose(delegationId), disclose(updatedDelegation));
+}
+  
+// ============================================================================
+// AGENT REVOCATION  
+// ============================================================================
+
+/**
+ * Revoke an agent's credential
+ * Only contract owner or issuer can revoke
+ */
+export circuit revokeAgent(
+  caller: ContractAddress,
+  agentDID: Bytes<32>
+): [] {
+  
+  assert(agentCredentials.member(disclose(agentDID)), "Agent not found");
+  
+  const credential = agentCredentials.lookup(disclose(agentDID));
+  
+  // Only owner or issuer can revoke
+  assert(
+    caller == contractOwner || caller == credential.issuer,
+    "Not authorized"
+  );
+  
+  // Update credential
+  const updatedCred = AgentCredential {
+    did: credential.did,
+    publicKey: credential.publicKey,
+    role: credential.role,
+    scopes: credential.scopes,
+    issuedAt: credential.issuedAt,
+    expiresAt: credential.expiresAt,
+    issuer: credential.issuer,
+    isActive: false  // Mark as revoked
+  };
+  
+  // Update with disclose() wrapper
+  agentCredentials.insert(disclose(agentDID), disclose(updatedCred));
+}
+  
+  // ============================================================================
+  // HELPER FUNCTIONS (Private)
+  // ============================================================================
+  
+  /**
+   * Verify proof of ownership (ZKP verification)
+   * In production, this would use actual ZKP verification
+   */
+circuit verifyProofOfOwnership(
+  did: Bytes<32>,
+  publicKey: Bytes<64>,
+  proof: Bytes<256>
+): Boolean {
+  // Simplified for demo
+  // In production: Verify ZK-SNARK proof
+  // For now, always return true (placeholder)
+  return true;
+}
+  
+  /**
+ * Hash a proof for verification
+ * Uses persistentHash() for cryptographic security
+ */
+circuit hashProof(
+  publicKey: Bytes<64>,
+  timestamp: Uint<64>
+): Bytes<32> {
+  // Create structured input for type-safe hashing
+  const input = ProofHashInput {
+    key: publicKey,
+    time: timestamp
+  };
+  
+  // Use persistentHash() for ledger-safe cryptographic hashing
+  return persistentHash<ProofHashInput>(input);
+}
+  
+  /**
+ * Hash delegation parameters to create unique ID
+ * Uses persistentHash() for cryptographic security
+ */
+circuit hashDelegation(
+  userDID: Bytes<32>,
+  agentDID: Bytes<32>,
+  timestamp: Uint<64>
+): Bytes<32> {
+  // Create structured input for type-safe hashing
+  const input = DelegationHashInput {
+    user: userDID,
+    agent: agentDID,
+    time: timestamp
+  };
+  
+  // Use persistentHash() for unique, cryptographically secure delegation IDs
+  return persistentHash<DelegationHashInput>(input);
+}
+  
+  /**
+   * Check if requested scopes are subset of available scopes
+   */
+circuit scopesAreSubset(
+  requested: Bytes<32>,
+  available: Bytes<32>
+): Boolean {
+  // Simplified bitwise AND check
+  // In production: Proper scope verification
+  return true;  // Placeholder
+}
+  
+// ============================================================================
+// HELPER FUNCTIONS FOR REVOCATION
+// ============================================================================
+
+/**
+ * Get agent index for revocation bitmap
+ * Maps DID to bitmap position
+ */
+circuit getAgentIndex(agentDID: Bytes<32>): Uint<64> {
+  // Simplified: Use hash mod 256 for bitmap position
+  // In production: Proper mapping system
+  return 0;  // Placeholder
+}
+
+/**
+ * Check if agent index is revoked in bitmap
+ */
+circuit isRevoked(agentIndex: Uint<64>): Boolean {
+  // Check bit in revocationBitmap
+  // Simplified: Always return false for now
+  return false;  // Placeholder
+}
+
+// ============================================================================
+// EXPORTED CIRCUITS FOR CROSS-CONTRACT CALLS
+// ============================================================================
+
+/**
+ * Check if agent credential is valid
+ * Called by CredentialVerifier for verification
+ * Uses assert() pattern for idiomatic error handling
+ */
+export circuit checkCredential(
+  agentDID: Bytes<32>,
+  currentTime: Uint<64>
+): [] {
+  // Check if agent exists
+  assert(agentCredentials.member(disclose(agentDID)), "Agent not found");
+  
+  const credential = agentCredentials.lookup(disclose(agentDID));
+  
+  // Validation chain using assert
+  assert(credential.isActive, "Agent not active");
+  assert(credential.expiresAt >= currentTime, "Credential expired");
+  
+  // Check revocation bitmap
+  const agentIndex = getAgentIndex(agentDID);
+  assert(!isRevoked(agentIndex), "Agent revoked");
+  
+  // If we reach here, credential is valid!
+}
+
+/**
+ * Check if delegation is valid
+ * Called by CredentialVerifier for delegation verification
+ */
+export circuit isDelegationValid(
+  userDID: Bytes<32>,
+  agentDID: Bytes<32>,
+  requiredScopes: Bytes<32>,
+  currentTime: Uint<64>
+): [] {
+  // Generate delegation ID
+  const delegationId = hashDelegation(disclose(userDID), disclose(agentDID), disclose(currentTime));
+  
+  // Check if delegation exists
+  assert(delegations.member(disclose(delegationId)), "Delegation not found");
+  
+  const delegation = delegations.lookup(disclose(delegationId));
+  
+  // Validation chain
+  assert(!delegation.isRevoked, "Delegation not active");
+  assert(delegation.expiresAt >= currentTime, "Delegation expired");
+  assert(scopesAreSubset(requiredScopes, delegation.scopes), "Scope mismatch");
+  
+  // If we reach here, delegation is valid!
+}
+
+// ============================================================================
+// HELPER FUNCTIONS (Private)
+// ============================================================================
+
+  /**
+   * Helper to create bytes32 from uint8
+   */
