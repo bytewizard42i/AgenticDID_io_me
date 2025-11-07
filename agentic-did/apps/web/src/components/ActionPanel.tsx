@@ -19,27 +19,6 @@ export default function ActionPanel({ onAction, onRogueAttempt, disabled, rogueM
           "We'll automatically select the right agent for you"
         )}
       </p>
-      
-      {/* Rogue Agent Button */}
-      {!rogueMode && (
-        <div className="mb-4">
-          <button
-            onClick={onRogueAttempt}
-            disabled={disabled}
-            className="w-full p-4 rounded-lg border-2 border-red-700 bg-red-950/30 hover:bg-red-900/50 hover:border-red-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-left"
-          >
-            <div className="flex items-center gap-3">
-              <AlertTriangle className="w-8 h-8 text-red-400" />
-              <div>
-                <p className="font-semibold text-red-200 mb-1">Try to Connect to Rogue Agent</p>
-                <p className="text-xs text-red-400">
-                  ⚠️ Simulate a bad actor attempt - System will detect and report
-                </p>
-              </div>
-            </div>
-          </button>
-        </div>
-      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {ACTIONS.map((action) => (
@@ -69,6 +48,27 @@ export default function ActionPanel({ onAction, onRogueAttempt, disabled, rogueM
           </button>
         ))}
       </div>
+      
+      {/* Rogue Agent Button */}
+      {!rogueMode && (
+        <div className="mt-4">
+          <button
+            onClick={onRogueAttempt}
+            disabled={disabled}
+            className="w-full p-4 rounded-lg border-2 border-red-700 bg-red-950/30 hover:bg-red-900/50 hover:border-red-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-left"
+          >
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="w-8 h-8 text-red-400" />
+              <div>
+                <p className="font-semibold text-red-200 mb-1">Try to Connect to Rogue Agent</p>
+                <p className="text-xs text-red-400">
+                  ⚠️ Simulate a bad actor attempt - System will detect and report
+                </p>
+              </div>
+            </div>
+          </button>
+        </div>
+      )}
     </div>
   );
 }
