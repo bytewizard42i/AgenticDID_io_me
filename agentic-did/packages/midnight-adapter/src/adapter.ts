@@ -75,6 +75,9 @@ export class MidnightAdapter {
     if (cred_hash.includes('traveler')) {
       return { role: 'Traveler', scopes: ['travel:book', 'travel:cancel'] };
     }
+    if (cred_hash.includes('shopper')) {
+      return { role: 'Shopper', scopes: ['shop:purchase', 'shop:cart'] };
+    }
     // Default
     return { role: 'Agent', scopes: ['read'] };
   }
