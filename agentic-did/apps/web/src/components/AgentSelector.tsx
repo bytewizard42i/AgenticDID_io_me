@@ -37,7 +37,9 @@ export default function AgentSelector({ selectedAgent, onSelect, isProcessing }:
       <h3 className="text-lg font-semibold text-midnight-200">Agent Selected for This Action</h3>
       <p className="text-sm text-midnight-400">The system automatically chose the appropriate authorized agent</p>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        {Object.entries(AGENTS).map(([key, agent], index) => {
+        {Object.entries(AGENTS)
+          .filter(([key, agent]) => !agent.isRogue || key === selectedAgent) // Show rogue only if selected
+          .map(([key, agent], index) => {
           const isRogue = agent.isRogue;
           
           return (
