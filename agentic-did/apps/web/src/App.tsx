@@ -170,7 +170,7 @@ export default function App() {
       // Comet speaks: Analyzing request
       if (listenInMode) {
         await sleep(800); // Longer delay to fully initialize speech and prevent cutoff
-        await speak("Hi! I'm Comet, your local agent. I'm analyzing your request and selecting the appropriate agent.", { rate: 1.1 });
+        await speak("Hi, I'm Comet, your local agent. I'm analyzing your request and selecting the appropriate agent.", { rate: 1.1 });
         await sleep(1500); // Wait for speech to complete
       }
     }
@@ -298,10 +298,6 @@ export default function App() {
           const endTime = Date.now();
           const duration = (endTime - startTime) / 1000;
           setExecutionTime(duration);
-
-          if (listenInMode) {
-            await speak(`Success! ${action.label} completed. All operations verified with zero-knowledge proofs.`, { rate: 1.1 });
-          }
 
           setResult({
             success: true,
