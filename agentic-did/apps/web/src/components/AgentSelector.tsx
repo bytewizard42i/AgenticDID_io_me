@@ -4,9 +4,10 @@ import { useState, useEffect } from 'react';
 type Props = {
   selectedAgent: AgentType;
   onSelect: (agent: AgentType) => void;
+  isProcessing: boolean;
 };
 
-export default function AgentSelector({ selectedAgent, onSelect }: Props) {
+export default function AgentSelector({ selectedAgent, onSelect, isProcessing }: Props) {
   const [glitchText, setGlitchText] = useState<Record<string, string>>({});
   
   useEffect(() => {
@@ -54,6 +55,15 @@ export default function AgentSelector({ selectedAgent, onSelect }: Props) {
                     ? 'border-midnight-500 bg-midnight-800/50'
                     : 'border-midnight-800 bg-midnight-900/30 hover:border-midnight-700'
               }`}
+              style={
+                selectedAgent === key && isProcessing
+                  ? {
+                      animation: isRogue 
+                        ? 'blink-fast-red 0.4s ease-in-out infinite' 
+                        : 'blink-fast 0.4s ease-in-out infinite'
+                    }
+                  : undefined
+              }
             >
               {/* Danger effects for rogue agent */}
               {isRogue && (

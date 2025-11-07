@@ -431,6 +431,7 @@ export default function App() {
           <AgentSelector
             selectedAgent={selectedAgent}
             onSelect={setSelectedAgent}
+            isProcessing={isProcessing}
           />
 
           {result && (
