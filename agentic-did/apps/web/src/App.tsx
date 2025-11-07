@@ -265,10 +265,10 @@ export default function App() {
 
       const presentation = await presentVP(vp, challenge.nonce);
 
-      // Verifier done - make solid
-      setIsVerifyingWithVerifier(false);
-
       if (presentation.status === 200) {
+        // Verifier done - make solid only on success
+        setIsVerifyingWithVerifier(false);
+        
         updateTimelineStep('present', {
           status: 'success',
           message: `Token issued: ${presentation.data.scopes?.join(', ')}`,
@@ -340,6 +340,9 @@ export default function App() {
           });
         }
       } else {
+        // Verifier failed - stop flashing
+        setIsVerifyingWithVerifier(false);
+        
         updateTimelineStep('present', {
           status: 'error',
           message: presentation.data.error || 'Verification failed',
