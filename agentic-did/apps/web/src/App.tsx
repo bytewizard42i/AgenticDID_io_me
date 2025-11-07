@@ -43,8 +43,8 @@ function createMockCredential(agentType: AgentType) {
     isRogue: agent.isRogue || false,
   });
 
-  // Simple hash for demo
-  const hash = btoa(credContent);
+  // Simple hash for demo - include agentType so backend can extract policy
+  const hash = btoa(`${agentType}:${credContent}`);
 
   return {
     pid: `pid:${agentType}:${Math.random().toString(36).slice(2, 10)}`,
