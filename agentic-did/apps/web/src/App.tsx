@@ -312,6 +312,7 @@ export default function App() {
 
         if (rogueMode && listenInMode) {
           await speak("Security breach prevented. Bad actor has been blocked and authorities have been notified.", { rate: 1.0, pitch: 0.9 });
+          await speak("Get out of here with that garbage.", { rate: 1.2, pitch: 0.8 });
         }
 
         setResult({
