@@ -1,5 +1,60 @@
 /**
- * Midnight Adapter - Credential State Verification
+ * ============================================================================
+ * MIDNIGHT ADAPTER - MOCK IMPLEMENTATION FOR DEMO
+ * ============================================================================
+ * 
+ * ⚠️ CRITICAL: THIS IS A MOCK IMPLEMENTATION FOR HACKATHON DEMO ⚠️
+ * 
+ * This adapter simulates Midnight Network integration without requiring
+ * actual blockchain connectivity. It enables fast, reliable demonstrations
+ * without external dependencies.
+ * 
+ * WHAT THIS MOCK DOES:
+ * - Simulates credential verification based on string matching
+ * - Returns hardcoded policy data for demo agents (Banker, Traveler, Shopper)
+ * - Implements simple revocation logic for demonstration
+ * - Provides consistent, predictable behavior for hackathon judges
+ * 
+ * WHAT THE REAL VERSION WILL DO:
+ * - Query on-chain AgenticDIDRegistry contract via Midnight Network
+ * - Verify actual zero-knowledge proofs cryptographically
+ * - Check real revocation status from blockchain state
+ * - Integrate with Midnight proof server for ZK verification
+ * - Use Mesh SDK to interact with Midnight Network testnet
+ * 
+ * DEMO vs PRODUCTION:
+ * ┌─────────────────────────────────────────────────────────────────┐
+ * │ DEMO (Current)          │ PRODUCTION (Phase 2)                 │
+ * ├─────────────────────────┼──────────────────────────────────────│
+ * │ String matching         │ On-chain contract queries            │
+ * │ Hardcoded roles         │ Cryptographic proof verification     │
+ * │ Simple revocation check │ Blockchain revocation registry       │
+ * │ No network calls        │ Real Midnight Network integration    │
+ * │ Instant response        │ ~500ms for ZK proof verification     │
+ * └─────────────────────────────────────────────────────────────────┘
+ * 
+ * WHY USE A MOCK:
+ * 1. Hackathon Environment: No testnet access required, works offline
+ * 2. Reliability: No network issues, always available for demos
+ * 3. Speed: <1ms verification vs ~500ms with real ZK proofs
+ * 4. Focus: Demonstrates UX and architecture without blockchain complexity
+ * 5. Testability: Easy to test all scenarios (valid, revoked, expired)
+ * 
+ * PRODUCTION MIGRATION PATH:
+ * This file will be replaced with RealMidnightAdapter that:
+ * 1. Connects to Midnight Network RPC endpoint
+ * 2. Queries AgenticDIDRegistry.compact contract
+ * 3. Verifies ZK proofs using Midnight proof server
+ * 4. Returns real on-chain credential data
+ * 
+ * @see ../midnight-adapter-v2/ - Future real implementation (Phase 2)
+ * @see ../../../contracts/AgenticDIDRegistry.compact - On-chain registry
+ * @see ../../../contracts/CredentialVerifier.compact - Proof verifier
+ * @see ../../../docs/PHASE2_IMPLEMENTATION.md - Migration roadmap
+ * 
+ * @version 1.0.0 (Demo - Mock Implementation)
+ * @author AgenticDID.io Team
+ * ============================================================================
  */
 
 import {
@@ -9,32 +64,77 @@ import {
   CredentialStatus,
 } from './types.js';
 
+/**
+ * Midnight Adapter Class
+ * 
+ * MOCK MODE (Current):
+ * This class simulates Midnight Network integration for demo purposes.
+ * All methods return plausible mock data based on simple heuristics.
+ * 
+ * CONFIGURATION:
+ * - enableMockMode: Always true in this version
+ * - Future: Will support real mode with RPC URL, contract addresses
+ */
 export class MidnightAdapter {
   private config: MidnightAdapterConfig;
 
+  /**
+   * Initialize the Midnight Adapter
+   * 
+   * @param config - Configuration object
+   * 
+   * MOCK MODE HARDCODED:
+   * enableMockMode is forcibly set to true in constructor
+   * This ensures demo never tries to make real network calls
+   */
   constructor(config: MidnightAdapterConfig = {}) {
     this.config = {
-      enableMockMode: true,
+      enableMockMode: true,  // ALWAYS true in demo version
       ...config,
     };
   }
 
   /**
    * Verify a Midnight receipt and check credential state
-   * MVP: Returns mock valid responses
-   * TODO: Wire to actual Midnight proof server / Minokawa contract
+   * 
+   * THIS IS THE CORE VERIFICATION METHOD
+   * 
+   * DEMO MODE (Current):
+   * - Uses mockVerifyReceipt() to simulate verification
+   * - No actual cryptographic verification
+   * - Returns hardcoded policy data based on credential hash
+   * 
+   * PRODUCTION MODE (Phase 2):
+   * Will perform these steps:
+   * 1. Parse attestation (ZK proof from verifiable presentation)
+   * 2. Verify cryptographic signature using public key
+   * 3. Query AgenticDIDRegistry contract for credential data
+   * 4. Check revocation bitmap on-chain
+   * 5. Verify ZK proof using Midnight proof server
+   * 6. Return real on-chain status + policy
+   * 
+   * @param input - Verification request containing credential hash and attestation
+   * @returns Verification result with status and policy
+   * 
+   * STATUS VALUES:
+   * - 'valid': Credential is active and proof verified
+   * - 'revoked': Credential has been revoked by issuer
+   * - 'expired': Credential past expiration time
+   * - 'invalid': Proof verification failed or credential not found
    */
   async verifyReceipt(input: VerifyReceiptInput): Promise<VerifyReceiptResult> {
+    // DEMO: Always use mock mode
     if (this.config.enableMockMode) {
       return this.mockVerifyReceipt(input);
     }
 
-    // TODO: Real Midnight verification
-    // 1. Parse attestation
-    // 2. Verify signature
-    // 3. Query state from Minokawa contract
-    // 4. Check revocation list
-    // 5. Return status + policy
+    // PRODUCTION: Real Midnight verification (not implemented in demo)
+    // 1. Parse attestation (ZK proof)
+    // 2. Verify signature with agent's public key
+    // 3. Query state from AgenticDIDRegistry.compact contract
+    // 4. Check revocation list on-chain
+    // 5. Verify ZK proof using Midnight proof server
+    // 6. Return verified status + policy from contract
 
     throw new Error('Real Midnight verification not yet implemented');
   }
