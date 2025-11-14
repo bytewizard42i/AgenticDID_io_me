@@ -1,13 +1,20 @@
 # 🔮 AgenticDID.io
 
-**Midnight-powered, privacy-preserving identity protocol for AI agents**
+**The Identity Layer for the Agentic Web**  
+*Privacy-preserving DIDs for humans, AI agents, and critical infrastructure for the "Fi" ecosystem*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Midnight Network](https://img.shields.io/badge/Midnight-Network-purple)](https://midnight.network)
 [![Google Cloud Run](https://img.shields.io/badge/Google-Cloud_Run-4285F4)](https://cloud.google.com/run)
 [![Status: MVP](https://img.shields.io/badge/Status-MVP%20Complete-green)](https://github.com/bytewizard42i/AgenticDID_io_me)
 
-AgenticDID.io lets AI agents prove authenticity and authorization using **privacy-preserving digital identifiers (PIDs)**, **verifiable credentials (VCs)**, and **zero-knowledge proofs (ZKPs)**—all without exposing private data.
+AgenticDID is building **universal decentralized identifiers (DIDs)** for the agentic web - enabling humans, AI agents, and objects to prove authenticity and execute declarative tasks using **zero-knowledge proofs**, **verifiable credentials**, and **rational privacy** - all without exposing private data. We're creating the **identity infrastructure FOR the "Fi" ecosystem**, enabling other protocols to become Fi-compatible.
+
+> 🌌 **The Big Picture**: 
+> - **What is Fi?**: "Fi" (Fair Finance) is the larger ecosystem vision - AgenticDID provides the identity layer
+> - **3-minute overview**: [VISION_SUMMARY.md](./docs/VISION_SUMMARY.md) - Quick understanding of our role
+> - **Complete vision**: [GRAND_VISION.md](./docs/GRAND_VISION.md) - How AgenticDID enables the Fi ecosystem
+> - **Current status**: [CURRENT_SCOPE.md](./docs/CURRENT_SCOPE.md) - What works NOW vs what's coming
 
 ### 🏆 Dual-Stack Innovation
 - **Google Cloud Run**: Serverless deployment with Google ADK multi-agent orchestration
@@ -20,13 +27,34 @@ AgenticDID.io lets AI agents prove authenticity and authorization using **privac
 
 ---
 
-## 🎯 What It Does
+## 🎯 Current Scope vs Grand Vision
 
-AgenticDID.io provides a complete identity protocol for AI agents with a **results-focused approach**:
+### What This Demo Does (Phase 1 - ✅ Complete)
+
+**AgenticDID.io**: Privacy-preserving identity for **AI agents**
+
+Focus: Enable AI agents to prove authenticity and authorization with zero-knowledge proofs
 
 > *Inspired by Charles Hoskinson's insight that the future is about results, not processes - users state what they want to achieve, and the system handles the implementation.*
 > 
 > **Source**: [Crypto Crow Interview with Charles Hoskinson](https://www.youtube.com/watch?v=HybXioqRr9A) - October 15, 2025
+
+### Future Scope (Phases 2-5 - 🔮 Roadmap)
+
+**Universal Identity Protocol**: Extend to humans, objects, and agentic commerce
+
+- 🔜 **Phase 2 (Q4 2025)**: DIDz Protocol for humans (age verification, biometrics, healthcare)
+- 🔮 **Phase 3 (Q2 2026)**: Agentic commerce (declarative intents, agent marketplace, "buy me a hat")
+- 🔮 **Phase 4 (Q3 2026)**: Cross-chain intentions (capacity exchange, trustless routing)
+- 🔮 **Phase 5 (2027+)**: "Fi" economics (fair distribution, cooperative consensus, no ponzinomics)
+
+**See [GRAND_VISION.md](./docs/GRAND_VISION.md) for complete roadmap and philosophical foundation**
+
+---
+
+## 🎯 What the Current Demo Does
+
+AgenticDID.io provides a complete identity protocol for AI agents with a **results-focused approach**:
 
 - **Results-first UX** - Pick your goal ("Buy Headphones"), system auto-selects the right agent
 - **Prove who they are** - Using privacy-preserving digital identifiers
@@ -494,8 +522,18 @@ VITE_API_BASE=http://localhost:8787
 
 ## 📚 Documentation
 
+### **🌌 Vision & Philosophy**
+- **[GRAND_VISION.md](./docs/GRAND_VISION.md)** - 🌟 **START HERE** - Complete vision from identity to "Fi"
+  - Synthesis of 3 foundational packets (Grok, Hoskinson, DIDz)
+  - Universal identity for humans, AI agents, and objects
+  - Roadmap from current demo to agentic commerce to fair finance
+  - Novel innovations (spoof transactions, Listen In Mode, results-focused UX)
+  - Alignment with Midnight Network architecture
+- **[DIDZ_SUITE_ARCHITECTURE.md](./docs/DIDZ_SUITE_ARCHITECTURE.md)** - Complete protocol suite architecture
+- **[WINNING_ROADMAP_FOR_JOHN.md](./docs/WINNING_ROADMAP_FOR_JOHN.md)** - Hackathon strategy & tool recommendations
+
 ### **Quick Start**
-- **[USER_START_HERE.md](./USER_START_HERE.md)** - 👋 **START HERE** - Your quick navigation guide
+- **[USER_START_HERE.md](./USER_START_HERE.md)** - 👋 Quick navigation guide for users
 - **[LINKS_TOOLS.md](./LINKS_TOOLS.md)** - 🔗 All resources organized by category
 - **[QUICKSTART.md](./docs/QUICKSTART.md)** - Get running in 2 minutes
 

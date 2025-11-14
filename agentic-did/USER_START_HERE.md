@@ -130,13 +130,24 @@ agentic-did/
 ### 🌟 Absolute Beginner Path
 1. ✅ **This file** (you're here!) - Understand the basics
 2. **[README.md](./README.md)** - What the project does
-3. **[HACKATHON_COMPLIANCE_REVIEW.md](./HACKATHON_COMPLIANCE_REVIEW.md)** - What needs to be done
-4. Try the demo (see "Quick Launch" above)
+3. **[docs/CURRENT_SCOPE.md](./docs/CURRENT_SCOPE.md)** - 🎯 What works NOW vs what's coming
+4. **[HACKATHON_COMPLIANCE_REVIEW.md](./HACKATHON_COMPLIANCE_REVIEW.md)** - What needs to be done
+5. Try the demo (see "Quick Launch" above)
+
+### 🌌 Vision & Philosophy Path (Understanding the Big Picture)
+1. **[docs/GRAND_VISION.md](./docs/GRAND_VISION.md)** - 🌟 **The Complete Vision** - Identity → Agentic Commerce → "Fi"
+   - Why we're building this (problem we're solving)
+   - How we got here (3 foundational packets)
+   - Where we're going (Phase 1 → Phase 5)
+   - What makes us unique (spoof transactions, Listen In Mode)
+2. **[docs/DIDZ_SUITE_ARCHITECTURE.md](./docs/DIDZ_SUITE_ARCHITECTURE.md)** - Technical architecture
+3. **[docs/AGENT_DELEGATION_WORKFLOW.md](./docs/AGENT_DELEGATION_WORKFLOW.md)** - Real-world use case walkthrough
 
 ### 🔧 Building/Development Path  
 1. **[docs/QUICKSTART.md](./docs/QUICKSTART.md)** - Get coding fast
 2. **[docs/reference/PROJECT_STRUCTURE.md](./docs/reference/PROJECT_STRUCTURE.md)** - Code organization
 3. **[LINKS_TOOLS.md](./LINKS_TOOLS.md)** - All tool links
+4. **[docs/WINNING_ROADMAP_FOR_JOHN.md](./docs/WINNING_ROADMAP_FOR_JOHN.md)** - Tools & strategy for hackathon
 
 ### 🚀 Deployment Path
 1. **[docs/DEPLOYMENT_GUIDE.md](./docs/DEPLOYMENT_GUIDE.md)** - Deploy to Cloud Run
