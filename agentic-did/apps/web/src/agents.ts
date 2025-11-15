@@ -1,7 +1,13 @@
 /**
  * Agent Definitions for AgenticDID.io Demo
  * 
- * Defines the types of AI agents available in the system and their permissions.
+ * Updated to match REAL-DEAL naming conventions and structure.
+ * 
+ * NAMING CONVENTION:
+ * - Registered Agents use RA- prefix (though not shown in UI)
+ * - Organized by role: LOCAL_AGENT, ISSUER_AGENT, TASK_AGENT
+ * - Stanford demonstrates multi-issuer architecture (3 separate agents)
+ * 
  * Each agent has:
  * - name: Display name
  * - role: Authorization role
@@ -9,16 +15,31 @@
  * - icon: Visual representation
  * - color: UI theme color
  * - description: What the agent does
+ * - category: Agent category (local, issuer, task)
  * - isRogue: (optional) Indicates revoked credential
  * - isTrustedService: (optional) Marks as trusted service provider
  * 
  * Security Model:
  * - Agents must have matching role AND scope for actions
  * - Rogue agents always fail (simulates revocation)
- * - Trusted services (e.g., Amazon) have verified credentials
+ * - Trusted services have verified credentials
  */
 
-export type AgentType = 'banker' | 'traveler' | 'shopper' | 'rogue';
+export type AgentType = 
+  | 'comet'
+  | 'agenticdid_agent'
+  | 'bank_agent'
+  | 'cex_agent'
+  | 'amazon_agent'
+  | 'airline_agent'
+  | 'voting_agent'
+  | 'doctors_office_agent'
+  | 'stanford_hospital_agent'
+  | 'stanford_ivf_agent'
+  | 'stanford_college_agent'
+  | 'blue_cross_agent'
+  | 'medical_records_agent'
+  | 'rogue';
 
 export type Agent = {
   name: string;
@@ -27,43 +48,166 @@ export type Agent = {
   icon: string;
   color: string;
   description: string;
+  category: 'local' | 'issuer' | 'task';
   isRogue?: boolean;
   isTrustedService?: boolean;
 };
 
 export const AGENTS: Record<AgentType, Agent> = {
-  banker: {
-    name: 'Legit Banker Agent',
-    role: 'Banker' as const,
-    scopes: ['bank:transfer', 'bank:balance'],
+  // LOCAL AGENT
+  comet: {
+    name: 'Comet (Local User Agent)',
+    role: 'LOCAL_AGENT' as const,
+    scopes: ['*'], // Local agent has full user permissions
+    icon: '☄️',
+    color: 'text-purple-400',
+    description: 'Your personal AI assistant running on your device',
+    category: 'local',
+  },
+
+  // ISSUER AGENT
+  agenticdid_agent: {
+    name: 'AgenticDID Protocol Issuer Agent',
+    role: 'ISSUER_AGENT' as const,
+    scopes: ['issuer:kyc', 'issuer:verify', 'issuer:issue'],
+    icon: '🔮',
+    color: 'text-indigo-400',
+    description: 'AgenticDID Foundation credential issuance agent',
+    category: 'issuer',
+  },
+
+  // TASK AGENTS - Financial
+  bank_agent: {
+    name: 'Bank of America Agent',
+    role: 'TASK_AGENT' as const,
+    scopes: ['bank:transfer', 'bank:balance', 'bank:statements'],
     icon: '🏦',
     color: 'text-green-400',
-    description: 'Authorized to perform banking operations',
-  },
-  traveler: {
-    name: 'Legit Traveler Agent',
-    role: 'Traveler' as const,
-    scopes: ['travel:book', 'travel:cancel'],
-    icon: '✈️',
-    color: 'text-blue-400',
-    description: 'Authorized to book and manage travel',
-  },
-  shopper: {
-    name: 'Amazon Shopping Agent',
-    role: 'Shopper' as const,
-    scopes: ['shop:purchase', 'shop:cart'],
-    icon: '📦',
-    color: 'text-orange-400',
-    description: 'Authorized Amazon agent for e-commerce purchases',
+    description: 'Authorized banking operations agent',
+    category: 'task',
     isTrustedService: true,
   },
+
+  cex_agent: {
+    name: 'CEX (Crypto Exchange) Agent',
+    role: 'TASK_AGENT' as const,
+    scopes: ['crypto:trade', 'crypto:balance', 'crypto:withdraw'],
+    icon: '₿',
+    color: 'text-yellow-400',
+    description: 'Cryptocurrency exchange operations',
+    category: 'task',
+    isTrustedService: true,
+  },
+
+  // TASK AGENTS - E-Commerce
+  amazon_agent: {
+    name: 'Amazon Shopping Agent',
+    role: 'TASK_AGENT' as const,
+    scopes: ['shop:purchase', 'shop:cart', 'shop:track'],
+    icon: '📦',
+    color: 'text-orange-400',
+    description: 'Authorized Amazon e-commerce agent',
+    category: 'task',
+    isTrustedService: true,
+  },
+
+  // TASK AGENTS - Travel
+  airline_agent: {
+    name: 'Airline Booking Agent',
+    role: 'TASK_AGENT' as const,
+    scopes: ['travel:book', 'travel:cancel', 'travel:checkin'],
+    icon: '✈️',
+    color: 'text-blue-400',
+    description: 'Flight booking and travel management',
+    category: 'task',
+    isTrustedService: true,
+  },
+
+  // TASK AGENTS - Government
+  voting_agent: {
+    name: 'Ecuadorian Voting Agent',
+    role: 'TASK_AGENT' as const,
+    scopes: ['voting:register', 'voting:cast', 'voting:verify'],
+    icon: '🗳️',
+    color: 'text-teal-400',
+    description: 'Government voter registration and ballot casting',
+    category: 'task',
+  },
+
+  // TASK AGENTS - Healthcare (Primary Care)
+  doctors_office_agent: {
+    name: "Doctor's Office Agent",
+    role: 'TASK_AGENT' as const,
+    scopes: ['medical:appointment', 'medical:prescription', 'medical:records'],
+    icon: '👨‍⚕️',
+    color: 'text-cyan-400',
+    description: 'Primary care appointments and prescriptions',
+    category: 'task',
+  },
+
+  // TASK AGENTS - Stanford Multi-Issuer Architecture
+  stanford_hospital_agent: {
+    name: 'Stanford Hospital Agent',
+    role: 'TASK_AGENT' as const,
+    scopes: ['hospital:admit', 'hospital:surgery', 'hospital:emergency', 'hospital:records'],
+    icon: '🏥',
+    color: 'text-red-400',
+    description: 'Stanford Hospital - HIPAA-compliant acute care',
+    category: 'task',
+  },
+
+  stanford_ivf_agent: {
+    name: 'Stanford IVF Research Center Agent',
+    role: 'TASK_AGENT' as const,
+    scopes: ['ivf:consultation', 'ivf:treatment', 'ivf:embryo', 'ivf:pregnancy'],
+    icon: '🤰',
+    color: 'text-pink-400',
+    description: 'Stanford IVF - Specialized reproductive healthcare',
+    category: 'task',
+  },
+
+  stanford_college_agent: {
+    name: 'Stanford College Agent',
+    role: 'TASK_AGENT' as const,
+    scopes: ['education:transcript', 'education:enroll', 'education:degree', 'research:lab'],
+    icon: '🎓',
+    color: 'text-amber-400',
+    description: 'Stanford University - FERPA-compliant academic credentials',
+    category: 'task',
+  },
+
+  // TASK AGENTS - Health Insurance
+  blue_cross_agent: {
+    name: 'Blue Cross Insurance Agent',
+    role: 'TASK_AGENT' as const,
+    scopes: ['insurance:coverage', 'insurance:claim', 'insurance:benefit'],
+    icon: '💙',
+    color: 'text-blue-600',
+    description: 'Health insurance coverage and claims',
+    category: 'task',
+    isTrustedService: true,
+  },
+
+  // TASK AGENTS - Medical Records Coordination
+  medical_records_agent: {
+    name: 'Blue Cross Medical Records Coordinator',
+    role: 'TASK_AGENT' as const,
+    scopes: ['records:aggregate', 'records:consent', 'records:share'],
+    icon: '📋',
+    color: 'text-slate-400',
+    description: 'Cross-provider medical records coordination',
+    category: 'task',
+  },
+
+  // ROGUE AGENT (for demo purposes)
   rogue: {
-    name: 'Rogue Agent',
-    role: 'Banker' as const, // Claims to be Banker
+    name: 'Rogue Agent (Revoked)',
+    role: 'TASK_AGENT' as const,
     scopes: ['bank:transfer', 'admin:*'], // Suspicious scopes
     icon: '🚨',
-    color: 'text-red-400',
+    color: 'text-red-600',
     description: 'Unauthorized agent with revoked credentials',
+    category: 'task',
     isRogue: true,
   },
 };
@@ -77,25 +221,108 @@ export type Action = {
 };
 
 export const ACTIONS: Action[] = [
+  // Financial Actions
   {
-    id: 'transfer',
-    label: 'Send $50',
-    requiredRole: 'Banker',
+    id: 'bank_transfer',
+    label: 'Send $50 (Bank)',
+    requiredRole: 'TASK_AGENT',
     requiredScope: 'bank:transfer',
     icon: '💸',
   },
   {
-    id: 'shop',
+    id: 'crypto_trade',
+    label: 'Buy 0.01 BTC',
+    requiredRole: 'TASK_AGENT',
+    requiredScope: 'crypto:trade',
+    icon: '₿',
+  },
+  
+  // E-Commerce Actions
+  {
+    id: 'amazon_shop',
     label: 'Buy Headphones ($149)',
-    requiredRole: 'Shopper',
+    requiredRole: 'TASK_AGENT',
     requiredScope: 'shop:purchase',
     icon: '🎧',
   },
+  
+  // Travel Actions
   {
-    id: 'flight',
-    label: 'Book Flight',
-    requiredRole: 'Traveler',
+    id: 'book_flight',
+    label: 'Book Flight to NYC',
+    requiredRole: 'TASK_AGENT',
     requiredScope: 'travel:book',
     icon: '🛫',
+  },
+  
+  // Government Actions
+  {
+    id: 'register_vote',
+    label: 'Register to Vote',
+    requiredRole: 'TASK_AGENT',
+    requiredScope: 'voting:register',
+    icon: '📝',
+  },
+  {
+    id: 'cast_ballot',
+    label: 'Cast Ballot',
+    requiredRole: 'TASK_AGENT',
+    requiredScope: 'voting:cast',
+    icon: '🗳️',
+  },
+  
+  // Healthcare Actions
+  {
+    id: 'book_appointment',
+    label: 'Book Doctor Appointment',
+    requiredRole: 'TASK_AGENT',
+    requiredScope: 'medical:appointment',
+    icon: '🩺',
+  },
+  {
+    id: 'hospital_admit',
+    label: 'Hospital Admission',
+    requiredRole: 'TASK_AGENT',
+    requiredScope: 'hospital:admit',
+    icon: '🏥',
+  },
+  {
+    id: 'ivf_consultation',
+    label: 'Schedule IVF Consultation',
+    requiredRole: 'TASK_AGENT',
+    requiredScope: 'ivf:consultation',
+    icon: '🤰',
+  },
+  
+  // Education Actions
+  {
+    id: 'view_transcript',
+    label: 'View Transcript',
+    requiredRole: 'TASK_AGENT',
+    requiredScope: 'education:transcript',
+    icon: '📜',
+  },
+  {
+    id: 'enroll_course',
+    label: 'Enroll in Course',
+    requiredRole: 'TASK_AGENT',
+    requiredScope: 'education:enroll',
+    icon: '📚',
+  },
+  
+  // Insurance Actions
+  {
+    id: 'check_coverage',
+    label: 'Check Insurance Coverage',
+    requiredRole: 'TASK_AGENT',
+    requiredScope: 'insurance:coverage',
+    icon: '💙',
+  },
+  {
+    id: 'aggregate_records',
+    label: 'Aggregate Medical Records',
+    requiredRole: 'TASK_AGENT',
+    requiredScope: 'records:aggregate',
+    icon: '📋',
   },
 ];
