@@ -7,6 +7,10 @@
 [![Midnight Network](https://img.shields.io/badge/Midnight-Network-purple)](https://midnight.network)
 [![Google Cloud Run](https://img.shields.io/badge/Google-Cloud_Run-4285F4)](https://cloud.google.com/run)
 [![Status: MVP](https://img.shields.io/badge/Status-MVP%20Complete-green)](https://github.com/bytewizard42i/AgenticDID_io_me)
+[![Production](https://img.shields.io/badge/Production-REAL--DEAL-blue)](../AgenticDID_io_me_REAL-DEAL/)
+
+> 🏗️ **NEW**: Production issuer model implemented in **[REAL-DEAL repo](../AgenticDID_io_me_REAL-DEAL/)** with three-axis categorization (Type + Domain + Assurance).  
+> See **[PRODUCTION_MODEL.md](./docs/PRODUCTION_MODEL.md)** for details on the new model and Stanford University multi-domain showcase.
 
 AgenticDID is building **universal decentralized identifiers (DIDs)** for the agentic web - enabling humans, AI agents, and objects to prove authenticity and execute declarative tasks using **zero-knowledge proofs**, **verifiable credentials**, and **rational privacy** - all without exposing private data. We're creating the **identity infrastructure FOR the "Fi" ecosystem**, enabling other protocols to become Fi-compatible.
 
