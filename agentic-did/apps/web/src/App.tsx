@@ -89,6 +89,7 @@ export default function App() {
   const [animatingRA, setAnimatingRA] = useState<'blink' | 'glow' | null>(null);
   const [animatingTI, setAnimatingTI] = useState<'blink' | 'glow' | null>(null);
   const actionPanelRef = useRef<HTMLDivElement>(null);
+  const cancelledRef = useRef(false);
   const { speak, isSpeaking, isAvailable } = useSpeech();
 
   const addTimelineStep = (step: Omit<TimelineStep, 'timestamp'>) => {
@@ -131,7 +132,27 @@ export default function App() {
   };
 
   const handleWorkflowCancel = () => {
-    handleClearData();
+    // Set cancellation flag to stop ongoing transaction
+    cancelledRef.current = true;
+    
+    // Add cancellation message to timeline
+    addTimelineStep({
+      id: 'cancelled',
+      label: '🛑 Transaction Cancelled',
+      status: 'error',
+      message: 'User cancelled the workflow',
+    });
+    
+    // Clear all state
+    setIsProcessing(false);
+    setIsSelectingAgent(false);
+    setIsVerifyingWithVerifier(false);
+    
+    // Show cancellation result
+    setResult({
+      success: false,
+      message: 'Transaction cancelled by user',
+    });
   };
 
   const handleNewAction = () => {
@@ -144,6 +165,9 @@ export default function App() {
   const handleAction = async (action: Action) => {
     const startTime = Date.now();
     setSelectedAction(action);
+
+    // Reset cancellation flag for new transaction
+    cancelledRef.current = false;
 
     // Auto-select the appropriate agent and TI based on action using workflow mapping
     const workflow = WORKFLOW_MAPPING[action.id];
@@ -168,6 +192,9 @@ export default function App() {
     
     // Scroll to workflow after brief delay
     await sleep(300);
+    
+    // Check for cancellation
+    if (cancelledRef.current) return;
 
     // If rogue mode, show warning
     if (rogueMode) {
@@ -227,6 +254,9 @@ export default function App() {
 
     // Give UI time to show the selected agent
     await sleep(listenInMode ? 500 : 300);
+    
+    // Check for cancellation
+    if (cancelledRef.current) return;
 
     try {
       // Step 1: Request Challenge
@@ -276,11 +306,17 @@ export default function App() {
       }
 
       await sleep(listenInMode ? 1500 : 100);
+      
+      // Check for cancellation
+      if (cancelledRef.current) return;
 
       // Agent selection complete - make solid and change RA to glow
       setIsSelectingAgent(false);
       setAnimatingRA('glow');
       await sleep(500);
+      
+      // Check for cancellation
+      if (cancelledRef.current) return;
 
       // Step 3: Present VP
       addTimelineStep({
@@ -310,6 +346,9 @@ export default function App() {
       }
 
       const presentation = await presentVP(vp, challenge.nonce);
+      
+      // Check for cancellation
+      if (cancelledRef.current) return;
 
       if (presentation.status === 200) {
         // Verifier done - make solid only on success and change TI to glow
