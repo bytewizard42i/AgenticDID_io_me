@@ -410,6 +410,9 @@ export default function App() {
             success: true,
             message: `Agent successfully executed: ${action.label}`,
           });
+          
+          // Reset selected action so task buttons are cleared for next workflow
+          setSelectedAction(null);
         } else {
           updateTimelineStep('action', {
             status: 'error',
