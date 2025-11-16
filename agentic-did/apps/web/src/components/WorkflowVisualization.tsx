@@ -92,12 +92,13 @@ export default function WorkflowVisualization({
   return (
     <div ref={workflowRef} className="relative my-8 p-6 bg-midnight-950/50 rounded-xl border border-midnight-700">
       {/* Header with Action Buttons */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 gap-4">
         <button
           onClick={onCancel}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-900/20 hover:bg-red-900/40 border border-red-700 text-red-400 hover:text-red-300 transition-all"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-900/20 hover:bg-red-900/40 border border-red-700 text-red-400 hover:text-red-300 transition-all shadow-lg hover:shadow-red-900/50"
+          title="Cancel workflow and start over"
         >
-          <X className="w-4 h-4" />
+          <X className="w-5 h-5" />
           <span className="text-sm font-semibold">Cancel</span>
         </button>
         
@@ -107,9 +108,10 @@ export default function WorkflowVisualization({
         
         <button
           onClick={onNewAction}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-cyan-900/20 hover:bg-cyan-900/40 border border-cyan-700 text-cyan-400 hover:text-cyan-300 transition-all"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-cyan-900/20 hover:bg-cyan-900/40 border border-cyan-700 text-cyan-400 hover:text-cyan-300 transition-all shadow-lg hover:shadow-cyan-900/50"
+          title="Choose another action"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-5 h-5" />
           <span className="text-sm font-semibold">New Action</span>
         </button>
       </div>
