@@ -180,21 +180,69 @@ export class MidnightAdapter {
       console.log('⚠️ Could not decode hash, using as-is');
     }
     
+    // Map agent types to policies - FOR DEMO: Always return valid for non-rogue agents
+    if (decodedHash.includes('bank_agent')) {
+      console.log('✅ Found bank_agent in hash');
+      return { role: 'TASK_AGENT', scopes: ['bank:transfer', 'bank:balance', 'bank:statements'] };
+    }
+    if (decodedHash.includes('cex_agent')) {
+      console.log('✅ Found cex_agent in hash');
+      return { role: 'TASK_AGENT', scopes: ['crypto:trade', 'crypto:balance', 'crypto:withdraw'] };
+    }
+    if (decodedHash.includes('amazon_agent')) {
+      console.log('✅ Found amazon_agent in hash');
+      return { role: 'TASK_AGENT', scopes: ['shop:purchase', 'shop:cart', 'shop:track'] };
+    }
+    if (decodedHash.includes('airline_agent')) {
+      console.log('✅ Found airline_agent in hash');
+      return { role: 'TASK_AGENT', scopes: ['travel:book', 'travel:cancel', 'travel:checkin'] };
+    }
+    if (decodedHash.includes('voting_agent')) {
+      console.log('✅ Found voting_agent in hash');
+      return { role: 'TASK_AGENT', scopes: ['voting:register', 'voting:cast', 'voting:verify'] };
+    }
+    if (decodedHash.includes('doctors_office_agent')) {
+      console.log('✅ Found doctors_office_agent in hash');
+      return { role: 'TASK_AGENT', scopes: ['medical:appointment', 'medical:prescription', 'medical:records'] };
+    }
+    if (decodedHash.includes('stanford_hospital_agent')) {
+      console.log('✅ Found stanford_hospital_agent in hash');
+      return { role: 'TASK_AGENT', scopes: ['hospital:admit', 'hospital:surgery', 'hospital:emergency', 'hospital:records'] };
+    }
+    if (decodedHash.includes('stanford_ivf_agent')) {
+      console.log('✅ Found stanford_ivf_agent in hash');
+      return { role: 'TASK_AGENT', scopes: ['ivf:consultation', 'ivf:treatment', 'ivf:embryo', 'ivf:pregnancy'] };
+    }
+    if (decodedHash.includes('stanford_college_agent')) {
+      console.log('✅ Found stanford_college_agent in hash');
+      return { role: 'TASK_AGENT', scopes: ['education:transcript', 'education:enroll', 'education:degree', 'research:lab'] };
+    }
+    if (decodedHash.includes('blue_cross_agent')) {
+      console.log('✅ Found blue_cross_agent in hash');
+      return { role: 'TASK_AGENT', scopes: ['insurance:coverage', 'insurance:claim', 'insurance:benefit'] };
+    }
+    if (decodedHash.includes('medical_records_agent')) {
+      console.log('✅ Found medical_records_agent in hash');
+      return { role: 'TASK_AGENT', scopes: ['records:aggregate', 'records:consent', 'records:share'] };
+    }
+    
+    // Legacy support for old agent types
     if (decodedHash.includes('banker')) {
-      console.log('✅ Found banker in hash');
-      return { role: 'Banker', scopes: ['bank:transfer', 'bank:balance'] };
+      console.log('✅ Found banker (legacy) in hash');
+      return { role: 'TASK_AGENT', scopes: ['bank:transfer', 'bank:balance'] };
     }
     if (decodedHash.includes('traveler')) {
-      console.log('✅ Found traveler in hash');
-      return { role: 'Traveler', scopes: ['travel:book', 'travel:cancel'] };
+      console.log('✅ Found traveler (legacy) in hash');
+      return { role: 'TASK_AGENT', scopes: ['travel:book', 'travel:cancel'] };
     }
     if (decodedHash.includes('shopper')) {
-      console.log('✅ Found shopper in hash');
-      return { role: 'Shopper', scopes: ['shop:purchase', 'shop:cart'] };
+      console.log('✅ Found shopper (legacy) in hash');
+      return { role: 'TASK_AGENT', scopes: ['shop:purchase', 'shop:cart'] };
     }
-    // Default
-    console.log('⚠️ No agent type found in hash, using default');
-    return { role: 'Agent', scopes: ['read'] };
+    
+    // Default - return valid TASK_AGENT role for demo (unless it's rogue)
+    console.log('⚠️ No specific agent type found in hash, using default TASK_AGENT');
+    return { role: 'TASK_AGENT', scopes: ['*'] };
   }
 
   /**
