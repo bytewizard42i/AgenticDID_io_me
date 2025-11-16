@@ -19,7 +19,7 @@
  * 5. Success/failure based on permissions
  */
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import MutualAuth from './components/MutualAuth';
@@ -88,6 +88,7 @@ export default function App() {
   const [arrowStyle] = useState<'gradient' | 'animated'>('gradient');
   const [animatingRA, setAnimatingRA] = useState<'blink' | 'glow' | null>(null);
   const [animatingTI, setAnimatingTI] = useState<'blink' | 'glow' | null>(null);
+  const actionPanelRef = useRef<HTMLDivElement>(null);
   const { speak, isSpeaking, isAvailable } = useSpeech();
 
   const addTimelineStep = (step: Omit<TimelineStep, 'timestamp'>) => {
@@ -127,6 +128,17 @@ export default function App() {
     setHighlightedBox(null);
     setAnimatingRA(null);
     setAnimatingTI(null);
+  };
+
+  const handleWorkflowCancel = () => {
+    handleClearData();
+  };
+
+  const handleNewAction = () => {
+    // Scroll to ActionPanel
+    if (actionPanelRef.current) {
+      actionPanelRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
   const handleAction = async (action: Action) => {
@@ -496,14 +508,16 @@ export default function App() {
           </div>
 
           {/* Step 2: Pick Action */}
-          <ActionPanel
-            onAction={handleAction}
-            onRogueAttempt={handleRogueAttempt}
-            onClearData={handleClearData}
-            disabled={isProcessing}
-            rogueMode={rogueMode}
-            selectedAction={selectedAction}
-          />
+          <div ref={actionPanelRef}>
+            <ActionPanel
+              onAction={handleAction}
+              onRogueAttempt={handleRogueAttempt}
+              onClearData={handleClearData}
+              disabled={isProcessing}
+              rogueMode={rogueMode}
+              selectedAction={selectedAction}
+            />
+          </div>
 
           {/* Registered Agents (RAs) - Always Visible */}
           <AgentSelector
@@ -541,6 +555,8 @@ export default function App() {
               animatingRA={animatingRA}
               animatingTI={animatingTI}
               isVerified={isVerified}
+              onCancel={handleWorkflowCancel}
+              onNewAction={handleNewAction}
             />
           )}
 

@@ -1,5 +1,5 @@
 import { Action, Agent } from '../agents';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, X, Plus } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 type ArrowStyle = 'gradient' | 'animated';
@@ -17,6 +17,8 @@ type Props = {
   animatingRA?: 'blink' | 'glow' | null;
   animatingTI?: 'blink' | 'glow' | null;
   isVerified?: boolean;
+  onCancel?: () => void;
+  onNewAction?: () => void;
 };
 
 export default function WorkflowVisualization({ 
@@ -27,7 +29,9 @@ export default function WorkflowVisualization({
   highlightedBox = null,
   animatingRA = null,
   animatingTI = null,
-  isVerified = false
+  isVerified = false,
+  onCancel,
+  onNewAction
 }: Props) {
   const [confettiPieces, setConfettiPieces] = useState<Array<{ id: number; left: number; delay: number; duration: number }>>([]);
   const workflowRef = useRef<HTMLDivElement>(null);
@@ -87,9 +91,28 @@ export default function WorkflowVisualization({
 
   return (
     <div ref={workflowRef} className="relative my-8 p-6 bg-midnight-950/50 rounded-xl border border-midnight-700">
-      <h3 className="text-xl font-bold text-midnight-100 mb-6 text-center">
-        🔄 Active Workflow
-      </h3>
+      {/* Header with Action Buttons */}
+      <div className="flex items-center justify-between mb-6">
+        <button
+          onClick={onCancel}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-900/20 hover:bg-red-900/40 border border-red-700 text-red-400 hover:text-red-300 transition-all"
+        >
+          <X className="w-4 h-4" />
+          <span className="text-sm font-semibold">Cancel</span>
+        </button>
+        
+        <h3 className="text-xl font-bold text-midnight-100 text-center flex-1">
+          🔄 Active Workflow
+        </h3>
+        
+        <button
+          onClick={onNewAction}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-cyan-900/20 hover:bg-cyan-900/40 border border-cyan-700 text-cyan-400 hover:text-cyan-300 transition-all"
+        >
+          <Plus className="w-4 h-4" />
+          <span className="text-sm font-semibold">New Action</span>
+        </button>
+      </div>
       
       {/* Horizontal Flow */}
       <div className="flex items-center justify-center gap-2 flex-wrap md:flex-nowrap">
