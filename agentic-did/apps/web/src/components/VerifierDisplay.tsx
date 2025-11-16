@@ -24,8 +24,8 @@ const TRUSTED_ISSUERS = Object.entries(AGENTS)
   .map(([key, agent]) => ({
     id: key,
     name: agent.issuerType ? `${agent.name} (TRUSTED ${agent.issuerType} ISSUER/VERIFIER)` : agent.name,
-    // Remove hand emojis from TI icons - TIs are organizations, not agents
-    icon: agent.icon.replace(/👋|🤚/g, '').trim(),
+    // Remove hand emojis from TI icons and add gavel on right - TIs are organizations, not agents
+    icon: `${agent.icon.replace(/👋|🤚/g, '').trim()}⚖️`,
     color: agent.color,
     category: agent.category,
     description: agent.description,

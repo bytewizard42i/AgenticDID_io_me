@@ -588,8 +588,8 @@ export default function App() {
               selectedAgent={AGENTS[workflowAgent]}
               selectedTI={{
                 name: AGENTS[workflowTI].name,
-                // Remove hand emojis from TI icon - TIs are organizations, not agents
-                icon: AGENTS[workflowTI].icon.replace(/👋|🤚/g, '').trim(),
+                // Remove hand emojis from TI icon and add gavel - TIs are organizations, not agents
+                icon: `${AGENTS[workflowTI].icon.replace(/👋|🤚/g, '').trim()}⚖️`,
                 color: AGENTS[workflowTI].color,
               }}
               arrowStyle={arrowStyle}
