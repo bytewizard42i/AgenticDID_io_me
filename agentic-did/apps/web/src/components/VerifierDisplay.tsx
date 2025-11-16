@@ -13,6 +13,8 @@ type Props = {
   isVerified: boolean;
   speak: (text: string, options?: SpeechOptions) => Promise<void>;
   listenInMode: boolean;
+  animatingTI?: AgentType | null;
+  animationType?: 'blink' | 'glow' | null;
 };
 
 // Generate TIs (Trusted Issuers) from AGENTS
@@ -30,7 +32,7 @@ const TRUSTED_ISSUERS = Object.entries(AGENTS)
     isTrustedService: agent.isTrustedService,
   }));
 
-export default function VerifierDisplay({ selectedAgent, isProcessing, isVerified, speak, listenInMode }: Props) {
+export default function VerifierDisplay({ selectedAgent, isProcessing, isVerified, speak, listenInMode, animatingTI, animationType }: Props) {
   const [showConfetti, setShowConfetti] = useState(false);
   const [confettiPieces, setConfettiPieces] = useState<Array<{ id: number; left: number; delay: number; duration: number }>>([]);
   const hasAnnouncedVerifying = useRef(false);
@@ -91,10 +93,19 @@ export default function VerifierDisplay({ selectedAgent, isProcessing, isVerifie
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {TRUSTED_ISSUERS.map((ti) => {
+          const isAnimating = animatingTI === ti.id;
+          const shouldBlink = isAnimating && animationType === 'blink';
+          const shouldGlow = isAnimating && animationType === 'glow';
+          
           return (
             <div
               key={ti.id}
-              className="p-5 rounded-lg border border-midnight-700 bg-midnight-900/50 hover:border-midnight-600 transition-all min-h-[140px] flex flex-col"
+              className={`p-5 rounded-lg border transition-all min-h-[140px] flex flex-col ${
+                shouldGlow
+                  ? 'border-purple-400 bg-midnight-800/50 shadow-[0_0_30px_rgba(168,85,247,0.6)]'
+                  : 'border-midnight-700 bg-midnight-900/50 hover:border-midnight-600'
+              }`}
+              style={shouldBlink ? { animation: 'border-blink 0.5s ease-in-out 3' } : undefined}
             >
               <div className="flex items-start gap-3 flex-1">
                 <span className="text-2xl flex-shrink-0">{ti.icon}</span>

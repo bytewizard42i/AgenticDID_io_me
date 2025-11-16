@@ -513,6 +513,8 @@ export default function App() {
             isVerified={isVerified}
             speak={speak}
             listenInMode={listenInMode}
+            animatingTI={workflowTI}
+            animationType={animatingTI}
           />
 
           {/* Workflow Visualization - Shows when action is selected */}
