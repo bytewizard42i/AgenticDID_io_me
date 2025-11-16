@@ -196,14 +196,16 @@ export default function App() {
 
       await sleep(1000);
     } else {
+      // Start RA blink animation immediately
+      setAnimatingRA('blink');
+      
       // Comet speaks: Analyzing request
       if (listenInMode) {
         await sleep(800); // Longer delay to fully initialize speech and prevent cutoff
         await speak("Hello, I'm Comet, your local agent. I'm analyzing your request and selecting the appropriate agent.", { rate: 1.1 });
-        
-        // Start RA blink animation
-        setAnimatingRA('blink');
         await sleep(1500); // Wait for speech to complete (3 blinks at 0.5s each)
+      } else {
+        await sleep(1500); // Time for 3 blinks at 0.5s each even without TTS
       }
     }
 
@@ -262,7 +264,7 @@ export default function App() {
       // Agent selection complete - make solid and change RA to glow
       setIsSelectingAgent(false);
       setAnimatingRA('glow');
-      await sleep(300);
+      await sleep(500);
 
       // Step 3: Present VP
       addTimelineStep({
@@ -275,6 +277,7 @@ export default function App() {
       // Start verifier flashing and TI blink animation
       setIsVerifyingWithVerifier(true);
       setAnimatingTI('blink');
+      await sleep(1500); // Time for 3 blinks at 0.5s each
 
       // Announce verifier is checking
       if (listenInMode && appropriateAgent !== 'rogue') {
@@ -296,6 +299,7 @@ export default function App() {
         // Verifier done - make solid only on success and change TI to glow
         setIsVerifyingWithVerifier(false);
         setAnimatingTI('glow');
+        await sleep(500); // Show glow before continuing
         
         updateTimelineStep('present', {
           status: 'success',
