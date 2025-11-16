@@ -156,6 +156,9 @@ export default function App() {
   };
 
   const handleNewAction = () => {
+    // Clear selected action so nothing is pre-selected
+    setSelectedAction(null);
+    
     // Scroll to ActionPanel
     if (actionPanelRef.current) {
       actionPanelRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
