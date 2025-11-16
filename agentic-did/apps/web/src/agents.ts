@@ -83,7 +83,7 @@ export const AGENTS: Record<AgentType, Agent> = {
     name: 'Bank of America Agent',
     role: 'TASK_AGENT' as const,
     scopes: ['bank:transfer', 'bank:balance', 'bank:statements'],
-    icon: '🏦',
+    icon: '🙌🏦🙌',
     color: 'text-green-400',
     description: 'Traditional banking - REGULATED_ENTITY verifier',
     category: 'task',
