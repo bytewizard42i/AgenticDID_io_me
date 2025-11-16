@@ -196,16 +196,20 @@ export default function App() {
 
       await sleep(1000);
     } else {
-      // Start RA blink animation immediately
-      setAnimatingRA('blink');
-      
       // Comet speaks: Analyzing request
       if (listenInMode) {
         await sleep(800); // Longer delay to fully initialize speech and prevent cutoff
-        await speak("Hello, I'm Comet, your local agent. I'm analyzing your request and selecting the appropriate agent.", { rate: 1.1 });
-        await sleep(1500); // Wait for speech to complete (3 blinks at 0.5s each)
+        await speak("Hello, I'm Comet, your local agent. I'm analyzing your request", { rate: 1.1 });
+        await sleep(500);
+        
+        // Start RA blink animation when saying "selecting the appropriate agent"
+        setAnimatingRA('blink');
+        await speak("and selecting the appropriate agent.", { rate: 1.1 });
+        await sleep(1500); // Wait for 3 blinks to complete
       } else {
-        await sleep(1500); // Time for 3 blinks at 0.5s each even without TTS
+        // Start RA blink immediately if no TTS
+        setAnimatingRA('blink');
+        await sleep(1500); // Time for 3 blinks at 0.5s each
       }
     }
 
@@ -274,23 +278,23 @@ export default function App() {
         message: 'Submitting proof bundle...',
       });
 
-      // Start verifier flashing and TI blink animation
+      // Start verifier flashing
       setIsVerifyingWithVerifier(true);
-      setAnimatingTI('blink');
-      await sleep(1500); // Time for 3 blinks at 0.5s each
 
       // Announce verifier is checking
       if (listenInMode && appropriateAgent !== 'rogue') {
-        const verifierNames: Record<string, string> = {
-          'banker': 'My Bank Trusted Verifier',
-          'traveler': 'My Airline Trusted Verifier',
-          'shopper': 'Amazon Trusted Verifier',
-        };
-        const verifierName = verifierNames[appropriateAgent];
-        if (verifierName) {
-          await speak(`${verifierName} is now verifying the zero-knowledge proof.`, { rate: 1.1, pitch: 0.9 });
-          await sleep(1500);
-        }
+        const agentName = AGENTS[appropriateAgent].name;
+        await speak(`${agentName} Trusted Issuer Verifier`, { rate: 1.1, pitch: 0.9 });
+        await sleep(300);
+        
+        // Start TI blink animation when saying "is now verifying"
+        setAnimatingTI('blink');
+        await speak(`is now verifying the zero-knowledge proof.`, { rate: 1.1, pitch: 0.9 });
+        await sleep(1500); // Time for 3 blinks to complete
+      } else {
+        // Start TI blink immediately if no TTS
+        setAnimatingTI('blink');
+        await sleep(1500); // Time for 3 blinks at 0.5s each
       }
 
       const presentation = await presentVP(vp, challenge.nonce);
