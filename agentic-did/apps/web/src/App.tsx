@@ -538,6 +538,9 @@ export default function App() {
               }}
               arrowStyle={arrowStyle}
               highlightedBox={highlightedBox}
+              animatingRA={animatingRA}
+              animatingTI={animatingTI}
+              isVerified={isVerified}
             />
           )}
 

@@ -1,6 +1,6 @@
 import { Action, Agent } from '../agents';
 import { ChevronRight } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 type ArrowStyle = 'gradient' | 'animated';
 
@@ -14,6 +14,9 @@ type Props = {
   };
   arrowStyle?: ArrowStyle;
   highlightedBox?: 'task' | 'agent' | 'ti' | null;
+  animatingRA?: 'blink' | 'glow' | null;
+  animatingTI?: 'blink' | 'glow' | null;
+  isVerified?: boolean;
 };
 
 export default function WorkflowVisualization({ 
@@ -21,8 +24,12 @@ export default function WorkflowVisualization({
   selectedAgent, 
   selectedTI,
   arrowStyle = 'gradient',
-  highlightedBox = null
+  highlightedBox = null,
+  animatingRA = null,
+  animatingTI = null,
+  isVerified = false
 }: Props) {
+  const [confettiPieces, setConfettiPieces] = useState<Array<{ id: number; left: number; delay: number; duration: number }>>([]);
   const workflowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -31,6 +38,25 @@ export default function WorkflowVisualization({
       workflowRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   }, []);
+
+  // Confetti effect when verified
+  useEffect(() => {
+    if (isVerified) {
+      const pieces = Array.from({ length: 30 }, (_, i) => ({
+        id: i,
+        left: Math.random() * 100,
+        delay: Math.random() * 500,
+        duration: 2000 + Math.random() * 1000,
+      }));
+      setConfettiPieces(pieces);
+      
+      const timer = setTimeout(() => {
+        setConfettiPieces([]);
+      }, 3500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isVerified]);
 
   const ArrowComponent = ({ style }: { style: ArrowStyle }) => {
     if (style === 'gradient') {
@@ -60,7 +86,7 @@ export default function WorkflowVisualization({
   };
 
   return (
-    <div ref={workflowRef} className="my-8 p-6 bg-midnight-950/50 rounded-xl border border-midnight-700">
+    <div ref={workflowRef} className="relative my-8 p-6 bg-midnight-950/50 rounded-xl border border-midnight-700">
       <h3 className="text-xl font-bold text-midnight-100 mb-6 text-center">
         🔄 Active Workflow
       </h3>
@@ -99,10 +125,13 @@ export default function WorkflowVisualization({
         <div className={`
           relative p-6 rounded-xl border-2 bg-midnight-900/50 min-w-[200px]
           transition-all duration-300
-          ${highlightedBox === 'agent' 
-            ? 'border-green-400 shadow-[0_0_30px_rgba(34,197,94,0.6)]' 
-            : 'border-midnight-600'}
-        `}>
+          ${animatingRA === 'glow'
+            ? 'border-green-400 shadow-[0_0_30px_rgba(34,197,94,0.6)]'
+            : highlightedBox === 'agent' 
+              ? 'border-green-400 shadow-[0_0_30px_rgba(34,197,94,0.6)]' 
+              : 'border-midnight-600'}
+        `}
+        style={animatingRA === 'blink' ? { animation: 'border-blink 0.5s ease-in-out 3' } : undefined}>
           <div className="text-center relative z-10">
             <div className="text-4xl mb-2">{selectedAgent.icon}</div>
             <p className={`text-sm font-semibold ${selectedAgent.color}`}>{selectedAgent.name}</p>
@@ -116,10 +145,13 @@ export default function WorkflowVisualization({
         <div className={`
           relative p-6 rounded-xl border-2 bg-midnight-900/50 min-w-[200px]
           transition-all duration-300
-          ${highlightedBox === 'ti' 
-            ? 'border-purple-400 shadow-[0_0_30px_rgba(168,85,247,0.6)]' 
-            : 'border-midnight-600'}
-        `}>
+          ${animatingTI === 'glow'
+            ? 'border-purple-400 shadow-[0_0_30px_rgba(168,85,247,0.6)]'
+            : highlightedBox === 'ti' 
+              ? 'border-purple-400 shadow-[0_0_30px_rgba(168,85,247,0.6)]' 
+              : 'border-midnight-600'}
+        `}
+        style={animatingTI === 'blink' ? { animation: 'border-blink 0.5s ease-in-out 3' } : undefined}>
           <div className="text-center relative z-10">
             <div className="text-4xl mb-2">{selectedTI.icon}</div>
             <p className={`text-sm font-semibold ${selectedTI.color}`}>{selectedTI.name}</p>
@@ -141,6 +173,25 @@ export default function WorkflowVisualization({
           </div>
         </div>
       </div>
+
+      {/* Confetti - positioned over workflow area */}
+      {confettiPieces.length > 0 && (
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          {confettiPieces.map((piece) => (
+            <div
+              key={piece.id}
+              className="absolute w-2 h-2 animate-confetti"
+              style={{
+                left: `${piece.left}%`,
+                top: '-10px',
+                backgroundColor: ['#60A5FA', '#34D399', '#A78BFA', '#F472B6', '#FBBF24'][piece.id % 5],
+                animationDelay: `${piece.delay}ms`,
+                animationDuration: `${piece.duration}ms`,
+              }}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
