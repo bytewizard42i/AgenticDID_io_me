@@ -351,26 +351,29 @@ export const ACTIONS: Action[] = [
  * Maps each action to its required agent and corresponding trusted issuer
  */
 export const WORKFLOW_MAPPING: Record<string, { agentKey: AgentType; tiKey: AgentType }> = {
-  // Financial Actions
-  'send_money': { agentKey: 'bank_agent', tiKey: 'bank_agent' },
-  'check_balance': { agentKey: 'bank_agent', tiKey: 'bank_agent' },
+  // Financial Actions - Banking
+  'bank_transfer': { agentKey: 'bank_agent', tiKey: 'bank_agent' },
+  
+  // Financial Actions - Crypto
   'crypto_trade': { agentKey: 'cex_agent', tiKey: 'cex_agent' },
   
   // E-commerce Actions
-  'buy_item': { agentKey: 'amazon_agent', tiKey: 'amazon_agent' },
-  'track_package': { agentKey: 'amazon_agent', tiKey: 'amazon_agent' },
+  'amazon_shop': { agentKey: 'amazon_agent', tiKey: 'amazon_agent' },
   
   // Travel Actions
   'book_flight': { agentKey: 'airline_agent', tiKey: 'airline_agent' },
-  'checkin_flight': { agentKey: 'airline_agent', tiKey: 'airline_agent' },
   
-  // Government Actions
+  // Government Actions - Voting
   'register_vote': { agentKey: 'voting_agent', tiKey: 'voting_agent' },
-  'cast_vote': { agentKey: 'voting_agent', tiKey: 'voting_agent' },
+  'cast_ballot': { agentKey: 'voting_agent', tiKey: 'voting_agent' },
   
-  // Healthcare Actions
+  // Healthcare Actions - Doctor
   'book_appointment': { agentKey: 'doctors_office_agent', tiKey: 'doctors_office_agent' },
+  
+  // Healthcare Actions - Hospital
   'hospital_admit': { agentKey: 'stanford_hospital_agent', tiKey: 'stanford_hospital_agent' },
+  
+  // Healthcare Actions - IVF
   'ivf_consultation': { agentKey: 'stanford_ivf_agent', tiKey: 'stanford_ivf_agent' },
   
   // Education Actions
@@ -379,5 +382,7 @@ export const WORKFLOW_MAPPING: Record<string, { agentKey: AgentType; tiKey: Agen
   
   // Insurance Actions
   'check_coverage': { agentKey: 'blue_cross_agent', tiKey: 'blue_cross_agent' },
+  
+  // Medical Records Actions
   'aggregate_records': { agentKey: 'medical_records_agent', tiKey: 'medical_records_agent' },
 };
