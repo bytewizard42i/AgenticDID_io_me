@@ -345,3 +345,39 @@ export const ACTIONS: Action[] = [
     icon: '📋',
   },
 ];
+
+/**
+ * Workflow Mapping: Action → Agent → TI
+ * Maps each action to its required agent and corresponding trusted issuer
+ */
+export const WORKFLOW_MAPPING: Record<string, { agentKey: AgentType; tiKey: AgentType }> = {
+  // Financial Actions
+  'send_money': { agentKey: 'bank_agent', tiKey: 'bank_agent' },
+  'check_balance': { agentKey: 'bank_agent', tiKey: 'bank_agent' },
+  'crypto_trade': { agentKey: 'cex_agent', tiKey: 'cex_agent' },
+  
+  // E-commerce Actions
+  'buy_item': { agentKey: 'amazon_agent', tiKey: 'amazon_agent' },
+  'track_package': { agentKey: 'amazon_agent', tiKey: 'amazon_agent' },
+  
+  // Travel Actions
+  'book_flight': { agentKey: 'airline_agent', tiKey: 'airline_agent' },
+  'checkin_flight': { agentKey: 'airline_agent', tiKey: 'airline_agent' },
+  
+  // Government Actions
+  'register_vote': { agentKey: 'voting_agent', tiKey: 'voting_agent' },
+  'cast_vote': { agentKey: 'voting_agent', tiKey: 'voting_agent' },
+  
+  // Healthcare Actions
+  'book_appointment': { agentKey: 'doctors_office_agent', tiKey: 'doctors_office_agent' },
+  'hospital_admit': { agentKey: 'stanford_hospital_agent', tiKey: 'stanford_hospital_agent' },
+  'ivf_consultation': { agentKey: 'stanford_ivf_agent', tiKey: 'stanford_ivf_agent' },
+  
+  // Education Actions
+  'view_transcript': { agentKey: 'stanford_college_agent', tiKey: 'stanford_college_agent' },
+  'enroll_course': { agentKey: 'stanford_college_agent', tiKey: 'stanford_college_agent' },
+  
+  // Insurance Actions
+  'check_coverage': { agentKey: 'blue_cross_agent', tiKey: 'blue_cross_agent' },
+  'aggregate_records': { agentKey: 'medical_records_agent', tiKey: 'medical_records_agent' },
+};

@@ -28,7 +28,8 @@ import VerifierDisplay from './components/VerifierDisplay';
 import ActionPanel from './components/ActionPanel';
 import Timeline, { TimelineStep } from './components/Timeline';
 import ResultBanner from './components/ResultBanner';
-import { AGENTS, AgentType, Action } from './agents';
+import WorkflowVisualization from './components/WorkflowVisualization';
+import { AGENTS, AgentType, Action, WORKFLOW_MAPPING } from './agents';
 import { getChallenge, presentVP } from './api';
 import { useSpeech } from './hooks/useSpeech';
 import { Volume2, VolumeX, Zap } from 'lucide-react';
@@ -80,12 +81,18 @@ export default function App() {
   const [rogueMode, setRogueMode] = useState(false);
   const [ipInfo, setIpInfo] = useState<any>(null);
   const [isVerified, setIsVerified] = useState(false);
+  const [showWorkflow, setShowWorkflow] = useState(false);
+  const [workflowAgent, setWorkflowAgent] = useState<AgentType | null>(null);
+  const [workflowTI, setWorkflowTI] = useState<AgentType | null>(null);
+  const [highlightedBox, setHighlightedBox] = useState<'task' | 'agent' | 'ti' | null>(null);
+  const [arrowStyle] = useState<'gradient' | 'animated'>('gradient');
   const { speak, isSpeaking, isAvailable } = useSpeech();
 
   const addTimelineStep = (step: Omit<TimelineStep, 'timestamp'>) => {
+    // Add to beginning for newest-on-top display
     setTimeline((prev) => [
-      ...prev,
       { ...step, timestamp: Date.now() },
+      ...prev,
     ]);
   };
 
@@ -112,21 +119,20 @@ export default function App() {
     setSelectedAction(null);
     setIsSelectingAgent(false);
     setIsVerifyingWithVerifier(false);
+    setShowWorkflow(false);
+    setWorkflowAgent(null);
+    setWorkflowTI(null);
+    setHighlightedBox(null);
   };
 
   const handleAction = async (action: Action) => {
     const startTime = Date.now();
     setSelectedAction(action);
 
-    // Auto-select the appropriate agent based on action
-    const actionToAgent: Record<string, AgentType> = {
-      'transfer': 'banker',
-      'shop': 'shopper',
-      'flight': 'traveler',
-    };
-
-    // If rogue mode is active, force rogue agent selection
-    const appropriateAgent = rogueMode ? 'rogue' : (actionToAgent[action.id] || 'banker');
+    // Auto-select the appropriate agent and TI based on action using workflow mapping
+    const workflow = WORKFLOW_MAPPING[action.id];
+    const appropriateAgent = rogueMode ? 'rogue' : (workflow?.agentKey || 'bank_agent');
+    const appropriateTI = workflow?.tiKey || 'bank_agent';
     
     setIsProcessing(true);
     setResult(null);
@@ -137,6 +143,15 @@ export default function App() {
     setIsSelectingAgent(true);
     setIsVerifyingWithVerifier(false);
     setSelectedAgent(appropriateAgent);
+    
+    // Show workflow visualization
+    setShowWorkflow(true);
+    setWorkflowAgent(appropriateAgent);
+    setWorkflowTI(appropriateTI);
+    setHighlightedBox('task');
+    
+    // Scroll to workflow after brief delay
+    await sleep(300);
 
     // If rogue mode, show warning
     if (rogueMode) {
@@ -487,6 +502,21 @@ export default function App() {
             speak={speak}
             listenInMode={listenInMode}
           />
+
+          {/* Workflow Visualization - Shows when action is selected */}
+          {showWorkflow && selectedAction && workflowAgent && workflowTI && (
+            <WorkflowVisualization
+              selectedAction={selectedAction}
+              selectedAgent={AGENTS[workflowAgent]}
+              selectedTI={{
+                name: AGENTS[workflowTI].name,
+                icon: AGENTS[workflowTI].icon,
+                color: AGENTS[workflowTI].color,
+              }}
+              arrowStyle={arrowStyle}
+              highlightedBox={highlightedBox}
+            />
+          )}
 
           {result && (
             <ResultBanner

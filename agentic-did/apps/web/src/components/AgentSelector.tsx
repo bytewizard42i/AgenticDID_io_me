@@ -41,19 +41,23 @@ export default function AgentSelector({ selectedAgent, onSelect, isProcessing }:
           .filter(([key, agent]) => !agent.isRogue || key === selectedAgent) // Show rogue only if selected
           .map(([key, agent], index) => {
           const isRogue = agent.isRogue;
+          const isLocked = key === 'comet' || key === 'agenticdid_agent';
           
           return (
             <button
               key={key}
-              onClick={() => onSelect(key as AgentType)}
+              onClick={() => !isLocked && onSelect(key as AgentType)}
+              disabled={isLocked}
               className={`p-4 rounded-lg border-2 transition-all text-left relative overflow-hidden ${
-                isRogue
-                  ? `border-red-900 bg-gradient-to-br from-red-950/40 to-black/60 hover:border-red-700 ${
-                      selectedAgent === key ? 'border-red-600 shadow-[0_0_30px_rgba(220,38,38,0.3)]' : 'shadow-[0_0_15px_rgba(220,38,38,0.15)]'
-                    }`
-                  : selectedAgent === key
-                    ? 'border-midnight-500 bg-midnight-800/50'
-                    : 'border-midnight-800 bg-midnight-900/30 hover:border-midnight-700'
+                isLocked
+                  ? 'border-yellow-300 bg-midnight-900/30 opacity-70 cursor-not-allowed shadow-[0_0_20px_rgba(253,224,71,0.5)]'
+                  : isRogue
+                    ? `border-red-900 bg-gradient-to-br from-red-950/40 to-black/60 hover:border-red-700 ${
+                        selectedAgent === key ? 'border-red-600 shadow-[0_0_30px_rgba(220,38,38,0.3)]' : 'shadow-[0_0_15px_rgba(220,38,38,0.15)]'
+                      }`
+                    : selectedAgent === key
+                      ? 'border-midnight-500 bg-midnight-800/50'
+                      : 'border-midnight-800 bg-midnight-900/30 hover:border-midnight-700'
               }`}
               style={
                 selectedAgent === key && isProcessing
@@ -65,6 +69,13 @@ export default function AgentSelector({ selectedAgent, onSelect, isProcessing }:
                   : undefined
               }
             >
+              {/* Locked indicator for comet and agenticdid_agent */}
+              {isLocked && (
+                <div className="absolute top-2 right-2 px-2 py-1 rounded bg-yellow-900/60 border border-yellow-300 text-xs text-yellow-300 font-bold shadow-[0_0_15px_rgba(253,224,71,0.6)] animate-pulse">
+                  🔒 Locked
+                </div>
+              )}
+              
               {/* Danger effects for rogue agent */}
               {isRogue && (
                 <>
