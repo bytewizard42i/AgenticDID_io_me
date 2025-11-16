@@ -23,7 +23,7 @@ const TRUSTED_ISSUERS = Object.entries(AGENTS)
   .filter(([_, agent]) => agent.category === 'issuer' || agent.isTrustedService === true)
   .map(([key, agent]) => ({
     id: key,
-    name: agent.issuerType ? `${agent.name} (TRUSTED ${agent.issuerType})` : agent.name,
+    name: agent.issuerType ? `${agent.name} (TRUSTED ${agent.issuerType} ISSUER/VERIFIER)` : agent.name,
     // Remove hand emojis from TI icons - TIs are organizations, not agents
     icon: agent.icon.replace(/👋|🤚/g, '').trim(),
     color: agent.color,
@@ -88,8 +88,8 @@ export default function VerifierDisplay({ selectedAgent, isProcessing, isVerifie
   // Always show TIs, even for rogue agent
   return (
     <div className="space-y-3 relative">
-      <h3 className="text-lg font-semibold text-midnight-200">Trusted Issuers (TIs)</h3>
-      <p className="text-sm text-midnight-400">Independent trusted issuers validate agent credentials using zero-knowledge proofs</p>
+      <h3 className="text-lg font-semibold text-midnight-200">Trusted Issuer/Verifiers (TIs)</h3>
+      <p className="text-sm text-midnight-400">Independent trusted issuer/verifiers validate agent credentials using zero-knowledge proofs</p>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {TRUSTED_ISSUERS.map((ti) => {

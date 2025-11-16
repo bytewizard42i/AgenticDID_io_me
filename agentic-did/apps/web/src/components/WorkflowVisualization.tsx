@@ -123,7 +123,7 @@ export default function WorkflowVisualization({
           <div className="text-center relative z-10">
             <div className="text-4xl mb-2">{selectedTI.icon}</div>
             <p className={`text-sm font-semibold ${selectedTI.color}`}>{selectedTI.name}</p>
-            <p className="text-xs text-midnight-400 mt-1">Trusted Verifier</p>
+            <p className="text-xs text-midnight-400 mt-1">Trusted Issuer/Verifier</p>
           </div>
         </div>
 
