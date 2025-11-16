@@ -29,6 +29,7 @@ import ActionPanel from './components/ActionPanel';
 import Timeline, { TimelineStep } from './components/Timeline';
 import ResultBanner from './components/ResultBanner';
 import WorkflowVisualization from './components/WorkflowVisualization';
+import TasksPromptBanner from './components/TasksPromptBanner';
 import { AGENTS, AgentType, Action, WORKFLOW_MAPPING } from './agents';
 import { getChallenge, presentVP } from './api';
 import { useSpeech } from './hooks/useSpeech';
@@ -90,6 +91,7 @@ export default function App() {
   const [animatingTI, setAnimatingTI] = useState<'blink' | 'glow' | null>(null);
   const actionPanelRef = useRef<HTMLDivElement>(null);
   const cancelledRef = useRef(false);
+  const [showTasksPrompt, setShowTasksPrompt] = useState(false);
   const { speak, isSpeaking, isAvailable } = useSpeech();
 
   const addTimelineStep = (step: Omit<TimelineStep, 'timestamp'>) => {
@@ -160,6 +162,21 @@ export default function App() {
     setSelectedAction(null);
     
     // Scroll to ActionPanel
+    if (actionPanelRef.current) {
+      actionPanelRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const handleShowTasksPrompt = () => {
+    setShowTasksPrompt(true);
+  };
+
+  const handleCloseTasksPrompt = () => {
+    setShowTasksPrompt(false);
+  };
+
+  const handleGoToTasks = () => {
+    setShowTasksPrompt(false);
     if (actionPanelRef.current) {
       actionPanelRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -571,6 +588,7 @@ export default function App() {
             isProcessing={isSelectingAgent}
             animatingAgent={workflowAgent}
             animationType={animatingRA}
+            onShowTasksPrompt={handleShowTasksPrompt}
           />
 
           {/* Trusted Issuers (TIs) - Always Visible */}
@@ -582,7 +600,16 @@ export default function App() {
             listenInMode={listenInMode}
             animatingTI={workflowTI}
             animationType={animatingTI}
+            onShowTasksPrompt={handleShowTasksPrompt}
           />
+
+          {/* Tasks Prompt Banner */}
+          {showTasksPrompt && (
+            <TasksPromptBanner
+              onClose={handleCloseTasksPrompt}
+              onGoToTasks={handleGoToTasks}
+            />
+          )}
 
           {/* Workflow Visualization - Shows when action is selected */}
           {showWorkflow && selectedAction && workflowAgent && workflowTI && (

@@ -7,9 +7,10 @@ type Props = {
   isProcessing: boolean;
   animatingAgent?: AgentType | null;
   animationType?: 'blink' | 'glow' | null;
+  onShowTasksPrompt?: () => void;
 };
 
-export default function AgentSelector({ selectedAgent, onSelect, isProcessing, animatingAgent, animationType }: Props) {
+export default function AgentSelector({ selectedAgent, onSelect, isProcessing, animatingAgent, animationType, onShowTasksPrompt }: Props) {
   const [glitchText, setGlitchText] = useState<Record<string, string>>({});
   
   useEffect(() => {
@@ -51,7 +52,15 @@ export default function AgentSelector({ selectedAgent, onSelect, isProcessing, a
           return (
             <button
               key={key}
-              onClick={() => !isLocked && onSelect(key as AgentType)}
+              onClick={() => {
+                if (isLocked) return;
+                // Show prompt if clicking on non-system agents (not comet/agenticdid)
+                if (key !== 'comet' && key !== 'agenticdid_agent' && onShowTasksPrompt) {
+                  onShowTasksPrompt();
+                } else {
+                  onSelect(key as AgentType);
+                }
+              }}
               disabled={isLocked}
               className={`p-4 rounded-lg border-2 transition-all text-left relative overflow-hidden ${
                 isLocked

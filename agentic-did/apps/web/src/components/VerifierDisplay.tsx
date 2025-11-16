@@ -15,6 +15,7 @@ type Props = {
   listenInMode: boolean;
   animatingTI?: AgentType | null;
   animationType?: 'blink' | 'glow' | null;
+  onShowTasksPrompt?: () => void;
 };
 
 // Generate TIs (Trusted Issuers) from AGENTS
@@ -32,7 +33,7 @@ const TRUSTED_ISSUERS = Object.entries(AGENTS)
     isTrustedService: agent.isTrustedService,
   }));
 
-export default function VerifierDisplay({ selectedAgent, isProcessing, isVerified, speak, listenInMode, animatingTI, animationType }: Props) {
+export default function VerifierDisplay({ selectedAgent, isProcessing, isVerified, speak, listenInMode, animatingTI, animationType, onShowTasksPrompt }: Props) {
   const [showConfetti, setShowConfetti] = useState(false);
   const [confettiPieces, setConfettiPieces] = useState<Array<{ id: number; left: number; delay: number; duration: number }>>([]);
   const hasAnnouncedVerifying = useRef(false);
@@ -98,9 +99,10 @@ export default function VerifierDisplay({ selectedAgent, isProcessing, isVerifie
           const shouldGlow = isAnimating && animationType === 'glow';
           
           return (
-            <div
+            <button
               key={ti.id}
-              className={`p-5 rounded-lg border transition-all min-h-[140px] flex flex-col ${
+              onClick={() => onShowTasksPrompt && onShowTasksPrompt()}
+              className={`p-5 rounded-lg border transition-all min-h-[140px] flex flex-col text-left cursor-pointer ${
                 shouldGlow
                   ? 'border-purple-400 bg-midnight-800/50 shadow-[0_0_30px_rgba(168,85,247,0.6)]'
                   : 'border-midnight-700 bg-midnight-900/50 hover:border-midnight-600'
@@ -132,7 +134,7 @@ export default function VerifierDisplay({ selectedAgent, isProcessing, isVerifie
                   </div>
                 </div>
               </div>
-            </div>
+            </button>
           );
         })}
       </div>
