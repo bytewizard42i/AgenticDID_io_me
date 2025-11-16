@@ -73,3 +73,15 @@
 .animate-confetti {
   animation: confetti 2s ease-in forwards;
 }
+
+/* Border blink animation for agent/TI selection - 3 blinks at 0.5s each */
+@keyframes border-blink {
+  0%, 49% {
+    border-color: rgb(34, 197, 94);
+    box-shadow: 0 0 30px rgba(34, 197, 94, 0.8);
+  }
+  50%, 100% {
+    border-color: rgba(34, 197, 94, 0.3);
+    box-shadow: 0 0 5px rgba(34, 197, 94, 0.2);
+  }
+}

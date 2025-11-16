@@ -86,6 +86,8 @@ export default function App() {
   const [workflowTI, setWorkflowTI] = useState<AgentType | null>(null);
   const [highlightedBox, setHighlightedBox] = useState<'task' | 'agent' | 'ti' | null>(null);
   const [arrowStyle] = useState<'gradient' | 'animated'>('gradient');
+  const [animatingRA, setAnimatingRA] = useState<'blink' | 'glow' | null>(null);
+  const [animatingTI, setAnimatingTI] = useState<'blink' | 'glow' | null>(null);
   const { speak, isSpeaking, isAvailable } = useSpeech();
 
   const addTimelineStep = (step: Omit<TimelineStep, 'timestamp'>) => {
@@ -123,6 +125,8 @@ export default function App() {
     setWorkflowAgent(null);
     setWorkflowTI(null);
     setHighlightedBox(null);
+    setAnimatingRA(null);
+    setAnimatingTI(null);
   };
 
   const handleAction = async (action: Action) => {
@@ -196,7 +200,10 @@ export default function App() {
       if (listenInMode) {
         await sleep(800); // Longer delay to fully initialize speech and prevent cutoff
         await speak("Hello, I'm Comet, your local agent. I'm analyzing your request and selecting the appropriate agent.", { rate: 1.1 });
-        await sleep(1500); // Wait for speech to complete
+        
+        // Start RA blink animation
+        setAnimatingRA('blink');
+        await sleep(1500); // Wait for speech to complete (3 blinks at 0.5s each)
       }
     }
 
@@ -252,8 +259,9 @@ export default function App() {
 
       await sleep(listenInMode ? 1500 : 100);
 
-      // Agent selection complete - make solid
+      // Agent selection complete - make solid and change RA to glow
       setIsSelectingAgent(false);
+      setAnimatingRA('glow');
       await sleep(300);
 
       // Step 3: Present VP
@@ -264,8 +272,9 @@ export default function App() {
         message: 'Submitting proof bundle...',
       });
 
-      // Start verifier flashing
+      // Start verifier flashing and TI blink animation
       setIsVerifyingWithVerifier(true);
+      setAnimatingTI('blink');
 
       // Announce verifier is checking
       if (listenInMode && appropriateAgent !== 'rogue') {
@@ -284,8 +293,9 @@ export default function App() {
       const presentation = await presentVP(vp, challenge.nonce);
 
       if (presentation.status === 200) {
-        // Verifier done - make solid only on success
+        // Verifier done - make solid only on success and change TI to glow
         setIsVerifyingWithVerifier(false);
+        setAnimatingTI('glow');
         
         updateTimelineStep('present', {
           status: 'success',
@@ -492,6 +502,8 @@ export default function App() {
             selectedAgent={selectedAgent || 'comet'}
             onSelect={setSelectedAgent}
             isProcessing={isSelectingAgent}
+            animatingAgent={workflowAgent}
+            animationType={animatingRA}
           />
 
           {/* Trusted Issuers (TIs) - Always Visible */}
@@ -510,7 +522,8 @@ export default function App() {
               selectedAgent={AGENTS[workflowAgent]}
               selectedTI={{
                 name: AGENTS[workflowTI].name,
-                icon: AGENTS[workflowTI].icon,
+                // Remove hand emojis from TI icon - TIs are organizations, not agents
+                icon: AGENTS[workflowTI].icon.replace(/👋|🤚/g, '').trim(),
                 color: AGENTS[workflowTI].color,
               }}
               arrowStyle={arrowStyle}

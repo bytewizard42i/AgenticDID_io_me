@@ -5,9 +5,11 @@ type Props = {
   selectedAgent: AgentType;
   onSelect: (agent: AgentType) => void;
   isProcessing: boolean;
+  animatingAgent?: AgentType | null;
+  animationType?: 'blink' | 'glow' | null;
 };
 
-export default function AgentSelector({ selectedAgent, onSelect, isProcessing }: Props) {
+export default function AgentSelector({ selectedAgent, onSelect, isProcessing, animatingAgent, animationType }: Props) {
   const [glitchText, setGlitchText] = useState<Record<string, string>>({});
   
   useEffect(() => {
@@ -42,6 +44,9 @@ export default function AgentSelector({ selectedAgent, onSelect, isProcessing }:
           .map(([key, agent], index) => {
           const isRogue = agent.isRogue;
           const isLocked = key === 'comet' || key === 'agenticdid_agent';
+          const isAnimating = animatingAgent === key;
+          const shouldBlink = isAnimating && animationType === 'blink';
+          const shouldGlow = isAnimating && animationType === 'glow';
           
           return (
             <button
@@ -51,22 +56,26 @@ export default function AgentSelector({ selectedAgent, onSelect, isProcessing }:
               className={`p-4 rounded-lg border-2 transition-all text-left relative overflow-hidden ${
                 isLocked
                   ? 'border-yellow-300 bg-midnight-900/30 opacity-70 cursor-not-allowed shadow-[0_0_20px_rgba(253,224,71,0.5)]'
-                  : isRogue
-                    ? `border-red-900 bg-gradient-to-br from-red-950/40 to-black/60 hover:border-red-700 ${
-                        selectedAgent === key ? 'border-red-600 shadow-[0_0_30px_rgba(220,38,38,0.3)]' : 'shadow-[0_0_15px_rgba(220,38,38,0.15)]'
-                      }`
-                    : selectedAgent === key
-                      ? 'border-midnight-500 bg-midnight-800/50'
-                      : 'border-midnight-800 bg-midnight-900/30 hover:border-midnight-700'
+                  : shouldGlow
+                    ? 'border-green-400 bg-midnight-800/50 shadow-[0_0_30px_rgba(34,197,94,0.6)]'
+                    : isRogue
+                      ? `border-red-900 bg-gradient-to-br from-red-950/40 to-black/60 hover:border-red-700 ${
+                          selectedAgent === key ? 'border-red-600 shadow-[0_0_30px_rgba(220,38,38,0.3)]' : 'shadow-[0_0_15px_rgba(220,38,38,0.15)]'
+                        }`
+                      : selectedAgent === key
+                        ? 'border-midnight-500 bg-midnight-800/50'
+                        : 'border-midnight-800 bg-midnight-900/30 hover:border-midnight-700'
               }`}
               style={
-                selectedAgent === key && isProcessing
-                  ? {
-                      animation: isRogue 
-                        ? 'blink-fast-red 0.5s ease-in-out infinite' 
-                        : 'blink-fast 0.5s ease-in-out infinite'
-                    }
-                  : undefined
+                shouldBlink
+                  ? { animation: 'border-blink 0.5s ease-in-out 3' }
+                  : selectedAgent === key && isProcessing
+                    ? {
+                        animation: isRogue 
+                          ? 'blink-fast-red 0.5s ease-in-out infinite' 
+                          : 'blink-fast 0.5s ease-in-out infinite'
+                      }
+                    : undefined
               }
             >
               {/* Locked indicator for comet and agenticdid_agent */}
