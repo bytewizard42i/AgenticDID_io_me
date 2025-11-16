@@ -472,25 +472,21 @@ export default function App() {
             selectedAction={selectedAction}
           />
 
-          {/* Step 3: See Selected Agent */}
-          {selectedAgent && (
-            <AgentSelector
-              selectedAgent={selectedAgent}
-              onSelect={setSelectedAgent}
-              isProcessing={isSelectingAgent}
-            />
-          )}
+          {/* Registered Agents (RAs) - Always Visible */}
+          <AgentSelector
+            selectedAgent={selectedAgent || 'comet'}
+            onSelect={setSelectedAgent}
+            isProcessing={isSelectingAgent}
+          />
 
-          {/* Step 4: Verifier Display */}
-          {selectedAgent && (
-            <VerifierDisplay
-              selectedAgent={selectedAgent}
-              isProcessing={isVerifyingWithVerifier}
-              isVerified={isVerified}
-              speak={speak}
-              listenInMode={listenInMode}
-            />
-          )}
+          {/* Trusted Issuers (TIs) - Always Visible */}
+          <VerifierDisplay
+            selectedAgent={selectedAgent || 'comet'}
+            isProcessing={isVerifyingWithVerifier}
+            isVerified={isVerified}
+            speak={speak}
+            listenInMode={listenInMode}
+          />
 
           {result && (
             <ResultBanner

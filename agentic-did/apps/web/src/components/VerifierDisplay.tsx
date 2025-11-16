@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
-import { AgentType } from '../agents';
-import { Shield, CheckCircle } from 'lucide-react';
+import { AGENTS, AgentType } from '../agents';
+import { Shield } from 'lucide-react';
 
 type SpeechOptions = {
   rate?: number;
@@ -15,37 +15,19 @@ type Props = {
   listenInMode: boolean;
 };
 
-type Verifier = {
-  id: string;
-  name: string;
-  icon: string;
-  color: string;
-  matchesAgent: AgentType[];
-};
-
-const VERIFIERS: Verifier[] = [
-  {
-    id: 'bank-verifier',
-    name: 'My Bank Trusted Verifier',
-    icon: '🏦',
-    color: 'text-green-400',
-    matchesAgent: ['banker'],
-  },
-  {
-    id: 'airline-verifier',
-    name: 'My Airline Trusted Verifier',
-    icon: '✈️',
-    color: 'text-blue-400',
-    matchesAgent: ['traveler'],
-  },
-  {
-    id: 'retail-verifier',
-    name: 'Amazon Trusted Verifier',
-    icon: '🛒',
-    color: 'text-purple-400',
-    matchesAgent: ['shopper'],
-  },
-];
+// Generate TIs (Trusted Issuers) from AGENTS
+// Include all issuers and trusted services
+const TRUSTED_ISSUERS = Object.entries(AGENTS)
+  .filter(([_, agent]) => agent.category === 'issuer' || agent.isTrustedService === true)
+  .map(([key, agent]) => ({
+    id: key,
+    name: agent.issuerType ? `${agent.name} (TRUSTED ${agent.issuerType})` : agent.name,
+    icon: agent.icon,
+    color: agent.color,
+    category: agent.category,
+    description: agent.description,
+    isTrustedService: agent.isTrustedService,
+  }));
 
 export default function VerifierDisplay({ selectedAgent, isProcessing, isVerified, speak, listenInMode }: Props) {
   const [showConfetti, setShowConfetti] = useState(false);
@@ -53,8 +35,8 @@ export default function VerifierDisplay({ selectedAgent, isProcessing, isVerifie
   const hasAnnouncedVerifying = useRef(false);
   const hasAnnouncedVerified = useRef(false);
 
-  // Find the matching verifier
-  const activeVerifier = VERIFIERS.find(v => v.matchesAgent.includes(selectedAgent));
+  // TIs are always shown, no longer need matching logic for active verifier
+  // All TIs are displayed at all times
 
   // Note: Verifier TTS is now called directly in App.tsx at the right moment
   // This useEffect is disabled to prevent timing conflicts
@@ -83,9 +65,9 @@ export default function VerifierDisplay({ selectedAgent, isProcessing, isVerifie
       setConfettiPieces(pieces);
 
       // Announce verification success
-      if (activeVerifier && listenInMode && !hasAnnouncedVerified.current) {
+      if (listenInMode && !hasAnnouncedVerified.current) {
         hasAnnouncedVerified.current = true;
-        speak(`${activeVerifier.name} has confirmed the proof is valid. Agent verified successfully!`, { rate: 1.1 });
+        speak(`Agent verified successfully by trusted issuers!`, { rate: 1.1 });
       }
 
       // Clear confetti after animation
@@ -98,72 +80,45 @@ export default function VerifierDisplay({ selectedAgent, isProcessing, isVerifie
     if (!isVerified) {
       hasAnnouncedVerified.current = false;
     }
-  }, [isVerified, isProcessing, activeVerifier, speak, listenInMode]);
+  }, [isVerified, isProcessing, speak, listenInMode]);
 
-  if (selectedAgent === 'rogue') {
-    return null; // Don't show verifiers for rogue agent
-  }
-
+  // Always show TIs, even for rogue agent
   return (
     <div className="space-y-3 relative">
-      <h3 className="text-lg font-semibold text-midnight-200">Zero-Knowledge Proof Verifiers</h3>
-      <p className="text-sm text-midnight-400">Independent verifiers validate agent credentials</p>
+      <h3 className="text-lg font-semibold text-midnight-200">Trusted Issuers (TIs)</h3>
+      <p className="text-sm text-midnight-400">Independent trusted issuers validate agent credentials using zero-knowledge proofs</p>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        {VERIFIERS.map((verifier) => {
-          const isActive = verifier.id === activeVerifier?.id;
-          const isVerifying = isActive && isProcessing;
-          const isComplete = isActive && isVerified && !isProcessing;
-
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        {TRUSTED_ISSUERS.map((ti) => {
           return (
             <div
-              key={verifier.id}
-              className={`p-4 rounded-lg border-2 transition-all text-left relative overflow-hidden ${
-                isActive
-                  ? 'border-midnight-500 bg-midnight-800/50'
-                  : 'border-midnight-800 bg-midnight-900/30 opacity-50'
-              }`}
-              style={
-                isVerifying
-                  ? {
-                      animation: 'blink-fast 0.5s ease-in-out infinite'
-                    }
-                  : undefined
-              }
+              key={ti.id}
+              className="p-5 rounded-lg border border-midnight-700 bg-midnight-900/50 hover:border-midnight-600 transition-all min-h-[140px] flex flex-col"
             >
-              {/* Checkmark when verified */}
-              {isComplete && (
-                <div className="absolute top-2 right-2">
-                  <CheckCircle className="w-6 h-6 text-green-400 animate-pulse" />
-                </div>
-              )}
-
-              <div className="flex items-center gap-3 mb-2">
-                <span className="text-3xl">{verifier.icon}</span>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <Shield className={`w-4 h-4 ${verifier.color}`} />
-                    <p className={`font-semibold ${verifier.color}`}>
-                      {verifier.name}
+              <div className="flex items-start gap-3 flex-1">
+                <span className="text-2xl flex-shrink-0">{ti.icon}</span>
+                <div className="flex-1 min-w-0 flex flex-col gap-2">
+                  <div className="flex items-start gap-2">
+                    <Shield className={`w-3 h-3 mt-0.5 ${ti.color} flex-shrink-0`} />
+                    <p className={`font-semibold text-sm ${ti.color} break-words leading-relaxed`}>
+                      {ti.name}
                     </p>
                   </div>
-                  <p className="text-xs text-midnight-400">
-                    {isVerifying ? 'Verifying ZKP...' : isComplete ? 'Verified ✓' : 'Standby'}
+                  <p className="text-xs text-midnight-400 break-words leading-relaxed">
+                    {ti.description}
                   </p>
-                </div>
-              </div>
-
-              {/* Status indicator */}
-              <div className="mt-2 text-xs">
-                {isActive && (
-                  <div className={`px-2 py-1 rounded ${
-                    isComplete 
-                      ? 'bg-green-950/50 border border-green-800 text-green-400'
-                      : 'bg-blue-950/50 border border-blue-800 text-blue-400'
-                  }`}>
-                    {isComplete ? '✓ Proof Valid' : isVerifying ? '⚡ Verifying...' : 'Selected'}
+                  <div className="flex items-center gap-2 mt-auto pt-1">
+                    {ti.category === 'issuer' ? (
+                      <span className="px-2 py-0.5 rounded text-xs bg-indigo-950/50 border border-indigo-800 text-indigo-400 whitespace-nowrap">
+                        Credential Issuer
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 rounded text-xs bg-green-950/50 border border-green-800 text-green-400 whitespace-nowrap">
+                        Trusted Service
+                      </span>
+                    )}
                   </div>
-                )}
+                </div>
               </div>
             </div>
           );

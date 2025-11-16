@@ -12,9 +12,19 @@ type Props = {
 
 export default function ActionPanel({ onAction, onRogueAttempt, onClearData, disabled, rogueMode, selectedAction }: Props) {
   return (
-    <div className="space-y-3">
-      <h3 className="text-lg font-semibold text-midnight-200">What do you want to do?</h3>
-      <p className="text-sm text-midnight-400">
+    <div className="space-y-4">
+      {/* Big Heading */}
+      <div className="text-center">
+        <h2 className="text-3xl md:text-4xl font-bold text-midnight-100 mb-2">
+          Enabled Tasks I can perform for you...
+        </h2>
+        <p className="text-lg text-midnight-300">
+          What do you want to do?
+        </p>
+      </div>
+      
+      {/* Status Message */}
+      <p className="text-sm text-midnight-400 text-center">
         {rogueMode ? (
           <span className="text-red-400 font-medium">⚠️ Rogue Mode Active - Now select an action to attempt</span>
         ) : (

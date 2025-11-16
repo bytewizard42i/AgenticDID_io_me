@@ -34,8 +34,8 @@ export default function AgentSelector({ selectedAgent, onSelect, isProcessing }:
   
   return (
     <div className="space-y-3">
-      <h3 className="text-lg font-semibold text-midnight-200">Agent Selected for This Action</h3>
-      <p className="text-sm text-midnight-400">The system automatically chose the appropriate authorized agent</p>
+      <h3 className="text-lg font-semibold text-midnight-200">Registered Agents (RAs)</h3>
+      <p className="text-sm text-midnight-400">All registered agents in the AgenticDID network. The system automatically selects the appropriate agent for each action.</p>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {Object.entries(AGENTS)
           .filter(([key, agent]) => !agent.isRogue || key === selectedAgent) // Show rogue only if selected
@@ -47,8 +47,6 @@ export default function AgentSelector({ selectedAgent, onSelect, isProcessing }:
               key={key}
               onClick={() => onSelect(key as AgentType)}
               className={`p-4 rounded-lg border-2 transition-all text-left relative overflow-hidden ${
-                index === 3 ? 'md:col-start-2' : ''
-              } ${
                 isRogue
                   ? `border-red-900 bg-gradient-to-br from-red-950/40 to-black/60 hover:border-red-700 ${
                       selectedAgent === key ? 'border-red-600 shadow-[0_0_30px_rgba(220,38,38,0.3)]' : 'shadow-[0_0_15px_rgba(220,38,38,0.15)]'

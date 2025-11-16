@@ -51,6 +51,7 @@ export type Agent = {
   category: 'local' | 'issuer' | 'task';
   isRogue?: boolean;
   isTrustedService?: boolean;
+  issuerType?: 'CORPORATION' | 'GOVERNMENT' | 'INSTITUTION';
 };
 
 export const AGENTS: Record<AgentType, Agent> = {
@@ -67,13 +68,14 @@ export const AGENTS: Record<AgentType, Agent> = {
 
   // ISSUER AGENT
   agenticdid_agent: {
-    name: 'AgenticDID Protocol Issuer Agent',
+    name: 'AgenticDID Protocol Agent',
     role: 'ISSUER_AGENT' as const,
     scopes: ['issuer:kyc', 'issuer:verify', 'issuer:issue'],
     icon: '🔮',
     color: 'text-indigo-400',
-    description: 'AgenticDID Foundation credential issuance agent',
+    description: 'AgenticDID Foundation - REGULATED_ENTITY credential issuer',
     category: 'issuer',
+    issuerType: 'CORPORATION',
   },
 
   // TASK AGENTS - Financial
@@ -83,55 +85,61 @@ export const AGENTS: Record<AgentType, Agent> = {
     scopes: ['bank:transfer', 'bank:balance', 'bank:statements'],
     icon: '🏦',
     color: 'text-green-400',
-    description: 'Authorized banking operations agent',
+    description: 'Traditional banking - REGULATED_ENTITY verifier',
     category: 'task',
     isTrustedService: true,
+    issuerType: 'CORPORATION',
   },
 
   cex_agent: {
-    name: 'CEX (Crypto Exchange) Agent',
+    name: 'Crypto Exchange Agent',
     role: 'TASK_AGENT' as const,
     scopes: ['crypto:trade', 'crypto:balance', 'crypto:withdraw'],
     icon: '₿',
     color: 'text-yellow-400',
-    description: 'Cryptocurrency exchange operations',
+    description: 'Cryptocurrency exchange - REGULATED_ENTITY verifier',
     category: 'task',
     isTrustedService: true,
+    issuerType: 'CORPORATION',
   },
 
   // TASK AGENTS - E-Commerce
   amazon_agent: {
-    name: 'Amazon Shopping Agent',
+    name: 'Amazon Shopping & Delivery Agent',
     role: 'TASK_AGENT' as const,
     scopes: ['shop:purchase', 'shop:cart', 'shop:track'],
     icon: '📦',
     color: 'text-orange-400',
-    description: 'Authorized Amazon e-commerce agent',
+    description: 'E-commerce marketplace - REGULATED_ENTITY verifier',
     category: 'task',
     isTrustedService: true,
+    issuerType: 'CORPORATION',
   },
 
   // TASK AGENTS - Travel
   airline_agent: {
-    name: 'Airline Booking Agent',
+    name: 'Airline Travel Services Agent',
     role: 'TASK_AGENT' as const,
     scopes: ['travel:book', 'travel:cancel', 'travel:checkin'],
     icon: '✈️',
     color: 'text-blue-400',
-    description: 'Flight booking and travel management',
+    description: 'Flight booking & travel - REGULATED_ENTITY verifier',
     category: 'task',
     isTrustedService: true,
+    issuerType: 'CORPORATION',
   },
 
   // TASK AGENTS - Government
   voting_agent: {
-    name: 'Ecuadorian Voting Agent',
+    name: 'Ecuadorian Election Authority Agent',
     role: 'TASK_AGENT' as const,
     scopes: ['voting:register', 'voting:cast', 'voting:verify'],
     icon: '🗳️',
     color: 'text-teal-400',
-    description: 'Government voter registration and ballot casting',
+    description: 'Government voting services - SYSTEM_CRITICAL verifier',
     category: 'task',
+    isTrustedService: true,
+    issuerType: 'GOVERNMENT',
   },
 
   // TASK AGENTS - Healthcare (Primary Care)
@@ -141,8 +149,10 @@ export const AGENTS: Record<AgentType, Agent> = {
     scopes: ['medical:appointment', 'medical:prescription', 'medical:records'],
     icon: '👨‍⚕️',
     color: 'text-cyan-400',
-    description: 'Primary care appointments and prescriptions',
+    description: 'Primary care medical services - REGULATED_ENTITY verifier',
     category: 'task',
+    isTrustedService: true,
+    issuerType: 'INSTITUTION',
   },
 
   // TASK AGENTS - Stanford Multi-Issuer Architecture
@@ -152,8 +162,10 @@ export const AGENTS: Record<AgentType, Agent> = {
     scopes: ['hospital:admit', 'hospital:surgery', 'hospital:emergency', 'hospital:records'],
     icon: '🏥',
     color: 'text-red-400',
-    description: 'Stanford Hospital - HIPAA-compliant acute care',
+    description: 'Acute care hospital - REGULATED_ENTITY verifier',
     category: 'task',
+    isTrustedService: true,
+    issuerType: 'INSTITUTION',
   },
 
   stanford_ivf_agent: {
@@ -162,41 +174,48 @@ export const AGENTS: Record<AgentType, Agent> = {
     scopes: ['ivf:consultation', 'ivf:treatment', 'ivf:embryo', 'ivf:pregnancy'],
     icon: '🤰',
     color: 'text-pink-400',
-    description: 'Stanford IVF - Specialized reproductive healthcare',
+    description: 'Specialized fertility care - REGULATED_ENTITY verifier',
     category: 'task',
+    isTrustedService: true,
+    issuerType: 'INSTITUTION',
   },
 
   stanford_college_agent: {
-    name: 'Stanford College Agent',
+    name: 'Stanford University Agent',
     role: 'TASK_AGENT' as const,
     scopes: ['education:transcript', 'education:enroll', 'education:degree', 'research:lab'],
     icon: '🎓',
     color: 'text-amber-400',
-    description: 'Stanford University - FERPA-compliant academic credentials',
+    description: 'Academic credentials & research - REGULATED_ENTITY verifier',
     category: 'task',
+    isTrustedService: true,
+    issuerType: 'INSTITUTION',
   },
 
   // TASK AGENTS - Health Insurance
   blue_cross_agent: {
-    name: 'Blue Cross Insurance Agent',
+    name: 'Blue Cross Blue Shield Agent',
     role: 'TASK_AGENT' as const,
     scopes: ['insurance:coverage', 'insurance:claim', 'insurance:benefit'],
     icon: '💙',
     color: 'text-blue-600',
-    description: 'Health insurance coverage and claims',
+    description: 'Health insurance - REGULATED_ENTITY verifier',
     category: 'task',
     isTrustedService: true,
+    issuerType: 'CORPORATION',
   },
 
   // TASK AGENTS - Medical Records Coordination
   medical_records_agent: {
-    name: 'Blue Cross Medical Records Coordinator',
+    name: 'Blue Cross Medical Records Agent',
     role: 'TASK_AGENT' as const,
     scopes: ['records:aggregate', 'records:consent', 'records:share'],
     icon: '📋',
     color: 'text-slate-400',
-    description: 'Cross-provider medical records coordination',
+    description: 'Medical records coordination - REGULATED_ENTITY verifier',
     category: 'task',
+    isTrustedService: true,
+    issuerType: 'CORPORATION',
   },
 
   // ROGUE AGENT (for demo purposes)
@@ -304,7 +323,7 @@ export const ACTIONS: Action[] = [
   },
   {
     id: 'enroll_course',
-    label: 'Enroll in Course',
+    label: 'My Diplomas and Certificates',
     requiredRole: 'TASK_AGENT',
     requiredScope: 'education:enroll',
     icon: '📚',
@@ -320,7 +339,7 @@ export const ACTIONS: Action[] = [
   },
   {
     id: 'aggregate_records',
-    label: 'Aggregate Medical Records',
+    label: 'Interact with Your Medical Records',
     requiredRole: 'TASK_AGENT',
     requiredScope: 'records:aggregate',
     icon: '📋',
