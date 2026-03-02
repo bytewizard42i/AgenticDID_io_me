@@ -1,0 +1,25 @@
+# Source control
+.git/
+.gitignore
+
+# Dependencies
+node_modules/
+
+# Documentation
+*.md
+docs/
+
+# IDE
+.vscode/
+.idea/
+
+# Compiled outputs (rebuild in container)
+compiled/
+build/
+dist/
+
+# Environment (use container env vars)
+.env*
+
+# Logs
+*.log

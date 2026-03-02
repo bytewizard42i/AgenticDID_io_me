@@ -1,0 +1,37 @@
+# Compiled contract outputs
+compiled/
+build/
+dist/
+
+# Dependencies
+node_modules/
+bun.lockb
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary
+.cache/
+.temp/
+.tmp/
+
+# ZK Keys (large files, regenerate as needed)
+*.prover
+*.verifier
+keys/
