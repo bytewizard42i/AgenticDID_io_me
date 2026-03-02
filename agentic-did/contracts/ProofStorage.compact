@@ -7,11 +7,11 @@
  * Built for: Google Cloud Run Hackathon + Midnight Network
  * Transparency: Verifiable audit trail while preserving privacy
  * 
- * Compact Version: Compiler v0.26.0, Language v0.18
- * Compiler: compactc_v0.26.0_x86_64-unknown-linux-musl
+ * Compact Version: Compiler v0.29.0, Language v0.21
+ * Compiler: compactc_v0.29.0
  */
 
-pragma language_version >= 0.16 && <= 0.18;
+pragma language_version >= 0.20;
 import CompactStandardLibrary;
   
 // ============================================================================

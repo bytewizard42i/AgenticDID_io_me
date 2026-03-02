@@ -50,7 +50,7 @@
 ### **1. File Header (REQUIRED)**
 
 ```compact
-pragma language_version 0.26;
+pragma language_version >= 0.20;
 import CompactStandardLibrary;
 ```
 
@@ -227,7 +227,7 @@ Address  // Correct
 
 1. **Add header** (line 1):
 ```compact
-pragma language_version 0.26;
+pragma language_version >= 0.20;
 import CompactStandardLibrary;
 ```
 

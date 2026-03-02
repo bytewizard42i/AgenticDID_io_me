@@ -328,7 +328,7 @@ export async function generateAuditReport(args: {
 
 ```compact
 // contracts/PolicyZ.compact
-pragma language_version >= 0.17.0;
+pragma language_version >= 0.20;
 import CompactStandardLibrary;
 
 ledger templates: Map<Bytes<32>, Template>;
@@ -406,7 +406,7 @@ export circuit recordConsent(
 
 ```compact
 // contracts/NotiZ.compact
-pragma language_version >= 0.17.0;
+pragma language_version >= 0.20;
 import CompactStandardLibrary;
 
 ledger eligibilityRoots: Map<Bytes<32>, EligibilityRoot>;
