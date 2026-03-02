@@ -1,0 +1,62 @@
+# Media Folder - Git Tracking Rules
+# ============================================================================
+# TRACK: Images (for documentation, diagrams, screenshots)
+# IGNORE: Videos (too large for git, use external storage)
+# ============================================================================
+
+# ============================================================================
+# IGNORE ALL VIDEO FILES
+# ============================================================================
+
+# Common video formats
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.wmv
+*.flv
+*.webm
+*.m4v
+*.mpeg
+*.mpg
+*.3gp
+*.ogv
+
+# Video project files
+*.prproj
+*.aep
+*.fcpproject
+
+# ============================================================================
+# TRACK IMAGES (explicitly allowed)
+# ============================================================================
+
+# The following are NOT ignored (will be tracked):
+# *.png
+# *.jpg
+# *.jpeg
+# *.gif
+# *.svg
+# *.webp
+# *.bmp
+# *.ico
+
+# ============================================================================
+# IGNORE LARGE/TEMPORARY FILES
+# ============================================================================
+
+# Photoshop/design files (optional - comment out if you want to track)
+*.psd
+*.ai
+*.sketch
+*.xd
+*.fig
+
+# Thumbnails
+Thumbs.db
+.DS_Store
+
+# Temporary files
+*.tmp
+*.temp
+~*

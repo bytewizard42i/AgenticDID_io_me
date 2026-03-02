@@ -1,0 +1,6 @@
+# This file keeps the videos/ directory in git
+# 
+# Videos themselves are gitignored, but we want the folder structure tracked.
+# 
+# Store demo videos here locally, but they won't be committed.
+# Use external hosting (YouTube, Vimeo, etc.) for sharing.
