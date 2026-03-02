@@ -339,16 +339,18 @@ spoofGen.start(); // Runs continuously in background
 - ✅ **Batch Processing**: Contract can optimize spoof handling
 
 **Optimization Strategies:**
+
+> **⚠️ DESIGN NOTE**: The original pseudocode below showed an `isSpoof` parameter being passed to the contract. This is a **fundamental design flaw** — if the contract can distinguish spoof from real, so can any observer watching the transactions. The actual implementation in `CredentialVerifier.compact` treats ALL verification queries identically (no `isSpoof` flag). Spoof optimization should happen **client-side only** (e.g., client skips parsing the result for spoof queries, but the on-chain transaction looks identical).
+
 ```typescript
-// Contract-side optimization
-public function verifyAgent(agentDID: String, isSpoof: Boolean): Boolean {
-  // Spoof queries skip expensive checks
-  if (isSpoof) {
-    return false; // Immediate return, no state read
-  }
+// CLIENT-SIDE optimization (contract sees identical queries)
+async function verifyWithSpoofs(agentDID: string, isSpoof: boolean) {
+  // Contract call is IDENTICAL for spoof and real
+  const result = await midnightContract.verifyAgent(agentDID);
   
-  // Real queries perform full verification
-  return this.performFullVerification(agentDID);
+  // Only the CLIENT decides whether to use the result
+  if (isSpoof) return; // Discard result
+  return result;       // Use result
 }
 ```
 
@@ -389,7 +391,18 @@ Contract → BOA: ZK Proof (no logging, no tracking)
 
 ### **Midnight Contract Implementation**
 
-```compact
+> **⚠️ IMPORTANT**: The pseudocode below is **conceptual/illustrative only** and does NOT use valid Compact syntax. The actual, compiler-verified contracts live in `contracts/AgenticDIDRegistry.compact`, `contracts/CredentialVerifier.compact`, and `contracts/ProofStorage.compact`. Key differences from this pseudocode:
+> - Compact uses `ledger` for state (not `private`/`public` keywords)
+> - `export circuit` instead of `public function`
+> - `assert()` instead of `require()`
+> - `Bytes<32>` instead of `String`; `Uint<64>` instead of `UInt64`
+> - `[]` instead of `Void` for unit return
+> - `.member()` / `.insert()` / `.lookup()` instead of `.has()` / `.set()` / `.get()`
+> - `disclose()` required for witness-derived values flowing to public state
+
+```
+// CONCEPTUAL PSEUDOCODE — NOT VALID COMPACT
+// See contracts/ directory for actual implementation
 circuit AgenticDIDRegistry {
   // PRIVATE STATE - never exposed externally
   private agentDIDs: Map<String, AgentRecord>;
