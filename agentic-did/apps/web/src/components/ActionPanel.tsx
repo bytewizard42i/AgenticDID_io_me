@@ -1,5 +1,25 @@
 import { ACTIONS, Action } from '../agents';
-import { AlertTriangle, RotateCcw } from 'lucide-react';
+import {
+  AlertTriangle, RotateCcw, DollarSign, Bitcoin, Headphones,
+  Plane, ClipboardEdit, Vote, Stethoscope, Building2, Baby,
+  ScrollText, BookOpen, HeartPulse, ClipboardList,
+} from 'lucide-react';
+
+const ACTION_ICONS: Record<string, typeof DollarSign> = {
+  bank_transfer: DollarSign,
+  crypto_trade: Bitcoin,
+  amazon_shop: Headphones,
+  book_flight: Plane,
+  register_vote: ClipboardEdit,
+  cast_ballot: Vote,
+  book_appointment: Stethoscope,
+  hospital_admit: Building2,
+  ivf_consultation: Baby,
+  view_transcript: ScrollText,
+  enroll_course: BookOpen,
+  check_coverage: HeartPulse,
+  aggregate_records: ClipboardList,
+};
 
 type Props = {
   onAction: (action: Action) => void;
@@ -54,7 +74,7 @@ export default function ActionPanel({ onAction, onRogueAttempt, onClearData, dis
                     : 'border-midnight-700 bg-midnight-900/30 hover:bg-midnight-800/50 hover:border-midnight-600'
             }`}
           >
-            <div className="text-4xl mb-3">{action.icon}</div>
+            {(() => { const Icon = ACTION_ICONS[action.id]; return Icon ? <Icon className="w-9 h-9 mb-3 text-midnight-300" /> : <div className="text-4xl mb-3">{action.icon}</div>; })()}
             <p className="font-semibold text-white mb-1">{action.label}</p>
             <p className="text-xs text-midnight-400">
               Requires: {action.requiredRole}
