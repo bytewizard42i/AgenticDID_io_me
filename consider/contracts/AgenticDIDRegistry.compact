@@ -67,6 +67,18 @@ ledger authorizedIssuers: Map<ContractAddress, Boolean>;
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
+ * Verification Result
+ * 
+ * BREADCRUMB: Return type for verifyAgent circuit
+ * Compact does not support anonymous struct return types
+ */
+struct VerificationResult {
+  valid: Boolean;
+  role: Bytes<32>;
+  scopes: Bytes<256>;
+}
+
+/**
  * Agent Credential
  * 
  * BREADCRUMB: Everything we store about an agent on-chain
@@ -232,7 +244,7 @@ export circuit registerAgent(
     scopes: scopes,
     issuer: caller,
     issuedAt: currentTime,
-    expiresAt: currentTime + duration,  // Calculate expiration
+    expiresAt: (currentTime + duration) as Uint<64>,  // Calculate expiration
     merkleCommitment: merkleCommitment
   };
   
@@ -280,7 +292,7 @@ export circuit registerAgent(
 export circuit verifyAgent(
   agentPID: Bytes<32>,
   currentTime: Uint<64>
-): {valid: Boolean, role: Bytes<32>, scopes: Bytes<256>} {
+): VerificationResult {
   // ┌─────────────────────────────────────────────────────────┐
   // │ STEP 1: Check if Agent Exists                            │
   // └─────────────────────────────────────────────────────────┘
@@ -288,10 +300,10 @@ export circuit verifyAgent(
   // BREADCRUMB: Does this agent exist in our registry?
   if (!agents.member(disclose(agentPID))) {
     // Agent not found - return invalid
-    return {
+    return VerificationResult {
       valid: false,
-      role: Bytes<32>::zero(),
-      scopes: Bytes<256>::zero()
+      role: pad(32, ""),
+      scopes: pad(256, "")
     };
   }
   
@@ -310,10 +322,10 @@ export circuit verifyAgent(
   const isRevoked = revocations.lookup(disclose(agentPID));
   if (isRevoked) {
     // Credential was revoked - deny!
-    return {
+    return VerificationResult {
       valid: false,
       role: credential.role,
-      scopes: Bytes<256>::zero()  // No permissions!
+      scopes: pad(256, "")  // No permissions!
     };
   }
   
@@ -324,10 +336,10 @@ export circuit verifyAgent(
   // BREADCRUMB: Is this credential still valid time-wise?
   if (currentTime > credential.expiresAt) {
     // Credential expired - deny!
-    return {
+    return VerificationResult {
       valid: false,
       role: credential.role,
-      scopes: Bytes<256>::zero()
+      scopes: pad(256, "")
     };
   }
   
@@ -336,7 +348,7 @@ export circuit verifyAgent(
   // └─────────────────────────────────────────────────────────┘
   
   // BREADCRUMB: Agent is valid! Return their role and permissions
-  return {
+  return VerificationResult {
     valid: true,
     role: credential.role,
     scopes: credential.scopes
@@ -421,13 +433,13 @@ export circuit getAgentInfo(
   if (!agents.member(disclose(agentPID))) {
     // Return empty/zero credential
     return AgentCredential {
-      agentPID: Bytes<32>::zero(),
-      role: Bytes<32>::zero(),
-      scopes: Bytes<256>::zero(),
-      issuer: ContractAddress::zero(),
-      issuedAt: Uint<64>::zero(),
-      expiresAt: Uint<64>::zero(),
-      merkleCommitment: Bytes<32>::zero()
+      agentPID: pad(32, ""),
+      role: pad(32, ""),
+      scopes: pad(256, ""),
+      issuer: ContractAddress { bytes: pad(32, "") },
+      issuedAt: 0,
+      expiresAt: 0,
+      merkleCommitment: pad(32, "")
     };
   }
   

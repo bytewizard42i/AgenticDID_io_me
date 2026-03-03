@@ -24,7 +24,7 @@ ledger delegations: Map<Bytes<32>, Delegation>;
 ledger totalAgents: Uint<64>;
 ledger totalDelegations: Uint<64>;
 ledger contractOwner: ContractAddress;
-ledger revocationBitmap: Uint<254>;  // Bitmap for revoked agents (max 256 agents)
+ledger revocationBitmap: Uint<248>;  // Bitmap for revoked agents (max width 248)
   
   // ============================================================================
   // DATA STRUCTURES
