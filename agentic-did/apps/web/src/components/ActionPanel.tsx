@@ -1,25 +1,6 @@
 import { ACTIONS, Action } from '../agents';
-import {
-  AlertTriangle, RotateCcw, DollarSign, Bitcoin, Headphones,
-  Plane, ClipboardEdit, Vote, Stethoscope, Building2, Baby,
-  ScrollText, BookOpen, HeartPulse, ClipboardList,
-} from 'lucide-react';
-
-const ACTION_ICONS: Record<string, typeof DollarSign> = {
-  bank_transfer: DollarSign,
-  crypto_trade: Bitcoin,
-  amazon_shop: Headphones,
-  book_flight: Plane,
-  register_vote: ClipboardEdit,
-  cast_ballot: Vote,
-  book_appointment: Stethoscope,
-  hospital_admit: Building2,
-  ivf_consultation: Baby,
-  view_transcript: ScrollText,
-  enroll_course: BookOpen,
-  check_coverage: HeartPulse,
-  aggregate_records: ClipboardList,
-};
+import { AlertTriangle, RotateCcw } from 'lucide-react';
+import { ACTION_ICONS } from '../utils/agentIcons';
 
 type Props = {
   onAction: (action: Action) => void;

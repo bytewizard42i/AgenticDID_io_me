@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { AGENTS, AgentType } from '../agents';
 import { Shield } from 'lucide-react';
+import { TrustedIssuerIcon } from '../utils/agentIcons';
 
 type SpeechOptions = {
   rate?: number;
@@ -25,8 +26,8 @@ const TRUSTED_ISSUERS = Object.entries(AGENTS)
   .map(([key, agent]) => ({
     id: key,
     name: agent.issuerType ? `${agent.name} (TRUSTED ${agent.issuerType} ISSUER/VERIFIER)` : agent.name,
-    // Remove hand emojis from TI icons and add gavel on right - TIs are organizations, not agents
-    icon: `${agent.icon.replace(/👋|🤚/g, '').trim()}⚖️`,
+    // Icon handled by TrustedIssuerIcon component via agentKey
+    icon: key,
     color: agent.color,
     category: agent.category,
     description: agent.description,
@@ -110,7 +111,7 @@ export default function VerifierDisplay({ selectedAgent, isProcessing, isVerifie
               style={shouldBlink ? { animation: 'border-blink 0.5s ease-in-out 3' } : undefined}
             >
               <div className="flex items-start gap-3 flex-1">
-                <span className="text-2xl flex-shrink-0">{ti.icon}</span>
+                <span className="text-2xl flex-shrink-0"><TrustedIssuerIcon agentKey={ti.icon} className="w-6 h-6" /></span>
                 <div className="flex-1 min-w-0 flex flex-col gap-2">
                   <div className="flex items-start gap-2">
                     <Shield className={`w-3 h-3 mt-0.5 ${ti.color} flex-shrink-0`} />

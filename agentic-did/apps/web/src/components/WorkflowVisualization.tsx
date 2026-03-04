@@ -1,6 +1,7 @@
 import { Action, Agent } from '../agents';
-import { ChevronRight, X, Plus } from 'lucide-react';
+import { ChevronRight, X, Plus, Sparkles } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { ACTION_ICONS, AGENT_ICONS, TrustedIssuerIcon } from '../utils/agentIcons';
 
 type ArrowStyle = 'gradient' | 'animated';
 
@@ -12,6 +13,8 @@ type Props = {
     icon: string;
     color: string;
   };
+  agentKey?: string;
+  tiKey?: string;
   arrowStyle?: ArrowStyle;
   highlightedBox?: 'task' | 'agent' | 'ti' | null;
   animatingRA?: 'blink' | 'glow' | null;
@@ -31,7 +34,9 @@ export default function WorkflowVisualization({
   animatingTI = null,
   isVerified = false,
   onCancel,
-  onNewAction
+  onNewAction,
+  agentKey,
+  tiKey
 }: Props) {
   const [confettiPieces, setConfettiPieces] = useState<Array<{ id: number; left: number; delay: number; duration: number }>>([]);
   const workflowRef = useRef<HTMLDivElement>(null);
@@ -138,7 +143,7 @@ export default function WorkflowVisualization({
           </div>
           
           <div className="text-center relative z-10">
-            <div className="text-4xl mb-2">{selectedAction.icon}</div>
+            {(() => { const Icon = ACTION_ICONS[selectedAction.id]; return Icon ? <Icon className="w-10 h-10 mb-2 text-cyan-300 mx-auto" /> : <div className="text-4xl mb-2">{selectedAction.icon}</div>; })()}
             <p className="text-sm font-semibold text-cyan-300">{selectedAction.label}</p>
             <p className="text-xs text-midnight-400 mt-1">Selected Task</p>
           </div>
@@ -158,7 +163,7 @@ export default function WorkflowVisualization({
         `}
         style={animatingRA === 'blink' ? { animation: 'border-blink 0.5s ease-in-out 3' } : undefined}>
           <div className="text-center relative z-10">
-            <div className="text-4xl mb-2">{selectedAgent.icon}</div>
+            {(() => { const Icon = agentKey ? AGENT_ICONS[agentKey] : null; return Icon ? <Icon className={`w-10 h-10 mb-2 mx-auto ${selectedAgent.color}`} /> : <div className="text-4xl mb-2">{selectedAgent.icon}</div>; })()}
             <p className={`text-sm font-semibold ${selectedAgent.color}`}>{selectedAgent.name}</p>
             <p className="text-xs text-midnight-400 mt-1">Auto-Selected Agent</p>
           </div>
@@ -178,7 +183,7 @@ export default function WorkflowVisualization({
         `}
         style={animatingTI === 'blink' ? { animation: 'border-blink 0.5s ease-in-out 3' } : undefined}>
           <div className="text-center relative z-10">
-            <div className="text-4xl mb-2">{selectedTI.icon}</div>
+            {tiKey ? <div className="mb-2 flex justify-center"><TrustedIssuerIcon agentKey={tiKey} className="w-8 h-8" /></div> : <div className="text-4xl mb-2">{selectedTI.icon}</div>}
             <p className={`text-sm font-semibold ${selectedTI.color}`}>{selectedTI.name}</p>
             <p className="text-xs text-midnight-400 mt-1">Trusted Issuer/Verifier</p>
           </div>
@@ -189,7 +194,7 @@ export default function WorkflowVisualization({
       {/* Comet Explanation Area */}
       <div className="mt-6 p-4 bg-midnight-900/30 rounded-lg border border-midnight-700">
         <div className="flex items-start gap-3">
-          <div className="text-3xl">☄️</div>
+          <Sparkles className="w-8 h-8 text-purple-400 flex-shrink-0" />
           <div className="flex-1">
             <p className="text-sm font-semibold text-purple-300 mb-1">Comet AI Assistant</p>
             <p className="text-sm text-midnight-300" id="comet-speech">

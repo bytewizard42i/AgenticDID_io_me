@@ -1,4 +1,4 @@
-import { X, ArrowDown } from 'lucide-react';
+import { X, ArrowDown, Sparkles } from 'lucide-react';
 
 type Props = {
   onClose: () => void;
@@ -16,7 +16,7 @@ export default function TasksPromptBanner({ onClose, onGoToTasks }: Props) {
           
           <div className="flex-1">
             <h3 className="text-lg font-bold text-cyan-100 mb-2">
-              ☄️ Comet says: Start with a Task!
+              <Sparkles className="w-5 h-5 inline text-purple-300" /> Comet says: Start with a Task!
             </h3>
             <p className="text-sm text-cyan-200 mb-4">
               No need to select agents or verifiers manually! Just <strong>choose what you want to do</strong> from the Tasks area below, and I'll automatically select the right agent and verifier for you. 🎯

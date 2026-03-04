@@ -1,5 +1,6 @@
 import { AGENTS, AgentType } from '../agents';
 import { useState, useEffect } from 'react';
+import { AGENT_ICONS } from '../utils/agentIcons';
 
 type Props = {
   selectedAgent: AgentType;
@@ -116,7 +117,7 @@ export default function AgentSelector({ selectedAgent, onSelect, isProcessing, a
               )}
               
               <div className="flex items-center gap-3 mb-2 relative z-10">
-                <span className={`text-3xl ${isRogue ? 'animate-pulse' : ''}`}>{agent.icon}</span>
+                {(() => { const Icon = AGENT_ICONS[key]; return Icon ? <Icon className={`w-8 h-8 ${agent.color} ${isRogue ? 'animate-pulse' : ''}`} /> : <span className={`text-3xl ${isRogue ? 'animate-pulse' : ''}`}>{agent.icon}</span>; })()}
                 <div className="flex-1">
                   <p className={`font-semibold ${agent.color} ${isRogue ? 'font-mono tracking-wide' : ''}`}>
                     {isRogue ? (glitchText.rogue || agent.name) : agent.name}
