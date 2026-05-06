@@ -42,7 +42,7 @@ export default function AgentSelector({ selectedAgent, onSelect, isProcessing, a
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {Object.entries(AGENTS)
           .filter(([key, agent]) => !agent.isRogue || key === selectedAgent) // Show rogue only if selected
-          .map(([key, agent], index) => {
+          .map(([key, agent]) => {
           const isRogue = agent.isRogue;
           const isLocked = key === 'comet' || key === 'agenticdid_agent';
           const isAnimating = animatingAgent === key;

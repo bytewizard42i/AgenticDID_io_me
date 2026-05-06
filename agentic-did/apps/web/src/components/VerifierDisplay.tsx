@@ -33,10 +33,9 @@ const TRUSTED_ISSUERS = Object.entries(AGENTS)
     isTrustedService: agent.isTrustedService,
   }));
 
-export default function VerifierDisplay({ selectedAgent, isProcessing, isVerified, speak, listenInMode, animatingTI, animationType, onShowTasksPrompt }: Props) {
+export default function VerifierDisplay({ isProcessing, isVerified, speak, listenInMode, animatingTI, animationType, onShowTasksPrompt }: Props) {
   const [showConfetti, setShowConfetti] = useState(false);
   const [confettiPieces, setConfettiPieces] = useState<Array<{ id: number; left: number; delay: number; duration: number }>>([]);
-  const hasAnnouncedVerifying = useRef(false);
   const hasAnnouncedVerified = useRef(false);
 
   // TIs are always shown, no longer need matching logic for active verifier

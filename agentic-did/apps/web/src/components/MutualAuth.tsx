@@ -31,7 +31,7 @@ type Props = {
 export default function MutualAuth({ speak, listenInMode }: Props) {
   const [authState, setAuthState] = useState<'idle' | 'authenticating' | 'authenticated' | 'failed'>('idle');
   const [authSteps, setAuthSteps] = useState<AuthStep[]>([]);
-  const [authMethod, setAuthMethod] = useState<'biometric' | 'totp' | null>(null);
+  const [, setAuthMethod] = useState<'biometric' | 'totp' | null>(null);
   const [showZkpProof, setShowZkpProof] = useState(false);
   const [showProofLog, setShowProofLog] = useState(false);
 

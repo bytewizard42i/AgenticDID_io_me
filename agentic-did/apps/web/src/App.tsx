@@ -92,7 +92,7 @@ export default function App() {
   const actionPanelRef = useRef<HTMLDivElement>(null);
   const cancelledRef = useRef(false);
   const [showTasksPrompt, setShowTasksPrompt] = useState(false);
-  const { speak, isSpeaking, isAvailable } = useSpeech();
+  const { speak, isAvailable } = useSpeech();
 
   const addTimelineStep = (step: Omit<TimelineStep, 'timestamp'>) => {
     // Add to beginning for newest-on-top display
@@ -389,11 +389,11 @@ export default function App() {
           await sleep(1500); // Wait for verifier TTS to announce
 
           // Agent-specific connection messages
-          if (appropriateAgent === 'banker') {
+          if (appropriateAgent === 'bank_agent') {
             await speak(`Connected to your bank agent and verified.`, { rate: 1.1, pitch: 0.9 });
-          } else if (appropriateAgent === 'traveler') {
+          } else if (appropriateAgent === 'airline_agent') {
             await speak(`Connected to your airline and verified.`, { rate: 1.1, pitch: 0.9 });
-          } else if (appropriateAgent === 'shopper') {
+          } else if (appropriateAgent === 'amazon_agent') {
             await speak(`Connected to verified Amazon agent.`, { rate: 1.1, pitch: 0.9 });
           }
           await sleep(2000); // Wait for verifier completion TTS
