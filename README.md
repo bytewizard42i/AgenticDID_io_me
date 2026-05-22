@@ -33,6 +33,24 @@ AgenticDID gives every participant — human, AI agent, or smart object — a **
 - **Spoof transaction system** — 80% noise queries make it impossible for adversaries to distinguish real verifications
 - **Listen In Mode** — toggle transparency to hear agent-to-agent communications in real-time
 
+## Position in the DIDz Substrate
+
+AgenticDID is the **Agent tier** of the [DIDz](https://github.com/bytewizard42i/didz-dapp-system) polymorphic identity substrate. DIDz is the universal foundation; each subject type plugs in as a tier on the same registry and trusted-issuer machinery.
+
+| Tier | Subject | Vertical |
+|------|---------|----------|
+| **Human** | Individual people | DIDz.io, KYCz |
+| **Organization** | Businesses, institutions, governments | DIDz.io org tier |
+| **Agent** | Autonomous Ai agents | **AgenticDID** *(this repo)* |
+| **Animal** | Living non-human subjects | PetProData, EquinePro |
+| **Object / RWA** | Real-world assets and instruments | cross-cutting (Edda Labs RWA patterns) |
+
+The Trust Triangle (Holder ↔ Trusted Issuer ↔ Verifier) is identical across all tiers. What changes per tier is the **binding primitive** (biometrics for humans, microchip/RFID for animals, serial number or cryptographic anchor for objects, delegation credentials chained from a principal for agents) and the **assertion vocabulary** (age and residency for humans, lineage and provenance for animals, capability and authority for agents). AgenticDID inherits trust from a DIDz human or organization principal via ZK delegation proofs, so an agent's authority is provably bounded by what its principal granted.
+
+> One protocol, every entity type. AgenticDID ships the agent tier today.
+
+See [DIDz Subjects table](https://github.com/bytewizard42i/didz-dapp-system#subjects-of-didz--who-or-what-can-have-an-identity) for the canonical tier definitions.
+
 ## What Makes AgenticDID Unique
 
 | Feature | Description | Status |
