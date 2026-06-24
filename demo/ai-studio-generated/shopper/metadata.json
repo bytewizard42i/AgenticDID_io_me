@@ -1,0 +1,5 @@
+{
+  "name": "Shopper AI",
+  "description": "An e-commerce AI agent that assists with online purchases, focusing on privacy and security. Users can search for products, compare prices, and complete purchases through a conversational interface.",
+  "requestFramePermissions": []
+}

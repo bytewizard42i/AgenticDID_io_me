@@ -1,0 +1,239 @@
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel0 \b \fs36 \u55356 ?\u57307 ?\u65039 ? Fi Standards for DIDs, Trusted Issuers, and Registered Agents\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 {\b Established}: November 2025\line {\b Authority}: Fi (Protocol Architect)\line {\b Status}: Canonical Protocol Standards\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 \u55356 ?\u57263 ? Core Philosophy\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 {\b TD Bank Philosophy: \u8220"One Perfect Check, Then Replicate\u8221"}\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 TD Bank built ONE perfect check template, tested it thoroughly, then replicated for all check types.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 {\b Applied to AgenticDID}: 1. Build {\b ONE perfect issuer} (trusted_issuer_0) 2. Build {\b ONE perfect agent} (agent_0) 3. Test the canonical flow end-to-end 4. Once proven \u8594 ? replicate for all others 5. Never deviate from proven pattern\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 {\b FIRM STANDARD}: No issuer or agent goes active until the canonical flow works perfectly.\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 \u55357 ?\u56634 ? Three-Axis Issuer Model\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Every Trusted Issuer MUST be characterized by THREE independent dimensions:\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 {\b Axis 1: IssuerType} (Legal Form)\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \f1 enum IssuerType \{\line
+  SELF_SOVEREIGN,      // Individual\line
+  CORPORATION,         // Business entity\line
+  GOVERNMENT_ENTITY,   // Government org\line
+  INSTITUTION,         // Non-profit/educational\line
+\}\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 {\b Axis 2: IssuerDomain} (Sector - CAN BE MULTIPLE)\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \f1 enum IssuerDomain \{\line
+  GENERAL,            // Default\line
+  IDENTITY_INFRA,     // Core identity\line
+  FINANCIAL,          // Banking, payments\line
+  MEDICAL,            // Healthcare\line
+  EDUCATION,          // Schools, universities\line
+  RESEARCH,           // Research institutions\line
+  GOV_SERVICES,       // Government services\line
+  VOTING,             // Elections\line
+  E_COMMERCE,         // Online shopping\line
+  TRAVEL,             // Airlines, hotels\line
+  // ... more\line
+\}\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 {\b Examples}: - Stanford: {\f1 [EDUCATION, RESEARCH, MEDICAL]} - Blue Cross: {\f1 [FINANCIAL, MEDICAL]} - Hospital: {\f1 [MEDICAL]}\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 {\b Axis 3: AssuranceLevel} (Trust Strength)\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \f1 enum AssuranceLevel \{\line
+  UNVERIFIED,         // Self-registered\line
+  BASIC_KYC,          // Email + phone\line
+  REGULATED_ENTITY,   // Licensed & regulated\line
+  SYSTEM_CRITICAL,    // Government/critical infra\line
+\}\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 {\b FIRM STANDARD}: ALL issuers use three-axis model. No exceptions.\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 \u55356 ?\u56724 ? DID Standards\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 {\b Format}\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \f1 did:agentic:<issuer_id>\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 {\b Rules}\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab \u9989 ? MUST use {\f1 did:agentic:} prefix\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab \u9989 ? MUST use snake_case\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab \u9989 ? MUST be globally unique\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 4.\tx360\tab \u9989 ? MUST be immutable\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 5.\tx360\tab \u10060 ? NO spaces or special characters (except underscore)\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 {\b Reserved Ranges}\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b agent_0 to agent_100}: System agents (protocol-controlled)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b canonical_agent_101}: Comet (reference local agent)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab {\b trusted_issuer_0}: AgenticDID Foundation (canonical issuer)\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 \u55356 ?\u57314 ? Trusted Issuer Standards\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 {\b Canonical Issuer: trusted_issuer_0}\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 {\b FIRM STANDARD}: {\f1 trusted_issuer_0} MUST be: 1. AgenticDID Foundation (dogfooding) 2. Fully implemented FIRST 3. The template all others follow 4. The protocol\u8217's trust anchor\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 {\b Configuration Requirements}\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Every issuer MUST specify:\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \f1 \{\line
+  issuerDid: string;              // \u9989 ? REQUIRED\line
+  issuerHumanName: string;        // \u9989 ? REQUIRED\line
+  \line
+  // Three-axis model\line
+  issuerType: IssuerType;         // \u9989 ? REQUIRED\line
+  domains: IssuerDomain[];        // \u9989 ? REQUIRED (array!)\line
+  assuranceLevel: AssuranceLevel; // \u9989 ? REQUIRED\line
+  \line
+  // Legal\line
+  legalName: string;              // \u9989 ? REQUIRED\line
+  \line
+  // Credential policy\line
+  allowedCredentialTypes: [];     // \u9989 ? REQUIRED\line
+  forbiddenCredentialTypes: [];   // \u9989 ? REQUIRED\line
+  \line
+  // Status\line
+  isActive: boolean;              // \u9989 ? REQUIRED (default: false)\line
+\}\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 {\b Activation Rules}\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Can only activate when: 1. \u9989 ? Corresponding agent implemented 2. \u9989 ? Workflows built and tested 3. \u9989 ? Documentation complete 4. \u9989 ? End-to-end testing passed\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 \u55358 ?\u56598 ? Registered Agent Standards\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 {\b Agent Hierarchy}\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 {\b THREE TYPES}:\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab {\b LOCAL_AGENT}: User\u8217's personal assistant\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Example: Comet\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab One per user\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Manages credentials, delegates tasks\sa180\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab {\b ISSUER_AGENT}: Official agent for issuer\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Example: agent_0\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Handles KYC, credential issuance\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab One per issuer\sa180\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab {\b TASK_AGENT}: Specialized service agent\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Examples: Bank Agent, Medical Records Agent\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Performs specific tasks\par}
+{\pard \ql \f0 \sa0 \li720 \fi-360 \endash \tx360\tab Many, each specialized\sa180\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 {\b Canonical Agents}\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 {\b Comet (canonical_agent_101)}: - \u9989 ? ACTIVE (only active agent currently) - Reference LOCAL_AGENT implementation - User\u8217's primary interface\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 {\b agent_0 (AgenticDID Issuer Agent)}: - \u55357 ?\u56604 ? NEXT TO BUILD - Reference ISSUER_AGENT implementation - Handles KYC and credential issuance for trusted_issuer_0\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 {\b Configuration Requirements}\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Every agent MUST specify:\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \f1 \{\line
+  agentDid: string;               // \u9989 ? REQUIRED\line
+  agentHumanName: string;         // \u9989 ? REQUIRED\line
+  role: AgentRole;                // \u9989 ? REQUIRED\line
+  parentIssuerDid?: string;       // Required for ISSUER/TASK agents\line
+  capabilities: string[];         // \u9989 ? REQUIRED\line
+  requiredCredentials?: string[]; // Credentials user needs\line
+  isActive: boolean;              // \u9989 ? REQUIRED (default: false)\line
+\}\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 \u55357 ?\u56540 ? Credential Type Standards\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 {\b Naming}\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u9989 ? SCREAMING_SNAKE_CASE\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u9989 ? Descriptive (no abbreviations)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u9989 ? Clear semantic meaning\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 {\b Examples}: - \u9989 ? {\f1 KYC_TIER_1} - \u9989 ? {\f1 INSURANCE_COVERAGE} - \u10060 ? {\f1 KYC1} (too abbreviated)\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 {\b Policy Enforcement}\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 Every issuer MUST specify both: - {\f1 allowedCredentialTypes}: What they CAN issue - {\f1 forbiddenCredentialTypes}: What they CANNOT issue\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 {\b Example}:\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \f1 // Blue Cross (FINANCIAL + MEDICAL)\line
+allowedCredentialTypes: [\line
+  'INSURANCE_COVERAGE',     // \u9989 ? Has MEDICAL domain\line
+  'INSURANCE_CLAIM',        // \u9989 ? Has FINANCIAL domain\line
+],\line
+forbiddenCredentialTypes: [\line
+  'MEDICAL_RECORD',         // \u10060 ? Not a healthcare provider\line
+  'BANK_ACCOUNT_VERIFIED',  // \u10060 ? Not a bank\line
+]\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 \u55356 ?\u57303 ?\u65039 ? Implementation Philosophy\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 {\b Build Order}\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 {\b FIRM STANDARD}: Follow this EXACT order:\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 {\b Phase 1} (Current): 1. Build trusted_issuer_0 \u9989 ? 2. Build agent_0 \u55357 ?\u56604 ? 3. Build Comet \u9989 ? 4. Test John\u8217's journey end-to-end 5. Document everything\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 {\b Phase 2} (After Phase 1 complete): 6. Replicate for next issuer (e.g., Bank) 7. Follow proven pattern 8. Test end-to-end\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 {\b Phase 3} (After Phase 2 complete): 9. Scale to all other issuers 10. Each follows the template\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 {\b FIRM STANDARD}: NEVER build multiple issuers in parallel until Phase 1 complete.\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 {\b The Canonical Flow}\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 This MUST work perfectly:\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \f1 USER (John)\line
+  \u8595 ?\line
+LOCAL_AGENT (Comet)\line
+  \u8595 ?\line
+ISSUER_AGENT (agent_0)\line
+  \u8595 ?\line
+TRUSTED_ISSUER (trusted_issuer_0)\line
+  \u8595 ?\line
+CREDENTIAL ISSUED (KYC_TIER_1)\line
+  \u8595 ?\line
+USER can now use TASK_AGENTS\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 \u55357 ?\u56541 ? Naming Conventions\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 {\b Files}: kebab-case\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \f1 \u9989 ? trusted-issuer-0.ts\line
+\u9989 ? blue-cross-issuer.ts\line
+\u10060 ? TrustedIssuer0.ts\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 {\b Constants}: SCREAMING_SNAKE_CASE\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \f1 const TRUSTED_ISSUER_0_DID = 'did:agentic:trusted_issuer_0';\line
+const COMET_AGENT_CONFIG: RegisteredAgentConfig = \{ /* ... */ \};\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 {\b Functions}: camelCase\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \f1 function getAgentByDid(did: string) \{ /* ... */ \}\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 {\b Types}: PascalCase\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \f1 interface TrustedIssuerConfig \{ /* ... */ \}\line
+enum IssuerType \{ /* ... */ \}\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 \u55357 ?\u56594 ? Security Standards\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab \u9989 ? All actions cryptographically signed\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab \u9989 ? Zero-knowledge proofs for privacy\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab \u9989 ? Brand protection enforced\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 4.\tx360\tab \u9989 ? User controls data sharing\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 5.\tx360\tab \u9989 ? Audit trails for access\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 6.\tx360\tab \u10060 ? Never transmit private keys\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 \u55357 ?\u56538 ? Documentation Standards\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 {\b Every file MUST have}:\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \f1 /**\line
+ * [File Purpose]\line
+ * \line
+ * [Description]\line
+ * \line
+ * Status: ACTIVE | INACTIVE | PLANNED\line
+ */\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 {\b Public functions MUST have JSDoc}:\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \f1 /**\line
+ * [Description]\line
+ * \line
+ * @param [name] - [description]\line
+ * @returns [description]\line
+ * \line
+ * @example\line
+ * [usage example]\line
+ */\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 \u9989 ? Activation Checklists\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 {\b Before Activating Issuer}:\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u9744 ? Three-axis model applied\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u9744 ? Allowed/forbidden credentials specified\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u9744 ? Corresponding agent implemented\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u9744 ? All workflows built and tested\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u9744 ? End-to-end testing complete\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u9744 ? Documentation updated\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 {\b Before Activating Agent}:\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u9744 ? Role assigned\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u9744 ? Capabilities list complete\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u9744 ? All capabilities implemented\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u9744 ? Required credentials specified\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u9744 ? Integration tested\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 \bullet \tx360\tab \u9744 ? Documentation updated\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 \u55357 ?\u56522 ? Current Registry (10 TIs + 10 RAs)\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 {\b Trusted Issuers}\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab \u9989 ? AgenticDID (IDENTITY_INFRA) - {\b ACTIVE}\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab \u10060 ? Bank (FINANCIAL) - OFF\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab \u10060 ? Amazon (E_COMMERCE) - OFF\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 4.\tx360\tab \u10060 ? Airline (TRAVEL) - OFF\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 5.\tx360\tab \u10060 ? Ecuador Voting (GOV_SERVICES, VOTING) - OFF\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 6.\tx360\tab \u10060 ? Doctor\u8217's Office (MEDICAL) - OFF\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 7.\tx360\tab \u10060 ? Hospital (MEDICAL) - OFF\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 8.\tx360\tab \u10060 ? IVF Center (MEDICAL) - OFF\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 9.\tx360\tab \u10060 ? Stanford (EDUCATION, RESEARCH, MEDICAL) - OFF\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 10.\tx360\tab \u10060 ? Blue Cross (FINANCIAL, MEDICAL) - OFF\sa180\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel2 \b \fs28 {\b Registered Agents}\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab \u9989 ? Comet (LOCAL_AGENT) - {\b ACTIVE}\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab \u55357 ?\u56604 ? agent_0 (ISSUER_AGENT) - {\b NEXT TO BUILD} 3-10. \u10060 ? All other agents - OFF\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 \outlinelevel1 \b \fs32 \u55356 ?\u57263 ? The Fi Standards (Summary)\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 1.\tx360\tab {\b Three-Axis Model} - ALWAYS\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 2.\tx360\tab {\b TD Bank Philosophy} - One perfect, then replicate\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 3.\tx360\tab {\b Canonical First} - trusted_issuer_0 before all others\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 4.\tx360\tab {\b Test Real Users} - John\u8217's journey must work\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 5.\tx360\tab {\b Document Everything} - Keep it updated\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 6.\tx360\tab {\b Type Safety} - TypeScript strict mode\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 7.\tx360\tab {\b Security First} - Crypto proofs, ZK, privacy\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 8.\tx360\tab {\b Consistent Naming} - Follow conventions\par}
+{\pard \ql \f0 \sa0 \li360 \fi-360 9.\tx360\tab {\b Never Activate Early} - Test thoroughly first\sa180\par}
+{\pard \qc \f0 \sa180 \li0 \fi0 \emdash\emdash\emdash\emdash\emdash\par}
+{\pard \ql \f0 \sa180 \li0 \fi0 {\b These standards are PROTOCOL LAW. Follow them rigorously.} \u55356 ?\u57307 ?\u65039 ?\par}

@@ -1,0 +1,65 @@
+{
+  "version": 2,
+  "name": "agenticdid",
+  "buildCommand": "cd frontend/web && bun install && bun run build",
+  "outputDirectory": "frontend/web/dist",
+  "installCommand": "bun install",
+  "framework": "vite",
+  "regions": ["iad1"],
+  "env": {
+    "VITE_API_BASE": "https://agenticdid-api.onrender.com",
+    "VITE_AGENTS_WS": "wss://agenticdid-agents.onrender.com",
+    "VITE_ENABLE_LISTEN_IN_MODE": "true",
+    "VITE_APP_NAME": "AgenticDID",
+    "VITE_APP_VERSION": "2.0.0"
+  },
+  "build": {
+    "env": {
+      "NODE_ENV": "production"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://agenticdid-api.onrender.com/api/:path*"
+    },
+    {
+      "source": "/agents/:path*",
+      "destination": "https://agenticdid-agents.onrender.com/:path*"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ],
+  "cleanUrls": true,
+  "trailingSlash": false
+}

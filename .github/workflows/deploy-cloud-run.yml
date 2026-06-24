@@ -1,0 +1,171 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+      - production
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGION: us-central1
+  REGISTRY: us-central1-docker.pkg.dev
+
+jobs:
+  # ============================================================================
+  # BUILD AND PUSH DOCKER IMAGES
+  # ============================================================================
+  build:
+    name: Build Docker Images
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    strategy:
+      matrix:
+        service:
+          - name: api-gateway
+            context: ./backend/api
+            image: agenticdid-api
+          - name: agents-runtime
+            context: ./backend/agents-runtime
+            image: agenticdid-agents
+          - name: midnight-gateway
+            context: ./backend/services/midnight-gateway
+            image: agenticdid-midnight
+          - name: tts-service
+            context: ./backend/services/tts-service
+            image: agenticdid-tts
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/agenticdid/${{ matrix.service.image }}:${{ github.sha }} \
+                       -t ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/agenticdid/${{ matrix.service.image }}:latest \
+                       ${{ matrix.service.context }}
+
+      - name: Push Docker image
+        run: |
+          docker push ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/agenticdid/${{ matrix.service.image }}:${{ github.sha }}
+          docker push ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/agenticdid/${{ matrix.service.image }}:latest
+
+  # ============================================================================
+  # DEPLOY TO CLOUD RUN
+  # ============================================================================
+  deploy:
+    name: Deploy to Cloud Run
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      # Deploy API Gateway
+      - name: Deploy API Gateway
+        run: |
+          gcloud run deploy agenticdid-api \
+            --image ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/agenticdid/agenticdid-api:${{ github.sha }} \
+            --region ${{ env.REGION }} \
+            --platform managed \
+            --allow-unauthenticated \
+            --set-env-vars "NODE_ENV=production,AGENTS_RUNTIME_URL=https://agenticdid-agents-${{ secrets.GCP_PROJECT_ID }}.run.app,MIDNIGHT_GATEWAY_URL=https://agenticdid-midnight-${{ secrets.GCP_PROJECT_ID }}.run.app" \
+            --set-secrets "ANTHROPIC_API_KEY=anthropic-key:latest" \
+            --memory 512Mi \
+            --cpu 1 \
+            --max-instances 10
+
+      # Deploy Agents Runtime
+      - name: Deploy Agents Runtime
+        run: |
+          gcloud run deploy agenticdid-agents \
+            --image ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/agenticdid/agenticdid-agents:${{ github.sha }} \
+            --region ${{ env.REGION }} \
+            --platform managed \
+            --allow-unauthenticated \
+            --set-env-vars "NODE_ENV=production,ENABLE_LISTEN_IN_MODE=true" \
+            --set-secrets "ANTHROPIC_API_KEY=anthropic-key:latest,GOOGLE_APPLICATION_CREDENTIALS_JSON=gcp-credentials:latest" \
+            --memory 1Gi \
+            --cpu 2 \
+            --max-instances 10
+
+      # Deploy Midnight Gateway
+      - name: Deploy Midnight Gateway
+        run: |
+          gcloud run deploy agenticdid-midnight \
+            --image ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/agenticdid/agenticdid-midnight:${{ github.sha }} \
+            --region ${{ env.REGION }} \
+            --platform managed \
+            --allow-unauthenticated \
+            --set-env-vars "NODE_ENV=production,MIDNIGHT_RPC_URL=https://testnet.midnight.network,ENABLE_SPOOF_TRANSACTIONS=true,SPOOF_TRANSACTION_RATIO=0.8" \
+            --memory 512Mi \
+            --cpu 1 \
+            --max-instances 10
+
+      # Deploy TTS Service
+      - name: Deploy TTS Service
+        run: |
+          gcloud run deploy agenticdid-tts \
+            --image ${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/agenticdid/agenticdid-tts:${{ github.sha }} \
+            --region ${{ env.REGION }} \
+            --platform managed \
+            --allow-unauthenticated \
+            --set-env-vars "NODE_ENV=production,TTS_PROVIDER=google,TTS_VOICE_NAME=en-US-Neural2-J" \
+            --set-secrets "GOOGLE_APPLICATION_CREDENTIALS_JSON=gcp-credentials:latest" \
+            --memory 256Mi \
+            --cpu 1 \
+            --max-instances 10
+
+      # Get deployed URLs
+      - name: Get Service URLs
+        id: urls
+        run: |
+          API_URL=$(gcloud run services describe agenticdid-api --region ${{ env.REGION }} --format 'value(status.url)')
+          AGENTS_URL=$(gcloud run services describe agenticdid-agents --region ${{ env.REGION }} --format 'value(status.url)')
+          echo "api_url=$API_URL" >> $GITHUB_OUTPUT
+          echo "agents_url=$AGENTS_URL" >> $GITHUB_OUTPUT
+
+      # Summary
+      - name: Deployment Summary
+        run: |
+          echo "🎉 Deployment Complete!"
+          echo "API Gateway: ${{ steps.urls.outputs.api_url }}"
+          echo "Agents Runtime: ${{ steps.urls.outputs.agents_url }}"
+          echo "View in Console: https://console.cloud.google.com/run?project=${{ env.PROJECT_ID }}"

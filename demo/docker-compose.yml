@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  # AgenticDID.io Application
+  agenticdid:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: agenticdid-demo
+    ports:
+      - "5173:5173"  # Frontend (Vite)
+      - "8787:8787"  # Backend (Verifier API)
+    environment:
+      - NODE_ENV=development
+    volumes:
+      # Mount source for hot reload (optional, comment out for production)
+      - ./apps:/app/apps
+      - ./packages:/app/packages
+    restart: unless-stopped
+    networks:
+      - agenticdid-network
+    healthcheck:
+      test: ["CMD", "bun", "run", "-e", "fetch('http://localhost:8787/health').catch(() => process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  # Midnight Proof Server (Undeployed/Local Mode)
+  # Version 3.0.7 for Haswell CPU compatibility
+  proof-server:
+    image: "midnightnetwork/proof-server:3.0.7"
+    container_name: midnight-proof-server
+    command: ["midnight-proof-server", "--network", "undeployed"]
+    ports:
+      - "6300:6300"
+    environment:
+      RUST_BACKTRACE: "full"
+    restart: unless-stopped
+    networks:
+      - agenticdid-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6300/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  agenticdid-network:
+    driver: bridge
+
+# Volume for persistence (if needed later)
+volumes:
+  agenticdid-data:
+    driver: local

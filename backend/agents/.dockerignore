@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+bun.lockb
+
+# Development
+.env
+.env.*
+!.env.example
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing
+coverage/
+*.test.ts
+*.spec.ts
+
+# Documentation
+README.md
+*.md
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc
+.cache/
+.temp/
+.tmp/
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose*.yml

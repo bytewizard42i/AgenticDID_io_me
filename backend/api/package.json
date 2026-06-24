@@ -1,0 +1,40 @@
+{
+  "name": "@agenticdid/api-gateway",
+  "version": "2.0.0",
+  "description": "AgenticDID Real Protocol - Main API Gateway (Production-Ready)",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "bun --watch src/index.ts",
+    "build": "bun build src/index.ts --outdir dist --target bun",
+    "start": "bun run dist/index.js",
+    "test": "bun test",
+    "lint": "eslint src/**/*.ts",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fastify/cors": "^9.0.1",
+    "@fastify/jwt": "^8.0.0",
+    "@fastify/rate-limit": "^9.1.0",
+    "fastify": "^4.28.1",
+    "pino-pretty": "^11.2.2",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "bun-types": "latest",
+    "typescript": "^5.5.3"
+  },
+  "keywords": [
+    "agenticdid",
+    "api",
+    "gateway",
+    "fastify",
+    "midnight",
+    "zkp",
+    "did",
+    "agents"
+  ],
+  "author": "AgenticDID Team",
+  "license": "MIT"
+}
