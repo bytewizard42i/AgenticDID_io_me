@@ -1,0 +1,133 @@
+version: '3.8'
+
+services:
+  # ==================== FRONTEND ====================
+  
+  # Web Frontend (React + Vite)
+  frontend:
+    build:
+      context: ./frontend/web
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_BASE=http://localhost:8787
+      - VITE_AGENTS_URL=http://localhost:3001
+      - VITE_MIDNIGHT_URL=http://localhost:3003
+      - VITE_ENABLE_TTS=true
+    volumes:
+      - ./frontend/web/src:/app/src
+      - ./frontend/web/index.html:/app/index.html
+    networks:
+      - agenticdid-network
+    depends_on:
+      - api-gateway
+
+  # ==================== BACKEND ====================
+  
+  # API Gateway (Main HTTP API)
+  api-gateway:
+    build:
+      context: ./backend/api
+      dockerfile: Dockerfile
+    ports:
+      - "8787:8787"
+    environment:
+      - NODE_ENV=development
+      - AGENTS_RUNTIME_URL=http://agents-runtime:3001
+      - MIDNIGHT_GATEWAY_URL=http://localhost:3003
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    env_file:
+      - .env
+    volumes:
+      - ./backend/api/src:/app/src
+    networks:
+      - agenticdid-network
+    depends_on:
+      - agents-runtime
+
+  # Agents Runtime (Google ADK + Claude)
+  agents-runtime:
+    build:
+      context: ./backend/agents
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - GOOGLE_APPLICATION_CREDENTIALS_JSON=${GOOGLE_APPLICATION_CREDENTIALS_JSON}
+      - MIDNIGHT_GATEWAY_URL=http://localhost:3003
+      - ENABLE_LISTEN_IN_MODE=false
+    env_file:
+      - .env
+    volumes:
+      - ./backend/agents/src:/app/src
+    networks:
+      - agenticdid-network
+
+  # Midnight Proof Server (ZK Proof Generation)
+  # Version: 3.0.7 for Haswell CPU compatibility (i7-4770)
+  # Use 4.0.0 if you have AVX-512 (Intel 10th gen+ or Skylake-X)
+  midnight-proof-server:
+    image: midnightnetwork/proof-server:3.0.7
+    ports:
+      - "6300:6300"
+    command: midnight-proof-server --network undeployed
+    restart: unless-stopped
+    networks:
+      - agenticdid-network
+
+  # Midnight Gateway (Smart Contracts) - COMMENTED OUT FOR HACKATHON
+  # Focus on contract development first, add gateway integration later
+  # midnight-gateway:
+  #   build:
+  #     context: ./backend/midnight
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3003:3003"
+  #   environment:
+  #     - NODE_ENV=development
+  #     - PROOF_SERVER_URL=http://midnight-proof-server:6300
+  #     - MIDNIGHT_RPC_URL=${MIDNIGHT_RPC_URL}
+  #     - MIDNIGHT_CHAIN_ID=${MIDNIGHT_CHAIN_ID}
+  #     - ENABLE_SPOOF_TRANSACTIONS=${ENABLE_SPOOF_TRANSACTIONS}
+  #     - SPOOF_TRANSACTION_RATIO=${SPOOF_TRANSACTION_RATIO}
+  #   env_file:
+  #     - .env
+  #   volumes:
+  #     - ./backend/midnight/src:/app/src
+  #     - ./protocol/contracts:/app/contracts:ro
+  #   networks:
+  #     - agenticdid-network
+  #   depends_on:
+  #     - midnight-proof-server
+
+  # TTS Service (Google Cloud TTS) - Commented out for now (optional service)
+  # tts-service:
+  #   build:
+  #     context: ./backend/services/tts-service
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3002:3002"
+  #   environment:
+  #     - NODE_ENV=development
+  #     - GOOGLE_APPLICATION_CREDENTIALS_JSON=${GOOGLE_APPLICATION_CREDENTIALS_JSON}
+  #     - TTS_PROVIDER=${TTS_PROVIDER}
+  #     - TTS_VOICE_NAME=${TTS_VOICE_NAME}
+  #     - TTS_LANGUAGE_CODE=${TTS_LANGUAGE_CODE}
+  #   env_file:
+  #     - .env
+  #   volumes:
+  #     - ./backend/services/tts-service/src:/app/src
+  #   networks:
+  #     - agenticdid-network
+
+networks:
+  agenticdid-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  redis-data:

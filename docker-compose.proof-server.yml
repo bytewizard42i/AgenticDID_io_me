@@ -1,0 +1,60 @@
+# Midnight Proof Server - Local Development
+# ============================================================================
+# This runs the Midnight Network proof server locally for ZK proof generation
+# 
+# Purpose: Generate zero-knowledge proofs for credential verification
+# Network: Undeployed (local development, no testnet dependency)
+# Port: 6300 (standard Midnight proof server port)
+# 
+# Usage:
+#   Start:  docker compose -f docker-compose.proof-server.yml up -d
+#   Stop:   docker compose -f docker-compose.proof-server.yml down
+#   Logs:   docker compose -f docker-compose.proof-server.yml logs -f
+#   Health: curl http://localhost:6300/health
+# 
+# Note: This runs SEPARATELY from backend services. It's shared infrastructure
+#       like a database - multiple services connect to one proof server.
+# ============================================================================
+
+services:
+  proof-server:
+    container_name: agenticdid-proof-server
+    image: midnightnetwork/proof-server:4.0.0
+    
+    # Network mode: "undeployed" for local development
+    # Other options: "devnet", "testnet" (for connecting to Midnight networks)
+    command: ["midnight-proof-server", "--network", "undeployed"]
+    
+    ports:
+      - "6300:6300"
+    
+    environment:
+      # Enable full Rust backtraces for debugging
+      RUST_BACKTRACE: "full"
+      
+      # Logging level (optional)
+      RUST_LOG: "info"
+    
+    # Health check to ensure proof server is ready
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6300/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    
+    # Restart policy
+    restart: unless-stopped
+    
+    # Resource limits (optional, adjust based on your system)
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '1'
+          memory: 2G
+
+# No volumes needed - proof server is stateless
+# No networks needed - uses default bridge network

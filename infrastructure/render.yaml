@@ -1,0 +1,130 @@
+# Render.com Deployment Configuration
+# Deploy with: render deploy -f infrastructure/render.yaml
+
+services:
+  # ==================== API Gateway ====================
+  - type: web
+    name: agenticdid-api
+    runtime: node
+    plan: starter
+    region: oregon
+    buildCommand: cd backend/api && bun install && bun run build
+    startCommand: cd backend/api && bun run start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: AGENTS_RUNTIME_URL
+        value: https://agenticdid-agents.onrender.com
+      - key: MIDNIGHT_GATEWAY_URL
+        value: https://agenticdid-midnight.onrender.com
+      - key: TTS_SERVICE_URL
+        value: https://agenticdid-tts.onrender.com
+      - key: FRONTEND_URL
+        value: https://agenticdid.vercel.app
+      - key: ANTHROPIC_API_KEY
+        sync: false  # Secret - enter manually in Render dashboard
+      - key: JWT_SECRET
+        generateValue: true
+      - key: API_RATE_LIMIT
+        value: 100
+      - key: LOG_LEVEL
+        value: info
+
+  # ==================== Agents Runtime ====================
+  - type: web
+    name: agenticdid-agents
+    runtime: node
+    plan: starter
+    region: oregon
+    buildCommand: cd backend/agents-runtime && bun install && bun run build
+    startCommand: cd backend/agents-runtime && bun run start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: ANTHROPIC_API_KEY
+        sync: false  # Secret
+      - key: GOOGLE_APPLICATION_CREDENTIALS_JSON
+        sync: false  # Secret
+      - key: DEFAULT_AGENT_MODEL
+        value: claude-opus-4-20250514
+      - key: AGENT_THINKING_BUDGET
+        value: 10000
+      - key: ENABLE_LISTEN_IN_MODE
+        value: true
+      - key: MIDNIGHT_GATEWAY_URL
+        value: https://agenticdid-midnight.onrender.com
+      - key: TTS_SERVICE_URL
+        value: https://agenticdid-tts.onrender.com
+
+  # ==================== Midnight Gateway ====================
+  - type: web
+    name: agenticdid-midnight
+    runtime: node
+    plan: starter
+    region: oregon
+    buildCommand: cd backend/services/midnight-gateway && bun install && bun run build
+    startCommand: cd backend/services/midnight-gateway && bun run start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MIDNIGHT_RPC_URL
+        value: https://testnet.midnight.network
+      - key: MIDNIGHT_CHAIN_ID
+        value: midnight-testnet-1
+      - key: ENABLE_SPOOF_TRANSACTIONS
+        value: true
+      - key: SPOOF_TRANSACTION_RATIO
+        value: 0.8
+      - key: LOG_LEVEL
+        value: info
+
+  # ==================== TTS Service ====================
+  - type: web
+    name: agenticdid-tts
+    runtime: node
+    plan: starter
+    region: oregon
+    buildCommand: cd backend/services/tts-service && bun install && bun run build
+    startCommand: cd backend/services/tts-service && bun run start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: GOOGLE_APPLICATION_CREDENTIALS_JSON
+        sync: false  # Secret
+      - key: TTS_PROVIDER
+        value: google
+      - key: TTS_VOICE_NAME
+        value: en-US-Neural2-J
+      - key: TTS_LANGUAGE_CODE
+        value: en-US
+      - key: LOG_LEVEL
+        value: info
+
+  # ==================== Credential Registry (Optional) ====================
+  # Uncomment when ready for Phase 2
+  # - type: web
+  #   name: agenticdid-credentials
+  #   runtime: node
+  #   plan: starter
+  #   region: oregon
+  #   buildCommand: cd backend/services/credential-registry && bun install && bun run build
+  #   startCommand: cd backend/services/credential-registry && bun run start
+  #   envVars:
+  #     - key: NODE_ENV
+  #       value: production
+  #     - key: DATABASE_URL
+  #       fromDatabase:
+  #         name: agenticdid-db
+  #         property: connectionString
+
+# ==================== Databases (Optional) ====================
+# databases:
+#   - name: agenticdid-db
+#     databaseName: agenticdid
+#     user: agenticdid
+#     plan: starter
+#     region: oregon

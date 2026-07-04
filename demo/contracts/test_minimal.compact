@@ -1,0 +1,12 @@
+pragma language_version >= 0.17.0;
+import CompactStandardLibrary;
+
+ledger owner: ContractAddress;
+
+constructor(addr: ContractAddress) {
+  owner = disclose(addr);
+}
+
+export circuit testOne(param: ContractAddress): [] {
+  owner = disclose(param);
+}

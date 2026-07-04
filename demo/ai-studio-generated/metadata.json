@@ -1,0 +1,5 @@
+{
+  "name": "Comet: AI Agent Orchestrator",
+  "description": "A local, privacy-preserving coordinator for user AI agents that analyzes user intent, selects appropriate specialist agents, and simulates secure, privacy-enhanced transaction execution.",
+  "requestFramePermissions": []
+}

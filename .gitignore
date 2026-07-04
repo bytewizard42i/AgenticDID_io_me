@@ -40,3 +40,28 @@ temp/
 
 # Reference repositories (cloned examples, not part of our project)
 reference-repos/
+
+# ---- Merged from AgenticDID_io_me_MAIN (2026-06-24) ----
+# Secrets
+*.pem
+*.key
+service-account.json
+gcp-credentials.json
+
+# Compiled contracts / wasm
+protocol/contracts/compiled/
+*.wasm
+*.wat
+
+# Build / framework artifacts
+.next/
+out/
+*.tsbuildinfo
+bun.lockb
+.vercel
+.render
+.gcloudignore
+
+# Vendored external Midnight repos (regenerate via midnight-reference-repos/clone_all_midnight_repos.sh)
+midnight-reference-repos/ref_*/
+midnight-reference-repos/i_am_Midnight_LLM_ref/

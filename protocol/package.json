@@ -1,0 +1,36 @@
+{
+  "name": "@agenticdid/protocol",
+  "version": "1.0.0",
+  "description": "Midnight Network smart contracts and protocol layer for AgenticDID",
+  "type": "module",
+  "scripts": {
+    "compile": "./scripts/compile-all.sh",
+    "compile:fast": "./scripts/compile-fast.sh",
+    "compile:registry": "./scripts/compile-registry.sh",
+    "compile:verifier": "./scripts/compile-verifier.sh",
+    "compile:storage": "./scripts/compile-storage.sh",
+    "test": "bun test",
+    "clean": "rm -rf compiled/*"
+  },
+  "dependencies": {
+    "@midnight-ntwrk/compact-runtime": "^0.9.0",
+    "@midnight-ntwrk/midnight-js-types": "^0.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.25",
+    "bun-types": "^1.2.22",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "bun": ">=1.2.0"
+  },
+  "keywords": [
+    "midnight",
+    "compact",
+    "smart-contracts",
+    "zk-proofs",
+    "did",
+    "identity"
+  ]
+}

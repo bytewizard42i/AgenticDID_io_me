@@ -1,0 +1,38 @@
+{
+  "name": "agenticdid",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Midnight-powered, privacy-preserving identity protocol for AI agents",
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "contracts/*"
+  ],
+  "scripts": {
+    "setup": "bun install",
+    "dev": "concurrently \"bun --cwd apps/verifier-api run dev\" \"bun --cwd apps/web run dev\"",
+    "build": "bun --cwd apps/web run build && bun --cwd apps/verifier-api run build",
+    "test": "bun test",
+    "lint": "bun run lint --filter '*'",
+    "clean": "rm -rf node_modules apps/*/node_modules packages/*/node_modules"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.5",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "bun": ">=1.0.0"
+  },
+  "keywords": [
+    "midnight",
+    "zkp",
+    "verifiable-credentials",
+    "privacy-preserving",
+    "ai-agents",
+    "did"
+  ],
+  "author": "AgenticDID.io Team",
+  "license": "MIT"
+}
