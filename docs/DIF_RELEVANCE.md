@@ -29,6 +29,21 @@ The Trusted AI Agents WG (newly active at DIF) is the most strategically importa
 3. Run Universal Resolver as a sidecar for the agent runtime.
 4. Adopt DIDComm v2 for agent-to-agent messages before locking in a custom protocol.
 
+## New since May (July 4, 2026)
+
+**Strategy flipped from "align with" to "lead."** We are building the protocol
+first and proposing it to DIF as the privacy-preserving delegation profile of
+the agentic stack (the Vouched/KYA-OS playbook). See:
+
+- **The plan**: [`DIF_STANDARDIZATION_PLAN.md`](./DIF_STANDARDIZATION_PLAN.md)
+- **The spec**: [`../spec/AGENTICDID_SPEC.md`](../spec/AGENTICDID_SPEC.md)
+- **The reference implementation**: `midnight-modules/modules/scoped-grant/`
+  (compiled, Compact 0.31.1)
+
+Context: KYA-OS (Vouched's donated framework, renamed June 2026) has a v1 in
+WG approval. It defines *what* must be verifiable about agents but not *how to
+do it privacy-preserving* — that slot is empty and AgenticDID fills it.
+
 ## Last refreshed
 
-May 24, 2026 from DIF homepage and GitHub org listing.
+July 4, 2026 (deep dive + standardization plan); previously May 24, 2026.
