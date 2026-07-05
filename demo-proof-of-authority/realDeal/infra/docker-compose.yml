@@ -1,0 +1,90 @@
+# Midnight local devnet for the proof-of-authority realDeal demo —
+# node + indexer + proof-server, adapted from the proven Passport
+# foundations stack (midnight-Passport-johns_copy/demo/.../infra/).
+#
+# NOTE (WSL + Docker Desktop): the Passport original used `network_mode: host`,
+# which does NOT expose ports to WSL under Docker Desktop (containers can see
+# each other, but localhost:PORT is dead from the WSL side). This version uses
+# a normal bridge network with published ports instead — the indexer reaches
+# the node by service name (ws://node:9944), and WSL reaches everything on
+# localhost via the published ports.
+#
+# Run:   docker compose up -d
+# Stop:  docker compose down          (add -v to reset chain state)
+#
+# The explicit project name keeps this stack's containers and volumes
+# separate from other demos (a shared default project name would mean a
+# shared — and stale — chain volume).
+
+name: agenticdid-poa-demo
+
+services:
+  node:
+    image: 'midnightntwrk/midnight-node:1.0.0'
+    ports:
+      - '9944:9944'
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+    volumes:
+      - node-data:/data
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9944/health']
+      interval: 2s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    environment:
+      CFG_PRESET: 'dev'
+      SIDECHAIN_BLOCK_BENEFICIARY: '04bcf7ad3be7a5c790460be82a713af570f22e0f801f6659ab8e84a52be6969e'
+
+  indexer:
+    image: 'midnightntwrk/indexer-standalone:4.3.3'
+    ports:
+      - '8088:8088'
+    restart: on-failure:10
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - indexer-data:/data
+    env_file:
+      - .env
+    environment:
+      RUST_LOG: 'indexer=info,chain_indexer=info,indexer_api=info,info'
+      APP__INFRA__NODE__URL: 'ws://node:9944'
+      APP__APPLICATION__NETWORK_ID: 'undeployed'
+      # Required non-empty since indexer 4.3.x; SPO features are unused on
+      # the localnet, any placeholder is accepted.
+      APP__INFRA__SPO_NODE__BLOCKFROST_ID: 'dummy-not-using-spo'
+    healthcheck:
+      test: ['CMD-SHELL', 'cat /var/run/indexer-standalone/running']
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 5s
+    depends_on:
+      node:
+        condition: service_healthy
+
+  proof-server:
+    image: 'midnightntwrk/proof-server:8.1.0'
+    ports:
+      - '6300:6300'
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      disable: true
+    environment:
+      RUST_BACKTRACE: 'full'
+      EXTRA_ARGS: -v
+
+volumes:
+  node-data:
+  indexer-data:

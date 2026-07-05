@@ -1,2 +1,6 @@
 node_modules/
 *.log
+contract/managed-zk/
+realDeal/infra/.env
+midnight-level-db/
+deployment.json

@@ -20,6 +20,16 @@ npm run demoland
 
 No Docker, no network, deterministic. Runs in seconds.
 
+## Quick start (realDeal — real ZK proofs on a live localnet)
+
+```bash
+npm install
+npm run compile-contract-zk   # full compile: prover/verifier keys (not in git)
+npm run infra:up              # node + indexer + proof server (Docker)
+npm run realdeal              # same 3 acts, real proofs (~2 min)
+npm run infra:down            # when done (add :reset to wipe chain state)
+```
+
 ## demoLand vs realDeal
 
 Per the DIDzMonolith [demoLand/realDeal convention](./docs/DEMOLAND_VS_REALDEAL.md):
@@ -30,7 +40,7 @@ Per the DIDzMonolith [demoLand/realDeal convention](./docs/DEMOLAND_VS_REALDEAL.
 | Chain | in-process via `@midnight-ntwrk/compact-runtime` | Midnight localnet (node + proof server + indexer) |
 | ZK proofs | not generated (circuit asserts still enforced) | real proofs |
 | Setup | none | Docker |
-| Status | ✅ working | 🔜 next |
+| Status | ✅ working | ✅ working |
 
 The storyline lives **once** in `shared/scenario.js`; both modes are thin
 orchestrators over it.
@@ -40,10 +50,13 @@ orchestrators over it.
 ```
 shared/     scenario.js (the 3 acts) + narrator.js — written once
 demoLand/   simulator.js (compact-runtime adapter) + run.js
-realDeal/   localnet adapter (upcoming)
-contract/   managed/ — compiled output of scoped_grant.compact
+realDeal/   wallet.js + adapter.js (midnight-js localnet) + run.js + infra/ (compose)
+contract/   managed/ — skip-zk output (in git); managed-zk/ — full ZK output (not in git)
 docs/       DEMOLAND_VS_REALDEAL.md
 ```
+
+**WSL note:** the compose file uses a bridge network with published ports —
+`network_mode: host` containers are unreachable from WSL under Docker Desktop.
 
 To regenerate the compiled contract after editing the module:
 `npm run compile-contract`.
