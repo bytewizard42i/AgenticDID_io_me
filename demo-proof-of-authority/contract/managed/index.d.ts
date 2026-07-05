@@ -7,45 +7,47 @@ export type Witnesses<PS> = {
 export type ImpureCircuits<PS> = {
   issue_grant(context: __compactRuntime.CircuitContext<PS>,
               grant_id_0: Uint8Array,
-              agent_pk_0: Uint8Array,
+              agent_public_key_0: Uint8Array,
               scope_0: Uint8Array,
-              limit_0: bigint,
+              max_amount_0: bigint,
               expiry_0: bigint): __compactRuntime.CircuitResults<PS, []>;
   delegate(context: __compactRuntime.CircuitContext<PS>,
            parent_id_0: Uint8Array,
            child_id_0: Uint8Array,
-           sub_agent_pk_0: Uint8Array,
+           sub_agent_public_key_0: Uint8Array,
            scope_0: Uint8Array,
-           limit_0: bigint,
+           max_amount_0: bigint,
            expiry_0: bigint): __compactRuntime.CircuitResults<PS, []>;
   assert_authorized(context: __compactRuntime.CircuitContext<PS>,
                     grant_id_0: Uint8Array,
                     scope_0: Uint8Array,
                     amount_0: bigint): __compactRuntime.CircuitResults<PS, []>;
-  revoke(context: __compactRuntime.CircuitContext<PS>, grant_id_0: Uint8Array): __compactRuntime.CircuitResults<PS, []>;
-  tick(context: __compactRuntime.CircuitContext<PS>): __compactRuntime.CircuitResults<PS, []>;
+  revoke_grant(context: __compactRuntime.CircuitContext<PS>,
+               grant_id_0: Uint8Array): __compactRuntime.CircuitResults<PS, []>;
+  advance_epoch(context: __compactRuntime.CircuitContext<PS>): __compactRuntime.CircuitResults<PS, []>;
 }
 
 export type ProvableCircuits<PS> = {
   issue_grant(context: __compactRuntime.CircuitContext<PS>,
               grant_id_0: Uint8Array,
-              agent_pk_0: Uint8Array,
+              agent_public_key_0: Uint8Array,
               scope_0: Uint8Array,
-              limit_0: bigint,
+              max_amount_0: bigint,
               expiry_0: bigint): __compactRuntime.CircuitResults<PS, []>;
   delegate(context: __compactRuntime.CircuitContext<PS>,
            parent_id_0: Uint8Array,
            child_id_0: Uint8Array,
-           sub_agent_pk_0: Uint8Array,
+           sub_agent_public_key_0: Uint8Array,
            scope_0: Uint8Array,
-           limit_0: bigint,
+           max_amount_0: bigint,
            expiry_0: bigint): __compactRuntime.CircuitResults<PS, []>;
   assert_authorized(context: __compactRuntime.CircuitContext<PS>,
                     grant_id_0: Uint8Array,
                     scope_0: Uint8Array,
                     amount_0: bigint): __compactRuntime.CircuitResults<PS, []>;
-  revoke(context: __compactRuntime.CircuitContext<PS>, grant_id_0: Uint8Array): __compactRuntime.CircuitResults<PS, []>;
-  tick(context: __compactRuntime.CircuitContext<PS>): __compactRuntime.CircuitResults<PS, []>;
+  revoke_grant(context: __compactRuntime.CircuitContext<PS>,
+               grant_id_0: Uint8Array): __compactRuntime.CircuitResults<PS, []>;
+  advance_epoch(context: __compactRuntime.CircuitContext<PS>): __compactRuntime.CircuitResults<PS, []>;
 }
 
 export type PureCircuits = {
@@ -57,23 +59,24 @@ export type Circuits<PS> = {
                     sk_0: Uint8Array): __compactRuntime.CircuitResults<PS, Uint8Array>;
   issue_grant(context: __compactRuntime.CircuitContext<PS>,
               grant_id_0: Uint8Array,
-              agent_pk_0: Uint8Array,
+              agent_public_key_0: Uint8Array,
               scope_0: Uint8Array,
-              limit_0: bigint,
+              max_amount_0: bigint,
               expiry_0: bigint): __compactRuntime.CircuitResults<PS, []>;
   delegate(context: __compactRuntime.CircuitContext<PS>,
            parent_id_0: Uint8Array,
            child_id_0: Uint8Array,
-           sub_agent_pk_0: Uint8Array,
+           sub_agent_public_key_0: Uint8Array,
            scope_0: Uint8Array,
-           limit_0: bigint,
+           max_amount_0: bigint,
            expiry_0: bigint): __compactRuntime.CircuitResults<PS, []>;
   assert_authorized(context: __compactRuntime.CircuitContext<PS>,
                     grant_id_0: Uint8Array,
                     scope_0: Uint8Array,
                     amount_0: bigint): __compactRuntime.CircuitResults<PS, []>;
-  revoke(context: __compactRuntime.CircuitContext<PS>, grant_id_0: Uint8Array): __compactRuntime.CircuitResults<PS, []>;
-  tick(context: __compactRuntime.CircuitContext<PS>): __compactRuntime.CircuitResults<PS, []>;
+  revoke_grant(context: __compactRuntime.CircuitContext<PS>,
+               grant_id_0: Uint8Array): __compactRuntime.CircuitResults<PS, []>;
+  advance_epoch(context: __compactRuntime.CircuitContext<PS>): __compactRuntime.CircuitResults<PS, []>;
 }
 
 export type Ledger = {
@@ -118,7 +121,7 @@ export type Ledger = {
     lookup(key_0: Uint8Array): Uint8Array;
     [Symbol.iterator](): Iterator<[Uint8Array, Uint8Array]>
   };
-  grant_limit: {
+  grant_max_amount: {
     isEmpty(): boolean;
     size(): bigint;
     member(key_0: Uint8Array): boolean;

@@ -9,11 +9,11 @@
 // The adapter interface every backend must provide:
 //   as(actorName)                      -> switch which actor signs the next call
 //   deriveKey(actorName)               -> the actor's public key commitment (Bytes<32>)
-//   issueGrant(id, agentPk, scope, limit, expiry)
-//   delegate(parentId, childId, subAgentPk, scope, limit, expiry)
+//   issueGrant(id, agentPublicKey, scope, maxAmount, expiry)
+//   delegate(parentId, childId, subAgentPublicKey, scope, maxAmount, expiry)
 //   assertAuthorized(id, scope, amount) -> throws if the proof fails
-//   revoke(id)
-//   tick()                             -> advance the epoch clock by 1
+//   revokeGrant(id)
+//   advanceEpoch()                     -> advance the epoch clock by 1
 //   scopeHash(label)                   -> Bytes<32> hash of a scope label
 //   grantId(label)                     -> deterministic Bytes<32> id for the demo
 // =============================================================================
@@ -85,7 +85,7 @@ export async function runScenario(adapter, say) {
   say.narrate('Alice changes her mind and revokes the ROOT grant. One action.');
 
   adapter.as('alice');
-  await adapter.revoke(ROOT);
+  await adapter.revokeGrant(ROOT);
   say.ok('Root grant revoked.');
 
   say.narrate('Alist tries to transact again...');

@@ -72,13 +72,13 @@ export function makeSimulatorAdapter() {
     scopeHash: (label) => bytes32(`scope:${label}`),
     grantId:   (label) => bytes32(`grant:${label}`),
 
-    issueGrant: (id, agentPk, scope, limit, expiry) =>
-      call('issue_grant', id, agentPk, scope, limit, expiry),
-    delegate: (parentId, childId, subAgentPk, scope, limit, expiry) =>
-      call('delegate', parentId, childId, subAgentPk, scope, limit, expiry),
+    issueGrant: (id, agentPublicKey, scope, maxAmount, expiry) =>
+      call('issue_grant', id, agentPublicKey, scope, maxAmount, expiry),
+    delegate: (parentId, childId, subAgentPublicKey, scope, maxAmount, expiry) =>
+      call('delegate', parentId, childId, subAgentPublicKey, scope, maxAmount, expiry),
     assertAuthorized: (id, scope, amount) =>
       call('assert_authorized', id, scope, amount),
-    revoke: (id) => call('revoke', id),
-    tick: () => call('tick'),
+    revokeGrant: (id) => call('revoke_grant', id),
+    advanceEpoch: () => call('advance_epoch'),
   };
 }

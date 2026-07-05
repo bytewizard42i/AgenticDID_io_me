@@ -47,7 +47,7 @@ disclosure of the principal's identity or the delegation topology.**
 | **Principal** | The human or organization that is the root source of authority. Identified by a DID; MAY hold verifiable credentials (e.g., proof of personhood, KYC). |
 | **Agent** | An autonomous process acting under delegated authority. Identified by a pairwise DID per counterparty context. |
 | **Grant** | A scoped, capped, expiring capability issued by a principal to an agent, or attenuated agent-to-agent. The unit of delegated authority. |
-| **Attenuation** | Delegation of a child grant whose authority is a strict subset of the parent's (scope ⊆, limit ≤, expiry ≤). |
+| **Attenuation** | Delegation of a child grant whose authority is a strict subset of the parent's (scope ⊆, max_amount ≤, expiry ≤). |
 | **Grant graph** | The tree of grants rooted at a principal. Stored in private state; never disclosed to verifiers. |
 | **Proof of authority** | A zero-knowledge proof that a specific agent holds a live grant covering a requested action. |
 | **Cascade revocation** | Revocation of a grant invalidating its entire delegation subtree in one action. |
@@ -85,7 +85,7 @@ A grant MUST contain at minimum:
 | `parent` | grant id / ∅ | public (v1) | Parent grant; absent for root grants |
 | `root` | grant id | public (v1) | Lineage root, for cascade revocation |
 | `scope` | 32-byte hash | public | Hash of the scope descriptor (§5.2) |
-| `limit` | uint | public | Numeric cap (e.g., spend ceiling) |
+| `max_amount` | uint | public | Per-action cap (e.g., spend ceiling per authorization) |
 | `expiry` | uint | public | Expiry epoch |
 
 > **NOTE (roadmap)**: fields marked "public (v1)" — the grant-graph topology —
@@ -111,7 +111,7 @@ with DIF Credential Schemas work.
    duplicate grant ids and MUST record the issuer as a key commitment.
 2. **Attenuate** — a grant holder issues a child grant. The registry MUST
    enforce: caller proves holdership of the parent in zero knowledge; child
-   `limit` ≤ parent `limit`; child `expiry` ≤ parent `expiry`; parent is live.
+   `max_amount` ≤ parent `max_amount`; child `expiry` ≤ parent `expiry`; parent is live.
 3. **Revoke** — the issuer of a grant revokes it. Revoking a root grant MUST
    invalidate the entire subtree (cascade). Revocation MUST take effect for
    all subsequent proofs of authority.
@@ -126,7 +126,7 @@ that all of the following hold, without revealing the witness values:
 1. The agent knows the secret key behind the grant's holder commitment.
 2. The grant is live (not revoked; lineage checks per §6.3).
 3. `scope` matches the grant's scope.
-4. `amount` ≤ the grant's limit.
+4. `amount` ≤ the grant's `max_amount`.
 5. The current epoch < the grant's expiry.
 
 The verifier MUST learn only the boolean outcome (and the public inputs it
@@ -177,7 +177,7 @@ supplied: scope and amount).
 
 `midnight-modules/modules/scoped-grant/scoped_grant.compact` — compiled
 against Compact compiler 0.31.1. Circuits: `issue_grant`, `delegate`,
-`assert_authorized`, `revoke`, `tick`. See the module README for the v1
+`assert_authorized`, `revoke_grant`, `advance_epoch`. See the module README for the v1
 caveat list, which corresponds to the roadmap notes in this spec.
 
 ---
