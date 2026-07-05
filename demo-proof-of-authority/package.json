@@ -1,0 +1,14 @@
+{
+  "name": "@agenticdid/demo-proof-of-authority",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AgenticDID proof-of-authority demo: 'Prove the mandate, not the man.' demoLand = in-process simulation of the real compiled scoped-grant contract; realDeal = live Midnight localnet.",
+  "type": "module",
+  "scripts": {
+    "demoland": "node demoLand/run.js",
+    "compile-contract": "compact compile --skip-zk ../../midnight-modules/modules/scoped-grant/scoped_grant.compact ../../midnight-modules/build/scoped-grant && cp ../../midnight-modules/build/scoped-grant/contract/index.js ../../midnight-modules/build/scoped-grant/contract/index.d.ts contract/managed/"
+  },
+  "dependencies": {
+    "@midnight-ntwrk/compact-runtime": "0.16.0"
+  }
+}
