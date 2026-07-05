@@ -65,3 +65,6 @@ bun.lockb
 # Vendored external Midnight repos (regenerate via midnight-reference-repos/clone_all_midnight_repos.sh)
 midnight-reference-repos/ref_*/
 midnight-reference-repos/i_am_Midnight_LLM_ref/
+
+# Windows Mark-of-the-Web sidecars (never commit)
+*:Zone.Identifier
