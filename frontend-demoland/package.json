@@ -1,7 +1,7 @@
 {
   "name": "agenticdid-demoland",
   "version": "1.0.0",
-  "description": "AgenticDID demoLand — four-pillar model demo UI",
+  "description": "AgenticDID demoLand — three-pillar model demo UI",
   "scripts": {
     "dev": "node server.js",
     "start": "node server.js"

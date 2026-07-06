@@ -4,7 +4,7 @@
 > Status: gaps found during Docker demo spin-up + gap analysis
 
 ## Demo (hackathon-era, needs rebuild)
-- [x] Docker demo still reflects OLD monolithic registry architecture — new standalone demoLand (frontend-demoland/) shows four-pillar model on port 3014; Docker demo marked stale in docs
+- [x] Docker demo still reflects OLD monolithic registry architecture — new standalone demoLand (frontend-demoland/) shows three-pillar model on port 3014; Docker demo marked stale in docs
 - [x] Demo doesn't show engine integration (scoped-grant v2, POL credential) — new demoLand shows two machines, scoped-grant lifecycle, ZK proof simulation, constitution alignment
 - [x] Demo UI needs 2026 modernization (glassmorphism, 3D tilt, haptics, tooltips) — new demoLand has all 2026 design elements
 - [x] Demo runs on port 3014 (standalone demoLand); Docker demo on 5173/8787/6300 marked stale
