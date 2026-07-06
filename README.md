@@ -143,3 +143,14 @@ AgenticDID is part of the **DIDz ecosystem** — 22 privacy-preserving products 
 
 **Built by**: [EnterpriseZK Labs LLC](https://enterprisezk.com) · John Santi
 **Built with**: Alice 🌟, Cassie 💜, Cara ✨, Casie 🌙, and Penny 🎀
+
+---
+
+## DIDz Ecosystem
+
+This project is part of the DIDz ecosystem — a suite of privacy-preserving
+identity, credential, and application tools built on Midnight Network.
+
+![DIDz Ecosystem Map](docs/DIDz-ecosystem-map.png)
+
+See the full ecosystem map above, or visit [didz.io](https://didz.io) for details.
