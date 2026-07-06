@@ -68,3 +68,6 @@ midnight-reference-repos/i_am_Midnight_LLM_ref/
 
 # Windows Mark-of-the-Web sidecars (never commit)
 *:Zone.Identifier
+
+# Large archives (keep on disk, don't commit)
+*.zip

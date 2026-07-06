@@ -17,12 +17,12 @@
 
 ## Architecture
 - [ ] Constitution still open — proposed: one DIDz root constitution + AgenticDID appendix
-- [ ] Cross-pollination docs not written (pointer docs to engine modules)
+- [x] Cross-pollination docs — `docs/ENGINE_REFERENCE.md` created
 
-## House convention docs (missing)
-- [ ] `docs/DEMOLAND_VS_REALDEAL.md`
-- [ ] `docs/DIF_RELEVANCE.md`
+## House convention docs
+- [x] `docs/DEMOLAND_VS_REALDEAL.md` — created
+- [x] `docs/DIF_RELEVANCE.md` — already existed
 
 ## Cleanup
-- [ ] `AgenticDID_io_me.zip` (63MB) in repo root — should be gitignored or removed
-- [ ] `didz-agenticdid-full-architecture.md:Zone.Identifier` — Windows metadata artifact, remove
+- [x] `AgenticDID_io_me.zip` (63MB) — untracked from git, added *.zip to .gitignore
+- [x] `didz-agenticdid-full-architecture.md:Zone.Identifier` — removed (already in .gitignore)
