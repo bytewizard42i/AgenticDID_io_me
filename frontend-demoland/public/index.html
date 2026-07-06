@@ -97,8 +97,9 @@
   .pill-amber { background: rgba(255,191,0,0.1); border: 1px solid var(--amber-border); color: var(--amber); }
   .pill-red { background: rgba(239,68,68,0.1); border: 1px solid var(--red-border); color: var(--red); }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
   .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
-  @media (max-width: 768px) { .grid-2, .grid-4 { grid-template-columns: 1fr; } }
+  @media (max-width: 768px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
   .pillar-card {
     padding: 18px; border-radius: var(--radius-sm);
     border: 1px solid var(--border); background: rgba(6,8,14,0.5);
@@ -149,13 +150,13 @@
 <div class="wrap">
   <div class="demo-badge">🎭 DEMO MODE</div>
   <h1>AgenticDID</h1>
-  <p class="subtitle">Privacy-preserving delegated authority for autonomous agents — four-pillar model on Midnight</p>
+  <p class="subtitle">Privacy-preserving delegated authority for autonomous agents — three-pillar model on Midnight</p>
 
-  <!-- Four Pillars -->
+  <!-- Three Pillars -->
   <div class="section">
-    <div class="section-title">🏛️ The four pillars <span class="info-icon">ⓘ<span class="tooltip">DIDz root identity + AgenticDID agent branch + RWAz asset branch + SelectConnect consumer product</span></span></div>
+    <div class="section-title">🏛️ The three pillars <span class="info-icon">ⓘ<span class="tooltip">DIDz root identity + AgenticDID agent authority + RWAz asset ownership — the foundational layers everything else builds on</span></span></div>
     <div class="card-3d" data-tilt>
-      <div class="grid-4">
+      <div class="grid-3">
         <div class="pillar-card" style="border-color: var(--blue-border)">
           <h3 style="color: var(--blue)">DIDz Root</h3>
           <p>Universal identity layer. Permanent registry entries, lifecycle status, entity types. <span class="pill pill-blue">machine 1</span></p>
@@ -167,10 +168,6 @@
         <div class="pillar-card" style="border-color: var(--green-border)">
           <h3 style="color: var(--green)">RWAz</h3>
           <p>Object/RWA identity. VIN stays, title moves. Encumbrances, provenance, fractionalization.</p>
-        </div>
-        <div class="pillar-card" style="border-color: var(--amber-border)">
-          <h3 style="color: var(--amber)">SelectConnect</h3>
-          <p>First consumer product. Contact sharing, progressive reveal, abuse bonds. Monetizes the protocol.</p>
         </div>
       </div>
     </div>
@@ -384,7 +381,7 @@ function revokeGrant() {
   }
 }
 
-log('AgenticDID demoLand initialized — four-pillar model, engine v2.');
+log('AgenticDID demoLand initialized — three-pillar model, engine v2.');
 log('Ready. Click "Issue grant" to start.', 'ok');
 </script>
 </body>
