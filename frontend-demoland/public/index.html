@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AgenticDID — DemoLand</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #06080e;
+    --panel: rgba(10,14,24,0.72);
+    --border: rgba(255,255,255,0.08);
+    --text: rgba(255,255,255,0.92);
+    --text-dim: rgba(255,255,255,0.55);
+    --green: #22c55e;
+    --green-border: rgba(34,197,94,0.25);
+    --blue: #3b82f6;
+    --blue-border: rgba(59,130,246,0.25);
+    --purple: #a855f7;
+    --purple-border: rgba(168,85,247,0.25);
+    --amber: #ffbf00;
+    --amber-border: rgba(255,191,0,0.25);
+    --red: #ef4444;
+    --red-border: rgba(239,68,68,0.25);
+    --radius: 16px;
+    --radius-sm: 10px;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Rajdhani', sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  .aurora {
+    position: fixed; top:0; left:0; width:100%; height:100%;
+    z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 10%, rgba(59,130,246,0.10), transparent),
+      radial-gradient(ellipse 50% 40% at 80% 20%, rgba(168,85,247,0.08), transparent),
+      radial-gradient(ellipse 40% 30% at 50% 80%, rgba(34,197,94,0.06), transparent);
+    animation: aurora-shift 20s ease-in-out infinite alternate;
+  }
+  @keyframes aurora-shift {
+    0% { transform: translateX(0) translateY(0); }
+    100% { transform: translateX(30px) translateY(-20px); }
+  }
+  .wrap { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 32px 20px 60px; }
+  .demo-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 14px; border-radius: 20px;
+    background: rgba(255,191,0,0.08); border: 1px solid var(--amber-border);
+    color: var(--amber); font-size: 12px; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase; margin-bottom: 16px;
+  }
+  h1 { font-size: 32px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
+  .subtitle { color: var(--text-dim); font-size: 15px; margin-bottom: 28px; }
+  .section { margin-bottom: 28px; }
+  .section-title { font-size: 17px; font-weight: 600; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .card-3d {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    backdrop-filter: blur(12px);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transform-style: preserve-3d;
+  }
+  .card-3d:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+  .info-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: rgba(255,255,255,0.1); color: var(--text-dim);
+    font-size: 10px; cursor: help; font-weight: 700;
+  }
+  .info-icon:hover { background: rgba(255,255,255,0.2); color: var(--text); }
+  .tooltip {
+    position: absolute; bottom: calc(100% + 8px); left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.92); border: 1px solid var(--border);
+    color: var(--text); padding: 8px 12px; border-radius: 8px;
+    font-size: 12px; white-space: nowrap; z-index: 100;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  }
+  .info-icon:hover .tooltip { opacity: 1; }
+  .pill {
+    display: inline-block; padding: 3px 10px; border-radius: 12px;
+    font-size: 11px; font-weight: 600; font-family: var(--mono);
+  }
+  .pill-green { background: rgba(34,197,94,0.1); border: 1px solid var(--green-border); color: var(--green); }
+  .pill-blue { background: rgba(59,130,246,0.1); border: 1px solid var(--blue-border); color: var(--blue); }
+  .pill-purple { background: rgba(168,85,247,0.1); border: 1px solid var(--purple-border); color: var(--purple); }
+  .pill-amber { background: rgba(255,191,0,0.1); border: 1px solid var(--amber-border); color: var(--amber); }
+  .pill-red { background: rgba(239,68,68,0.1); border: 1px solid var(--red-border); color: var(--red); }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  @media (max-width: 768px) { .grid-2, .grid-4 { grid-template-columns: 1fr; } }
+  .pillar-card {
+    padding: 18px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border); background: rgba(6,8,14,0.5);
+  }
+  .pillar-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+  .pillar-card p { font-size: 12px; color: var(--text-dim); line-height: 1.6; }
+  .machine-box {
+    padding: 18px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+  }
+  .machine-box h3 { font-size: 15px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .machine-box p { font-size: 13px; color: var(--text-dim); line-height: 1.7; margin-bottom: 10px; }
+  .machine-box code { font-family: var(--mono); font-size: 12px; color: var(--green); }
+  .grant-viz {
+    font-family: var(--mono); font-size: 11px; line-height: 1.8;
+    padding: 14px; border-radius: var(--radius-sm);
+    background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+    color: var(--text-dim); white-space: pre; overflow-x: auto;
+  }
+  .btn {
+    padding: 10px 20px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border); background: rgba(255,255,255,0.05);
+    color: var(--text); font-family: var(--sans); font-size: 14px;
+    font-weight: 600; cursor: pointer; transition: all 0.2s;
+  }
+  .btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: rgba(59,130,246,0.15); border-color: var(--blue-border); color: var(--blue); }
+  .btn-danger { background: rgba(239,68,68,0.15); border-color: var(--red-border); color: var(--red); }
+  .log {
+    font-family: var(--mono); font-size: 11px; line-height: 1.8;
+    padding: 14px; border-radius: var(--radius-sm);
+    background: rgba(0,0,0,0.3); border: 1px solid var(--border);
+    color: var(--text-dim); max-height: 240px; overflow-y: auto;
+  }
+  .log .ts { color: var(--blue); }
+  .log .ok { color: var(--green); }
+  .log .warn { color: var(--amber); }
+  .log .err { color: var(--red); }
+  .stat-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+  .stat { flex: 1; min-width: 120px; text-align: center; padding: 12px; border-radius: var(--radius-sm); background: rgba(6,8,14,0.5); border: 1px solid var(--border); }
+  .stat .val { font-size: 24px; font-weight: 700; font-family: var(--mono); }
+  .stat .lbl { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+<div class="aurora"></div>
+<div class="wrap">
+  <div class="demo-badge">🎭 DEMO MODE</div>
+  <h1>AgenticDID</h1>
+  <p class="subtitle">Privacy-preserving delegated authority for autonomous agents — four-pillar model on Midnight</p>
+
+  <!-- Four Pillars -->
+  <div class="section">
+    <div class="section-title">🏛️ The four pillars <span class="info-icon">ⓘ<span class="tooltip">DIDz root identity + AgenticDID agent branch + RWAz asset branch + SelectConnect consumer product</span></span></div>
+    <div class="card-3d" data-tilt>
+      <div class="grid-4">
+        <div class="pillar-card" style="border-color: var(--blue-border)">
+          <h3 style="color: var(--blue)">DIDz Root</h3>
+          <p>Universal identity layer. Permanent registry entries, lifecycle status, entity types. <span class="pill pill-blue">machine 1</span></p>
+        </div>
+        <div class="pillar-card" style="border-color: var(--purple-border)">
+          <h3 style="color: var(--purple)">AgenticDID</h3>
+          <p>Agent identity + delegated authority. Scoped grants, attenuation, ZK proof of authority. <span class="pill pill-purple">machine 2</span></p>
+        </div>
+        <div class="pillar-card" style="border-color: var(--green-border)">
+          <h3 style="color: var(--green)">RWAz</h3>
+          <p>Object/RWA identity. VIN stays, title moves. Encumbrances, provenance, fractionalization.</p>
+        </div>
+        <div class="pillar-card" style="border-color: var(--amber-border)">
+          <h3 style="color: var(--amber)">SelectConnect</h3>
+          <p>First consumer product. Contact sharing, progressive reveal, abuse bonds. Monetizes the protocol.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Two Machines -->
+  <div class="section">
+    <div class="section-title">⚙️ Two machines <span class="info-icon">ⓘ<span class="tooltip">Machine 1 = identity (who you are). Machine 2 = permission (what you can do). Never confuse the two.</span></span></div>
+    <div class="card-3d" data-tilt>
+      <div class="grid-2">
+        <div class="machine-box" style="background: rgba(59,130,246,0.04); border-color: var(--blue-border)">
+          <h3 style="color: var(--blue)">🔐 Machine 1: Identity</h3>
+          <p>The agent's DIDz — a permanent, non-transferable registry entry with entity type <code>AgentDIDz</code> and lifecycle status.</p>
+          <p><b style="color:rgba(255,255,255,0.8)">Contract:</b> <code>DIDzRegistry.compact</code> (15 circuits)</p>
+          <p><b style="color:rgba(255,255,255,0.8)">Key circuits:</b> <code>register_did</code>, <code>assert_i_control</code>, <code>prove_entity_type</code>, <code>rotate_owner_key</code>, <code>set_terminal_status</code></p>
+          <p><b style="color:rgba(255,255,255,0.8)">Privacy:</b> On-chain = existence + status only. Entity type, subject binding, owner key = committed, revealed via ZK.</p>
+        </div>
+        <div class="machine-box" style="background: rgba(168,85,247,0.04); border-color: var(--purple-border)">
+          <h3 style="color: var(--purple)">🎫 Machine 2: Permission</h3>
+          <p>The scoped-grant system — bounded, revocable, attenuating authority delegated from principal to agent.</p>
+          <p><b style="color:rgba(255,255,255,0.8)">Module:</b> <code>midnight-modules/scoped-grant v2</code></p>
+          <p><b style="color:rgba(255,255,255,0.8)">Key circuits:</b> <code>issue_grant</code>, <code>delegate</code>, <code>assert_authorized</code>, <code>revoke_grant</code>, <code>advance_epoch</code></p>
+          <p><b style="color:rgba(255,255,255,0.8)">ZK proof:</b> Verifier learns one bit — "authorized for this scope and amount, unexpired, unrevoked" — nothing else.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Demo: Issue Grant -->
+  <div class="section">
+    <div class="section-title">🎬 Demo: Issue a scoped grant <span class="info-icon">ⓘ<span class="tooltip">Simulated: shows the flow of creating a scoped grant from a principal to an agent, then verifying it.</span></span></div>
+    <div class="card-3d" data-tilt>
+      <div class="stat-row">
+        <div class="stat"><div class="val" id="stat-grants" style="color:var(--purple)">0</div><div class="lbl">Active Grants</div></div>
+        <div class="stat"><div class="val" id="stat-delegations" style="color:var(--blue)">0</div><div class="lbl">Delegations</div></div>
+        <div class="stat"><div class="val" id="stat-revocations" style="color:var(--red)">0</div><div class="lbl">Revocations</div></div>
+        <div class="stat"><div class="val" id="stat-proofs" style="color:var(--green)">0</div><div class="lbl">ZK Proofs</div></div>
+      </div>
+      <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:16px">
+        <button class="btn btn-primary" onclick="issueGrant()">🎫 Issue grant</button>
+        <button class="btn" onclick="delegateGrant()" id="btn-delegate" disabled>↳ Delegate (attenuate)</button>
+        <button class="btn" onclick="proveAuthority()" id="btn-prove" disabled>🔐 Prove authority</button>
+        <button class="btn btn-danger" onclick="revokeGrant()" id="btn-revoke" disabled>✕ Revoke (cascade)</button>
+      </div>
+      <div class="grant-viz" id="grant-viz">// No grants yet. Click "Issue grant" to simulate creating one.</div>
+    </div>
+  </div>
+
+  <!-- Event Log -->
+  <div class="section">
+    <div class="section-title">📋 Event log</div>
+    <div class="card-3d" data-tilt>
+      <div class="log" id="log">// AgenticDID demoLand event log — actions appear here.</div>
+    </div>
+  </div>
+
+  <!-- Constitution Reference -->
+  <div class="section">
+    <div class="section-title">📜 Constitution alignment</div>
+    <div class="card-3d" data-tilt style="padding: 20px">
+      <p style="font-size:13px; color:var(--text-dim); line-height:1.7">
+        This demo follows the <b style="color:var(--text)">DIDz Constitution</b> (Appendix A: AgenticDID rules).
+        Key invariants enforced:
+      </p>
+      <ul style="font-size:13px; color:var(--text-dim); line-height:1.8; margin-left:20px; margin-top:8px">
+        <li><b style="color:var(--text)">A2:</b> Two machines — identity and permission are never confused</li>
+        <li><b style="color:var(--text)">A4:</b> Attenuation-only — child grants are always strict subsets of parents</li>
+        <li><b style="color:var(--text)">§17:</b> Dual spend limits — per_action_cap AND cumulative_cap, both enforced</li>
+        <li><b style="color:var(--text)">§20:</b> Cascade revocation — revoking a root invalidates the entire subtree</li>
+        <li><b style="color:var(--text)">§22:</b> ZK proof of authority — verifier learns one bit, nothing else</li>
+        <li><b style="color:var(--text)">§27:</b> Constitutional violations trigger grant revocation, not identity deletion</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- What This Demonstrates -->
+  <div class="section">
+    <div class="section-title">🧠 What this demonstrates</div>
+    <div class="card-3d" data-tilt style="padding: 20px; font-size: 13px; color: var(--text-dim); line-height: 1.8">
+      <b style="color:var(--text)">Scoped grants</b> replace broad API keys with narrow, expiring, revocable authority —
+      "buy groceries up to $50" instead of "access my bank account."<br><br>
+      <b style="color:var(--text)">Attenuation</b> means an agent can delegate to a sub-agent, but only with less power.
+      The delegation tree is a strict subset chain.<br><br>
+      <b style="color:var(--text)">ZK proof of authority</b> lets a verifier confirm "this agent is authorized for this
+      action" without learning who the principal is, what other grants exist, or the delegation topology.<br><br>
+      <b style="color:var(--text)">Cascade revocation</b> kills an entire delegation subtree in one action —
+      revoke the root, every child grant dies instantly.<br><br>
+      <b style="color:var(--text)">Constitutional enforcement</b> means violations (exceeding authority, impersonating,
+      bypassing revocation) trigger grant revocation and status changes — but the permanent identity record is never deleted.
+    </div>
+  </div>
+</div>
+
+<script>
+// 3D tilt effect
+document.querySelectorAll('[data-tilt]').forEach(el => {
+  el.addEventListener('mousemove', e => {
+    const r = el.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - 0.5;
+    const y = (e.clientY - r.top) / r.height - 0.5;
+    el.style.transform = `perspective(800px) rotateY(${x * 3}deg) rotateX(${-y * 3}deg)`;
+  });
+  el.addEventListener('mouseleave', () => { el.style.transform = ''; });
+});
+
+// Haptics
+function haptic(ms = 10) { if (navigator.vibrate) navigator.vibrate(ms); }
+
+// State
+let grants = [];
+let grantIdCounter = 0;
+let logEntries = [];
+let stats = { grants: 0, delegations: 0, revocations: 0, proofs: 0 };
+
+function log(msg, cls = '') {
+  const ts = new Date().toLocaleTimeString('en-US', { hour12: false });
+  logEntries.push(`<span class="ts">[${ts}]</span> <span class="${cls}">${msg}</span>`);
+  document.getElementById('log').innerHTML = logEntries.join('\n');
+  document.getElementById('log').scrollTop = 999999;
+}
+
+function updateStats() {
+  document.getElementById('stat-grants').textContent = stats.grants;
+  document.getElementById('stat-delegations').textContent = stats.delegations;
+  document.getElementById('stat-revocations').textContent = stats.revocations;
+  document.getElementById('stat-proofs').textContent = stats.proofs;
+}
+
+function updateViz() {
+  if (grants.length === 0) {
+    document.getElementById('grant-viz').textContent = '// No grants yet. Click "Issue grant" to simulate creating one.';
+    return;
+  }
+  let viz = '// GRANT GRAPH (private state — verifier never sees this)\n';
+  grants.forEach(g => {
+    const indent = g.parent !== null ? '  └─ ' : '';
+    const status = g.revoked ? ' ❌ REVOKED' : ' ✅ live';
+    viz += `${indent}grant_${g.id}  scope=${g.scope}  cap=$${g.cap}  expiry=epoch+${g.expiry}${status}\n`;
+  });
+  document.getElementById('grant-viz').textContent = viz;
+}
+
+function issueGrant() {
+  haptic(15);
+  grantIdCounter++;
+  const scopes = ['purchase:groceries', 'transfer:rent', 'sign:contract', 'access:calendar'];
+  const scope = scopes[Math.floor(Math.random() * scopes.length)];
+  const cap = [25, 50, 100, 200][Math.floor(Math.random() * 4)];
+  const expiry = 24 + Math.floor(Math.random() * 48);
+  const g = { id: grantIdCounter, parent: null, scope, cap, expiry, revoked: false };
+  grants.push(g);
+  stats.grants++;
+  log(`issue_grant → grant_${g.id}  scope=${scope}  per_action_cap=$${cap}  expiry=epoch+${expiry}h`, 'ok');
+  updateStats(); updateViz();
+  document.getElementById('btn-delegate').disabled = false;
+  document.getElementById('btn-prove').disabled = false;
+  document.getElementById('btn-revoke').disabled = false;
+}
+
+function delegateGrant() {
+  haptic(12);
+  const live = grants.filter(g => !g.revoked);
+  if (live.length === 0) return;
+  const parent = live[Math.floor(Math.random() * live.length)];
+  grantIdCounter++;
+  const childCap = Math.floor(parent.cap / 2);
+  const childExpiry = Math.floor(parent.expiry / 2);
+  const g = { id: grantIdCounter, parent: parent.id, scope: parent.scope, cap: childCap, expiry: childExpiry, revoked: false };
+  grants.push(g);
+  stats.delegations++;
+  log(`delegate → grant_${g.id}  parent=grant_${parent.id}  cap=$${childCap} (≤$${parent.cap})  expiry=${childExpiry}h (≤${parent.expiry}h)  ATTENUATED`, 'ok');
+  updateStats(); updateViz();
+}
+
+function proveAuthority() {
+  haptic(8);
+  const live = grants.filter(g => !g.revoked);
+  if (live.length === 0) return;
+  const g = live[Math.floor(Math.random() * live.length)];
+  stats.proofs++;
+  log(`assert_authorized → grant_${g.id}  proof=ZK{holder knows key ∧ grant live ∧ scope matches ∧ amount ≤ cap ∧ epoch < expiry}  → TRUE  (verifier learns ONE BIT)`, 'ok');
+  updateStats();
+}
+
+function revokeGrant() {
+  haptic(20);
+  const live = grants.filter(g => !g.revoked);
+  if (live.length === 0) return;
+  const root = live.find(g => g.parent === null) || live[0];
+  // Cascade: revoke root and all children
+  const toRevoke = [root.id];
+  let changed = true;
+  while (changed) {
+    changed = false;
+    grants.forEach(g => {
+      if (!g.revoked && toRevoke.includes(g.parent) && !toRevoke.includes(g.id)) {
+        toRevoke.push(g.id);
+        changed = true;
+      }
+    });
+  }
+  grants.forEach(g => { if (toRevoke.includes(g.id)) g.revoked = true; });
+  stats.revocations += toRevoke.length;
+  stats.grants = grants.filter(g => !g.revoked).length;
+  log(`revoke_grant → grant_${root.id}  CASCADE: revoked ${toRevoke.length} grant(s) [${toRevoke.map(id => 'grant_' + id).join(', ')}]`, 'warn');
+  updateStats(); updateViz();
+  if (stats.grants === 0) {
+    document.getElementById('btn-delegate').disabled = true;
+    document.getElementById('btn-prove').disabled = true;
+    document.getElementById('btn-revoke').disabled = true;
+  }
+}
+
+log('AgenticDID demoLand initialized — four-pillar model, engine v2.');
+log('Ready. Click "Issue grant" to start.', 'ok');
+</script>
+</body>
+</html>

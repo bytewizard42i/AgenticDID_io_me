@@ -1,0 +1,12 @@
+{
+  "name": "agenticdid-demoland",
+  "version": "1.0.0",
+  "description": "AgenticDID demoLand — four-pillar model demo UI",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

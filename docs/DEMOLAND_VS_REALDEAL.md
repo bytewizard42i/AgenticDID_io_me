@@ -3,14 +3,28 @@
 > Convention: every DIDzMonolith product ships two modes.
 > Canonical spec: `~/PixyPi/docs/DEMOLAND_AUTH_STANDARD.md`
 
-## demoLand (current)
+## demoLand — standalone (new, 2026 UI)
 
+- **Location**: `frontend-demoland/`
+- **Port**: 3014
+- **Server**: Express static server (`node server.js`)
+- **No Docker, no network** — pure HTML/CSS/JS simulation
+- **What it shows**: Four-pillar model, two machines, scoped-grant lifecycle
+  (issue → delegate → prove → revoke with cascade), ZK proof simulation,
+  constitution alignment, 2026 glassmorphism + 3D tilt design
+- **Start**: `cd frontend-demoland && npm install && npm start`
+- **URL**: http://localhost:3014
+
+## demoLand — Docker (hackathon-era, needs rebuild)
+
+- **Location**: `demo/`
 - **Ports**: 5173 (frontend), 8787 (backend), 6300 (proof server)
 - **Server**: Docker Compose (`demo/docker-compose.yml`)
 - **Chain**: undeployed mode — local Midnight node + proof server
 - **Auth**: 7-method standard (see canonical doc)
 - **Docker required** — `docker compose up` in `demo/`
 - **Safe to record** — local node, no external network
+- **⚠️ STALE**: still reflects old monolithic registry architecture
 
 ## realDeal (planned)
 
