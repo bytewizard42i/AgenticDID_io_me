@@ -181,7 +181,7 @@
         <div class="machine-box" style="background: rgba(59,130,246,0.04); border-color: var(--blue-border)">
           <h3 style="color: var(--blue)">🔐 Machine 1: Identity</h3>
           <p>The agent's DIDz — a permanent, non-transferable registry entry with entity type <code>AgentDIDz</code> and lifecycle status.</p>
-          <p><b style="color:rgba(255,255,255,0.8)">Contract:</b> <code>DIDzRegistry.compact</code> (15 circuits)</p>
+          <p><b style="color:rgba(255,255,255,0.8)">Contract:</b> <code>DIDzRegistry.compact</code> (17 circuits)</p>
           <p><b style="color:rgba(255,255,255,0.8)">Key circuits:</b> <code>register_did</code>, <code>assert_i_control</code>, <code>prove_entity_type</code>, <code>rotate_owner_key</code>, <code>set_terminal_status</code></p>
           <p><b style="color:rgba(255,255,255,0.8)">Privacy:</b> On-chain = existence + status only. Entity type, subject binding, owner key = committed, revealed via ZK.</p>
         </div>
@@ -213,6 +213,25 @@
         <button class="btn btn-danger" onclick="revokeGrant()" id="btn-revoke" disabled>✕ Revoke (cascade)</button>
       </div>
       <div class="grant-viz" id="grant-viz">// No grants yet. Click "Issue grant" to simulate creating one.</div>
+    </div>
+  </div>
+
+  <!-- Intent Compiler (Phase A2) -->
+  <div class="section">
+    <div class="section-title">🤖 Intent → Grant Compiler <span class="info-icon">ⓘ<span class="tooltip">Type a natural-language intent and the compiler produces the minimal scoped grant that covers it. This is Machine 2 in action.</span></span></div>
+    <div class="card-3d" data-tilt>
+      <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:12px">
+        <input type="text" id="intent-input" placeholder="e.g. buy groceries at acme for up to $50 within 2 hours" style="flex:1; min-width:300px; padding:10px 14px; background:rgba(10,14,26,0.6); border:1px solid var(--border); border-radius:8px; color:var(--text); font-size:14px" onkeydown="if(event.key==='Enter')compileIntent()">
+        <button class="btn btn-primary" onclick="compileIntent()">⚡ Compile</button>
+      </div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px">
+        <button class="btn" style="font-size:11px; padding:6px 12px" onclick="setIntentExample('buy groceries at acme for up to $50')">groceries $50</button>
+        <button class="btn" style="font-size:11px; padding:6px 12px" onclick="setIntentExample('buy coffee at starbucks for $5')">coffee $5</button>
+        <button class="btn" style="font-size:11px; padding:6px 12px" onclick="setIntentExample('transfer $100 to bob for 1 day')">transfer $100</button>
+        <button class="btn" style="font-size:11px; padding:6px 12px" onclick="setIntentExample('buy gas for $30 within 2 hours')">gas 2hr</button>
+        <button class="btn" style="font-size:11px; padding:6px 12px" onclick="setIntentExample('subscribe to netflix for $15 per month')">subscription</button>
+      </div>
+      <div id="intent-output" style="font-family:var(--mono); font-size:12px; color:var(--text-dim); min-height:40px">// Compiled grant request will appear here.</div>
     </div>
   </div>
 
@@ -379,6 +398,84 @@ function revokeGrant() {
     document.getElementById('btn-prove').disabled = true;
     document.getElementById('btn-revoke').disabled = true;
   }
+}
+
+// ===== Intent Compiler (Phase A2) =====
+const SCOPE_PATTERNS = [
+  { re: /grocer(y|ies)/i, scope: 'purchase:groceries' },
+  { re: /coffee|cafe|starbucks/i, scope: 'purchase:coffee' },
+  { re: /gas|fuel|petrol/i, scope: 'purchase:fuel' },
+  { re: /restaurant|dining|food|meal|lunch|dinner/i, scope: 'purchase:dining' },
+  { re: /book|ebook|kindle/i, scope: 'purchase:books' },
+  { re: /subscription|subscribe|netflix|spotify/i, scope: 'subscription:pay' },
+  { re: /transfer|send|wire|pay to/i, scope: 'transfer:send' },
+  { re: /invest|trade|buy stock|sell stock/i, scope: 'trade:execute' },
+  { re: /sign|signing|contract|document/i, scope: 'sign:document' },
+  { re: /data|access|read|query/i, scope: 'data:read' },
+  { re: /post|publish|write|blog|article/i, scope: 'content:publish' },
+  { re: /vote|ballot|election/i, scope: 'civic:vote' },
+];
+const COUNTERPARTY_RE = /(?:at|to|from)\s+([a-z][a-z0-9-]{1,30})/i;
+const AMOUNT_RE = /\$(\d+(?:\.\d{1,2})?)|(\d+)\s*(?:dollars?|usd)/i;
+const TIME_RE = /(\d+)\s*(hour|hr|minute|min|day|week|month)/i;
+const UNLIMITED = '18446744073709551615';
+
+function setIntentExample(text) {
+  document.getElementById('intent-input').value = text;
+  compileIntent();
+}
+
+function compileIntent() {
+  const intent = document.getElementById('intent-input').value.trim();
+  const out = document.getElementById('intent-output');
+  if (!intent) { out.innerHTML = '<span style="color:var(--red)">// Please enter an intent</span>'; return; }
+
+  // Extract scope
+  let scope = null;
+  for (const { re, scope: s } of SCOPE_PATTERNS) { if (re.test(intent)) { scope = s; break; } }
+  if (!scope) {
+    out.innerHTML = `<span style="color:var(--red)">// Could not determine scope from: "${intent}"</span>`;
+    log(`intent_compile → FAILED: unrecognized scope`, 'warn');
+    return;
+  }
+
+  // Extract amount
+  let perActionCap = UNLIMITED;
+  let amountWarn = '';
+  const amMatch = intent.match(AMOUNT_RE);
+  if (amMatch) {
+    const dollars = amMatch[1] ? parseFloat(amMatch[1]) : parseInt(amMatch[2], 10);
+    perActionCap = Math.round(dollars * 100).toString();
+  } else {
+    amountWarn = ' ⚠ no amount → unlimited';
+  }
+
+  // Extract counterparty
+  let counterparty = 'null';
+  const cpMatch = intent.match(COUNTERPARTY_RE);
+  if (cpMatch) counterparty = `"cp:${cpMatch[1].toLowerCase()}"`;
+
+  // Extract expiry
+  let expiry = 3600;
+  const tMatch = intent.match(TIME_RE);
+  if (tMatch) {
+    const v = parseInt(tMatch[1], 10);
+    const u = tMatch[2].toLowerCase();
+    expiry = { hour: 3600, hr: 3600, minute: 60, min: 60, day: 86400, week: 604800, month: 2592000 }[u] * v;
+  }
+
+  const grant = {
+    scope,
+    per_action_cap: perActionCap + ' cents',
+    cumulative_cap: perActionCap + ' cents',
+    expiry_seconds: expiry,
+    allowed_counterparty: counterparty,
+  };
+
+  out.innerHTML = `<span style="color:var(--green)">// Compiled grant request:</span>\n` +
+    JSON.stringify(grant, null, 2).replace(/"/g, '"').replace(/\n/g, '<br>').replace(/  /g, '&nbsp;&nbsp;') +
+    (amountWarn ? `<br><span style="color:var(--amber)">${amountWarn}</span>` : '');
+  log(`intent_compile → scope=${scope}, cap=${perActionCap}c, expiry=${expiry}s, cp=${counterparty}`, 'ok');
 }
 
 log('AgenticDID demoLand initialized — three-pillar model, engine v2.');
