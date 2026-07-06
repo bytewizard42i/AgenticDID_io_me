@@ -16,7 +16,7 @@
 - [ ] Verify all contracts compile on `compactc 0.31.1`
 
 ## Architecture
-- [ ] Constitution still open — proposed: one DIDz root constitution + AgenticDID appendix
+- [x] Constitution drafted — DIDZ_CONSTITUTION.md with Appendix A (AgenticDID rules: two machines, attenuation-only, agent-specific violations)
 - [x] Cross-pollination docs — `docs/ENGINE_REFERENCE.md` created
 
 ## House convention docs
