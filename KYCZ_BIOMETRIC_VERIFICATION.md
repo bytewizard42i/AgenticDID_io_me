@@ -1,4 +1,4 @@
-# 🧬 KYCz — Zero-Knowledge KYC with Biometric Liveness
+# 🧬 KYCz, Zero-Knowledge KYC with Biometric Liveness
 
 **The Human Identity Verification Layer for AgenticDID**
 
@@ -9,11 +9,11 @@
 
 ## What Is KYCz?
 
-**KYC + zkProofs = KYCz** — Privacy-preserving identity verification powered by the Midnight blockchain.
+**KYC + zkProofs = KYCz**, Privacy-preserving identity verification powered by the Midnight blockchain.
 
-KYCz takes traditional Know Your Customer (KYC) data, stores it in Midnight's **private state**, and uses **zero-knowledge proofs** to make assertions about that data — **without ever revealing the underlying information**.
+KYCz takes traditional Know Your Customer (KYC) data, stores it in Midnight's **private state**, and uses **zero-knowledge proofs** to make assertions about that data, **without ever revealing the underlying information**.
 
-Identity is verified through **multi-factor biometric liveness detection**, ensuring a real human is behind every verification — not a deepfake, bot, or synthetic identity.
+Identity is verified through **multi-factor biometric liveness detection**, ensuring a real human is behind every verification, not a deepfake, bot, or synthetic identity.
 
 ---
 
@@ -24,7 +24,7 @@ AgenticDID enables AI agents to have verifiable digital identities. KYCz is the 
 1. **Verifies the human** behind an agent via 8-factor biometric liveness
 2. **Stores KYC data** in Midnight's private state (not a centralized DB)
 3. **Issues zk-proofs** that the agent can carry as verifiable credentials
-4. **Enables re-verification** — biometrics confirm the same human returns
+4. **Enables re-verification**, biometrics confirm the same human returns
 
 ```
 Human → KYCz Biometric Liveness → Midnight Private State → zk-Proof Credentials → Agent Identity
@@ -36,7 +36,7 @@ Human → KYCz Biometric Liveness → Midnight Private State → zk-Proof Creden
 
 | Factor | Weight | Technique |
 |--------|--------|----------|
-| **3D Parallax** | 17% | Depth variation detection — defeats flat screen/photo spoofs |
+| **3D Parallax** | 17% | Depth variation detection, defeats flat screen/photo spoofs |
 | **Eye Blink Rate** | 15% | Eye Aspect Ratio (EAR) via 68-point facial landmarks |
 | **Face Micro-Movements** | 15% | Involuntary movement signatures, frame-to-frame landmark drift |
 | **Face Movement Challenge** | 15% | Random head-turn/nod/blink-on-command prompts |
@@ -48,9 +48,9 @@ Human → KYCz Biometric Liveness → Midnight Private State → zk-Proof Creden
 **Behavioral factors** (blink, parallax, micro-movement, challenge) = **62%** of score.
 
 ### Additional Layers
-- **Voice/Speech Liveness** — 5 random words + lip-sync cross-validation
-- **Document OCR** — ID/passport/license scanning with AI validation
-- **Chat Cross-Reference** — AI chatbot verifies document data against live responses
+- **Voice/Speech Liveness**, 5 random words + lip-sync cross-validation
+- **Document OCR**, ID/passport/license scanning with AI validation
+- **Chat Cross-Reference**, AI chatbot verifies document data against live responses
 
 ---
 
@@ -79,11 +79,11 @@ Human → KYCz Biometric Liveness → Midnight Private State → zk-Proof Creden
 
 ## 5-Step KYCz Workflow
 
-1. **System Check** — Camera, video quality, face detection, lighting, FPS
-2. **ID Document Scan** — Front/back capture, OCR, AI field validation
-3. **Biometric Liveness** — All 8 factors + voice/speech simultaneously
-4. **Chat Verification** — Cross-reference document data with live responses
-5. **Midnight Commitment** — KYC data → private state, credential issued
+1. **System Check**, Camera, video quality, face detection, lighting, FPS
+2. **ID Document Scan**, Front/back capture, OCR, AI field validation
+3. **Biometric Liveness**, All 8 factors + voice/speech simultaneously
+4. **Chat Verification**, Cross-reference document data with live responses
+5. **Midnight Commitment**, KYC data → private state, credential issued
 
 ---
 

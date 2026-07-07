@@ -33,7 +33,7 @@ Most DID projects add agent support as an afterthought. We designed for agents f
 - Three-axis issuer model (TI/RA/Task) for institutional clarity
 - ZK proofs ensure privacy even when agents act on your behalf
 
-The "z" marker in `did:agentic:user:abc123z` isn't decoration—it's a philosophical statement about self-sovereignty in an agent-mediated world.
+The "z" marker in `did:agentic:user:abc123z` isn't decoration,it's a philosophical statement about self-sovereignty in an agent-mediated world.
 
 ### 3. We integrated Midnight Network for its robust security and surety.
 

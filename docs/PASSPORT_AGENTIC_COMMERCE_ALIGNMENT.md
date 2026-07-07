@@ -14,16 +14,16 @@ Midnight roadmap. That is an opening for AgenticDID to align and contribute.
 
 ## What Passport said about agents
 
-- **Agents are personas / first-class citizens** — treated like individual, managed, and
+- **Agents are personas / first-class citizens**, treated like individual, managed, and
   enterprise users, with defined journeys.
 - **Agentic commerce is huge and real:** the **Explorer 2** initiative processed
   **160 million agent payments** in under a year. (Track alongside the emerging
   **AP2 / Agent Payments** direction.)
 - **Two missing pieces Passport targets:**
-  1. **Principal Privacy** — the agent proves it is **authorised by a real human** and
+  1. **Principal Privacy**, the agent proves it is **authorised by a real human** and
      operates within a **defined scope** (spending limits, duration), **without publishing
      the human's identity on-chain**.
-  2. **Legal Compliance** — agent transactions comply with the legal context.
+  2. **Legal Compliance**, agent transactions comply with the legal context.
 - **The mandate/pact flow:**
   1. The human signs a **mandate** granting scope (example: a DeFi agent budget of
      **$10,000**).
@@ -34,7 +34,7 @@ Midnight roadmap. That is an opening for AgenticDID to align and contribute.
   not fooled by look-alike DApps the way humans (who misread characters) are. **ZK gives
   provability of intention.**
 - **Contingent settlement:** transactions can sit **"pending"** until ZK proofs / contract
-  signatures satisfy defined criteria — a built-in audit trail.
+  signatures satisfy defined criteria, a built-in audit trail.
 
 ## Mapping to AgenticDID concepts
 
@@ -52,7 +52,7 @@ Midnight roadmap. That is an opening for AgenticDID to align and contribute.
 
 1. **Add budget + duration** to the delegation/scope schema (mirror the mandate's
    spend-limit and time bounds).
-2. **Formalise the pact evaluator** — the in-scope/out-of-scope decision — as an explicit,
+2. **Formalise the pact evaluator**, the in-scope/out-of-scope decision, as an explicit,
    ZK-provable check.
 3. **Principal-privacy proof:** specify the ZK statement "this agent is authorised by a
    human principal" that reveals no principal identity on-chain.
@@ -71,7 +71,7 @@ Passport fork's `04_First-PR-to-Passport-Origin-Strategy.md`.
 
 ## Contacts
 
-- Karmel ("Carmel") — Passport **product lead**, GitHub `Karmoola`.
-- Hector Bulgarini — technical demo, GitHub `hbulgarini`, X `@hectorest06`.
+- Karmel ("Carmel"), Passport **product lead**, GitHub `Karmoola`.
+- Hector Bulgarini, technical demo, GitHub `hbulgarini`, X `@hectorest06`.
 
 _Last updated: 2026-07-04._

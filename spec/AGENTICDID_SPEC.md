@@ -1,9 +1,9 @@
 # AgenticDID: Privacy-Preserving Delegated Authority for Autonomous Agents
 
-**Draft Specification — v0.1 (skeleton)**
+**Draft Specification, v0.1 (skeleton)**
 
 - **Author**: John Santi
-- **Status**: DRAFT — pre-submission skeleton, intended for proposal to the
+- **Status**: DRAFT, pre-submission skeleton, intended for proposal to the
   Decentralized Identity Foundation (DIF) Trusted AI Agents Working Group as a
   privacy-preserving delegation profile of the agentic identity stack.
 - **Created**: July 4, 2026
@@ -23,13 +23,13 @@ AgenticDID defines a protocol by which a **principal** (a human or
 organization) delegates bounded authority to an autonomous **agent**, agents
 attenuate and re-delegate that authority to **sub-agents**, and any
 **verifier** can confirm an agent's authority with a zero-knowledge proof that
-reveals a single bit — *authorized for this scope and amount, unexpired,
-unrevoked* — and nothing else. Not the principal's identity. Not the
+reveals a single bit, *authorized for this scope and amount, unexpired,
+unrevoked*, and nothing else. Not the principal's identity. Not the
 delegation chain. Not sibling grants.
 
 Existing agentic identity work (DIF KYA-OS, OAuth-derived flows) defines
 *what* must be verifiable about an agent. AgenticDID defines *how to make it
-verifiable without surveillance* — closing the privacy gap in delegated
+verifiable without surveillance*, closing the privacy gap in delegated
 authority.
 
 ## 2. Motivation
@@ -67,9 +67,9 @@ AgenticDID is designed to compose with DIF KYA-OS conformance levels:
 
 ### 4.1 Conformance classes
 
-1. **AgenticDID Verifier** — consumes proofs of authority (§8).
-2. **AgenticDID Agent** — holds grants, produces proofs, MAY attenuate (§7).
-3. **AgenticDID Registry** — maintains the grant graph and revocation state (§6).
+1. **AgenticDID Verifier**, consumes proofs of authority (§8).
+2. **AgenticDID Agent**, holds grants, produces proofs, MAY attenuate (§7).
+3. **AgenticDID Registry**, maintains the grant graph and revocation state (§6).
 
 ## 5. Data model
 
@@ -88,7 +88,7 @@ A grant MUST contain at minimum:
 | `max_amount` | uint | public | Per-action cap (e.g., spend ceiling per authorization) |
 | `expiry` | uint | public | Expiry epoch |
 
-> **NOTE (roadmap)**: fields marked "public (v1)" — the grant-graph topology —
+> **NOTE (roadmap)**: fields marked "public (v1)", the grant-graph topology ,
 > SHALL move behind commitments with nullifier-based revocation checks in v2,
 > so that even the shape of the graph is unlinkable.
 
@@ -107,15 +107,15 @@ with DIF Credential Schemas work.
 
 ## 6. Grant lifecycle (Registry operations)
 
-1. **Issue** — a principal creates a root grant. The registry MUST reject
+1. **Issue**, a principal creates a root grant. The registry MUST reject
    duplicate grant ids and MUST record the issuer as a key commitment.
-2. **Attenuate** — a grant holder issues a child grant. The registry MUST
+2. **Attenuate**, a grant holder issues a child grant. The registry MUST
    enforce: caller proves holdership of the parent in zero knowledge; child
    `max_amount` ≤ parent `max_amount`; child `expiry` ≤ parent `expiry`; parent is live.
-3. **Revoke** — the issuer of a grant revokes it. Revoking a root grant MUST
+3. **Revoke**, the issuer of a grant revokes it. Revoking a root grant MUST
    invalidate the entire subtree (cascade). Revocation MUST take effect for
    all subsequent proofs of authority.
-4. **Expire** — grants past `expiry` MUST fail verification with no issuer
+4. **Expire**, grants past `expiry` MUST fail verification with no issuer
    action required.
 
 ## 7. Proof of authority
@@ -142,8 +142,8 @@ supplied: scope and amount).
 
 ## 9. Audit and accountability
 
-- Every grant issuance and revocation is a recorded state transition —
-  satisfying KYA-OS L3 "immutable auditing" — while proofs of authority
+- Every grant issuance and revocation is a recorded state transition ,
+  satisfying KYA-OS L3 "immutable auditing", while proofs of authority
   remain unlinkable to principals.
 - Designated auditors MAY be given selective-disclosure access to the grant
   graph (progressive reveal); this is OPTIONAL and out of scope for v0.1.
@@ -175,7 +175,7 @@ supplied: scope and amount).
 
 ## 12. Reference implementation
 
-`midnight-modules/modules/scoped-grant/scoped_grant.compact` — compiled
+`midnight-modules/modules/scoped-grant/scoped_grant.compact`, compiled
 against Compact compiler 0.31.1. Circuits: `issue_grant`, `delegate`,
 `assert_authorized`, `revoke_grant`, `advance_epoch`. See the module README for the v1
 caveat list, which corresponds to the roadmap notes in this spec.

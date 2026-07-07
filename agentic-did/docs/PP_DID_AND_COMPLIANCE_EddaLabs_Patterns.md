@@ -1,4 +1,4 @@
-# PP DID and Compliance — Edda Labs / Brick Towers RWA Patterns for AgenticDID
+# PP DID and Compliance, Edda Labs / Brick Towers RWA Patterns for AgenticDID
 
 **Source**: Edda Labs deep dive video by Erick (Part 2: ZK Identity for RWA)
 **Video**: https://www.youtube.com/watch?v=l6hMb942sOA
@@ -19,7 +19,7 @@ Brick Towers' `midnight-rwa` is a production ZK-KYC system on Midnight for Real 
 ### Brick Towers' Generic Pattern
 
 ```compact
-// From crypto.compact — works with ANY type T
+// From crypto.compact, works with ANY type T
 export struct SignedCredential<T> {
   credential: T;           // the data being attested
   signature: Signature;    // Schnorr: { r: CurvePoint, s: Field }
@@ -33,12 +33,12 @@ export pure circuit verify<T>(cred: SignedCredential<T>, challenge: Field): Bool
 }
 ```
 
-### AgenticDID Application — Agent Credential Types
+### AgenticDID Application, Agent Credential Types
 
 Our agents need multiple credential types. Each becomes a struct `T` that plugs into `SignedCredential<T>`:
 
 ```compact
-// Agent identity credential — "who is this agent?"
+// Agent identity credential, "who is this agent?"
 export struct AgentIdentityCredential {
   agentDID: Bytes<32>;           // did:midnight:agent:...
   ownerDID: Bytes<32>;           // did:midnight:user:... (the principal)
@@ -48,7 +48,7 @@ export struct AgentIdentityCredential {
   scopeHash: Bytes<32>;          // hash of permitted operations
 }
 
-// Agent delegation credential — "what can this agent do?"
+// Agent delegation credential, "what can this agent do?"
 export struct AgentDelegationCredential {
   delegatorDID: Bytes<32>;       // who delegated authority
   delegateeDID: Bytes<32>;       // the agent receiving authority
@@ -58,7 +58,7 @@ export struct AgentDelegationCredential {
   expiryTimestamp: Uint<64>;
 }
 
-// Agent attestation — "what does this agent claim?"
+// Agent attestation, "what does this agent claim?"
 export struct AgentAttestation {
   subjectDID: Bytes<32>;         // who the attestation is about
   claimType: Field;              // type of claim
@@ -82,7 +82,7 @@ export { generateDeterministicK };
 // export { sign };  // ← COMMENTED OUT due to CompactRuntime bug
 ```
 
-**AgenticDID impact**: Agent credential signing MUST happen in TypeScript, using the exported pure circuits as helpers. The `sign<T>` circuit compiles and verifies correctly inside ZK — the bug is only in the JS runtime. Plan for this in Phase 2.
+**AgenticDID impact**: Agent credential signing MUST happen in TypeScript, using the exported pure circuits as helpers. The `sign<T>` circuit compiles and verifies correctly inside ZK, the bug is only in the JS runtime. Plan for this in Phase 2.
 
 ---
 
@@ -99,7 +99,7 @@ export circuit onboard(...): [] {
   authorizations.insert(ownPublicKey());
 }
 
-// Authorization check — before every token send
+// Authorization check, before every token send
 export circuit isAuthorizedSend(recipient: Either<ZswapCoinPublicKey, ContractAddress>): [] {
   if (disclose(recipient.is_left)) {
     const authPath = findAuthorizationPath(recipient.left);  // witness lookup
@@ -110,15 +110,15 @@ export circuit isAuthorizedSend(recipient: Either<ZswapCoinPublicKey, ContractAd
 }
 ```
 
-### AgenticDID Application — Agent Registry
+### AgenticDID Application, Agent Registry
 
 Our current agent registry concept uses Map-based storage. HistoricMerkleTree is superior for agent authorization:
 
 ```compact
-// Agent registry — who is a registered agent?
+// Agent registry, who is a registered agent?
 export ledger agentRegistry: HistoricMerkleTree<32, Bytes<32>>;
 
-// Delegation tree — who has delegated authority?
+// Delegation tree, who has delegated authority?
 export ledger delegationTree: HistoricMerkleTree<32, Bytes<32>>;
 
 // Register an agent (issuer-only)
@@ -144,10 +144,10 @@ circuit assertAgentRegistered(agentDID: Bytes<32>): [] {
 
 ### Why HistoricMerkleTree for Agents
 
-1. **Race condition immunity** — If Agent A registers while Agent B's proof is in-flight, Agent B's proof still works against the historical root.
-2. **Privacy** — Nobody can enumerate all registered agents. You can only prove your own membership.
-3. **Delegation chain verification** — Each delegation adds to the tree. The full chain is provable without revealing intermediate delegators.
-4. **Scale** — Depth 32 = ~4 billion agents. More than enough.
+1. **Race condition immunity**, If Agent A registers while Agent B's proof is in-flight, Agent B's proof still works against the historical root.
+2. **Privacy**, Nobody can enumerate all registered agents. You can only prove your own membership.
+3. **Delegation chain verification**, Each delegation adds to the tree. The full chain is provable without revealing intermediate delegators.
+4. **Scale**, Depth 32 = ~4 billion agents. More than enough.
 
 ---
 
@@ -164,7 +164,7 @@ export sealed ledger ALLOWED_COUNTRY_CODE1: Field;
 ### AgenticDID Application
 
 ```compact
-// System-level trust anchors — immutable after deployment
+// System-level trust anchors, immutable after deployment
 export sealed ledger systemIssuerPublicKey: CurvePoint;    // root agent issuer
 export sealed ledger maxDelegationDepth: Uint<32>;          // prevent infinite chains
 export sealed ledger agentSchemaVersion: Uint<32>;          // credential schema version
@@ -173,9 +173,9 @@ export sealed ledger minAssuranceLevel: Uint<32>;           // minimum credentia
 ```
 
 **Why sealed matters for AgenticDID**:
-- `systemIssuerPublicKey` — the root authority for agent credential issuance. If this changes, the entire trust chain is broken. It MUST be sealed.
-- `maxDelegationDepth` — prevents circular or infinitely deep delegation chains. Should be fixed at deployment.
-- `agentSchemaVersion` — prevents schema mismatch between agents using different credential versions.
+- `systemIssuerPublicKey`, the root authority for agent credential issuance. If this changes, the entire trust chain is broken. It MUST be sealed.
+- `maxDelegationDepth`, prevents circular or infinitely deep delegation chains. Should be fixed at deployment.
+- `agentSchemaVersion`, prevents schema mismatch between agents using different credential versions.
 
 ---
 
@@ -213,10 +213,10 @@ export circuit onboardAgent(
   assert(disclose(agentConfig.chainDepth) <= maxDelegationDepth, "Delegation too deep");
   assert(disclose(agentConfig.expiryTimestamp) > 0, "Agent must have expiry");
 
-  // 4. Stake requirement (temporary deposit — proves skin in the game)
+  // 4. Stake requirement (temporary deposit, proves skin in the game)
   assertMinimumStake(stakeCoin);
 
-  // 5. All checks passed — register agent
+  // 5. All checks passed, register agent
   agentRegistry.insert(
     disclose(persistentHash<Bytes<32>>(agentConfig.delegateeDID))
   );
@@ -236,7 +236,7 @@ circuit assertCoinValue(inputCoin: CoinInfo): [] {
   assert(coin.value >= 100, "insufficient balance");
   receive(coin);  // take custody
   sendImmediate(coin, left<ZswapCoinPublicKey, ContractAddress>(ownPublicKey()), coin.value);
-  // immediately return — proves they HAVE the funds
+  // immediately return, proves they HAVE the funds
 }
 ```
 
@@ -271,7 +271,7 @@ export const witnesses = {
 
   localAgentKey(context): [AgenticDIDPrivateState, Uint8Array] {
     if (!context.privateState.agentSecretKey) {
-      throw new Error('No agent key configured — are you acting as owner?');
+      throw new Error('No agent key configured, are you acting as owner?');
     }
     return [context.privateState, context.privateState.agentSecretKey];
   },
@@ -295,7 +295,7 @@ export const witnesses = {
 };
 ```
 
-**Key difference from Brick Towers**: AgenticDID has two key contexts — the owner and the agent may be different entities. The private state carries both, with the agent key being optional (only present when operating as an agent).
+**Key difference from Brick Towers**: AgenticDID has two key contexts, the owner and the agent may be different entities. The private state carries both, with the agent key being optional (only present when operating as an agent).
 
 ---
 
@@ -318,7 +318,7 @@ Following Brick Towers: **disclose the minimum needed for the circuit logic**. M
 
 ---
 
-## 7. Testing — Agent Simulator
+## 7. Testing, Agent Simulator
 
 ### Following Brick Towers' Pattern
 
@@ -411,4 +411,4 @@ Based on this analysis, the Phase 2 implementation roadmap should incorporate:
 ---
 
 *Analysis by Cassie for AgenticDID Phase 2, April 11, 2026*
-*Source: Edda Labs video series by Erick — https://eddalabs.io*
+*Source: Edda Labs video series by Erick, https://eddalabs.io*

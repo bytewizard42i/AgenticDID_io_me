@@ -1,6 +1,6 @@
-# AgenticDID × SelectConnect — AI Agent Contact Protocol
+# AgenticDID × SelectConnect, AI Agent Contact Protocol
 
-*How SelectConnect's progressive reveal and abuse bonds govern how AI agents request access to human data, attention, and services — creating the first economically accountable human-AI contact protocol.*
+*How SelectConnect's progressive reveal and abuse bonds govern how AI agents request access to human data, attention, and services, creating the first economically accountable human-AI contact protocol.*
 
 ---
 
@@ -25,7 +25,7 @@ AI Agent (DIDz-verified via AgenticDID):
   → Creates SelectConnect card with agent credentials
   → "Authorized by [Organization] ✓" (DIDz delegation chain)
   → "Purpose: [specific task] ✓" (disclosed at Level 1)
-  → Posts bond (higher for AI agents than humans — trust premium)
+  → Posts bond (higher for AI agents than humans, trust premium)
 
 Human recipient:
   → Sees Level 1: Agent name + purpose + authorization proof
@@ -82,4 +82,4 @@ Bond structure:
 
 ---
 
-*Last updated: March 22, 2026 — Penny 🎀*
+*Last updated: March 22, 2026, Penny 🎀*

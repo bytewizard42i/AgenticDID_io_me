@@ -1,4 +1,4 @@
-# 🔗 KYCz Binding Stack — Proving KYC Ownership Without DID
+# 🔗 KYCz Binding Stack, Proving KYC Ownership Without DID
 
 **Date**: February 20, 2026  
 **Full Doc**: [KYCz Binding Stack](https://github.com/bytewizard42i/KYCz_us_app/blob/main/docs/KYCZ_BINDING_STACK.md) | [KYCz Repo](https://github.com/bytewizard42i/KYCz_us_app)
@@ -11,12 +11,12 @@ Three things must be bound: **a real human** + **KYC data in Midnight** + **proo
 
 ## The Solution: 6-Layer Binding Stack
 
-1. **Document Possession** — DL barcode (PDF417) or Passport NFC chip
-2. **Photo-to-Face Binding** — DL/passport photo matched to live person
-3. **Biometric Liveness** — 8-factor proof of human (not deepfake/replay)
-4. **Optional Reinforcement** — Plaid, carrier verification, KBA
-5. **Midnight Commitment** — Data + face hash + binding proof → private state
-6. **Re-Verification** — Returning user face-matched against stored hash
+1. **Document Possession**, DL barcode (PDF417) or Passport NFC chip
+2. **Photo-to-Face Binding**, DL/passport photo matched to live person
+3. **Biometric Liveness**, 8-factor proof of human (not deepfake/replay)
+4. **Optional Reinforcement**, Plaid, carrier verification, KBA
+5. **Midnight Commitment**, Data + face hash + binding proof → private state
+6. **Re-Verification**, Returning user face-matched against stored hash
 
 ## Recommended: DL Barcode + Face Match
 

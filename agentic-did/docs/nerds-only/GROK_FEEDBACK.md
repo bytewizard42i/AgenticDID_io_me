@@ -34,13 +34,13 @@
 
 ### Routes
 - **health.ts**: Simple but vital for monitoring
-- **auth.ts (290 lines)**: Challenge/present/verify routes are core to DID flows—strong for privacy (ties into ZK proofs)
+- **auth.ts (290 lines)**: Challenge/present/verify routes are core to DID flows,strong for privacy (ties into ZK proofs)
 - **agents.ts (105 lines)**: Proxy setup is lightweight; ready for Phase 2 expansion
 
 ### Services
-- **agentsClient.ts (370 lines)**: Type-safe Claude integration is key for agents—good for A2A
+- **agentsClient.ts (370 lines)**: Type-safe Claude integration is key for agents,good for A2A
 - **midnightClient.ts (485 lines)**: ZK verification logic seems detailed; aligns with Midnight's Compact language
-- **ttsClient.ts (490 lines)**: Audio handling for Listen In Mode is unique—modular for future swaps (e.g., ElevenLabs)
+- **ttsClient.ts (490 lines)**: Audio handling for Listen In Mode is unique,modular for future swaps (e.g., ElevenLabs)
 - **tokenService.ts (270 lines)**: JWT with HMAC-SHA256 is secure; capability tokens fit auth model
 
 ### Infrastructure

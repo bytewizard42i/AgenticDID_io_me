@@ -12,9 +12,9 @@
 ## 🎯 The Mission
 
 > *"Crypto has reached an evolutionary fork where it either evolves into a highly professional, consumer-grade product suitable for the general public, or remains largely degen casino products that the average person trying to save and earn cannot tolerate the risk."*  
-> — Rick McCracken (@RichardMcCrackn)
+>, Rick McCracken (@RichardMcCrackn)
 
-**Our Answer**: Build the standards that make "Fi" (as Charles Hoskinson envisions) a reality—where there's just **finance**, not fragmented silos. Privacy-preserving digital identity is the key.
+**Our Answer**: Build the standards that make "Fi" (as Charles Hoskinson envisions) a reality,where there's just **finance**, not fragmented silos. Privacy-preserving digital identity is the key.
 
 ---
 
@@ -206,7 +206,7 @@ STEP 3: Accept & Onboard
 
 ## 🏛️ Midnight: Blockchain for Grownups
 
-*"One day there will just be 'Fi'."* — Charles Hoskinson
+*"One day there will just be 'Fi'."*, Charles Hoskinson
 
 **We're building the standards to make it happen.**
 

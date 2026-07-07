@@ -1,4 +1,4 @@
-# AgenticDID — Engine Reference
+# AgenticDID, Engine Reference
 
 > Pointer to the shared Compact modules that AgenticDID imports (or will import).
 

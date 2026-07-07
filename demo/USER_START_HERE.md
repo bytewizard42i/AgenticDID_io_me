@@ -11,7 +11,7 @@
 ## 📖 Key Terms Explained (Start Here if You're New!)
 
 ### What is AgenticDID.io?
-A system that lets AI agents prove who they are and what they're authorized to do—without revealing private information. Think of it like a secure ID card for robots.
+A system that lets AI agents prove who they are and what they're authorized to do,without revealing private information. Think of it like a secure ID card for robots.
 
 ### Important Jargon Decoded
 

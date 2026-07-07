@@ -42,7 +42,7 @@ the agentic stack (the Vouched/KYA-OS playbook). See:
 
 Context: KYA-OS (Vouched's donated framework, renamed June 2026) has a v1 in
 WG approval. It defines *what* must be verifiable about agents but not *how to
-do it privacy-preserving* — that slot is empty and AgenticDID fills it.
+do it privacy-preserving*, that slot is empty and AgenticDID fills it.
 
 ## Last refreshed
 

@@ -1,4 +1,4 @@
-# AgenticDID — Credit Score & Insurance Integration
+# AgenticDID, Credit Score & Insurance Integration
 
 **Date**: July 6, 2026
 **Status**: Design
@@ -18,7 +18,7 @@ no-spend; delegation reserves child budget from parent).
 
 Add an **insurance dimension** to grants:
 
-- **`maxInsuranceTierByBand`** — the highest CryptoSure tier an agent may purchase,
+- **`maxInsuranceTierByBand`**, the highest CryptoSure tier an agent may purchase,
   expressed relative to the **principal's proven credit-score band**. A higher-score
   principal can authorize an agent to buy up to a higher tier ($5k → $50k); a lower band
   caps the agent lower, regardless of the cash cap.

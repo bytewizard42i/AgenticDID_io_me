@@ -8,7 +8,7 @@
 > "AI agents are managing our money, shopping for us, even handling healthcare. But here's the problem: How do they prove they're authorized to act on YOUR behalf?"
 
 **[6-15s] THE SOLUTION**
-> "Meet AgenticDID—the identity layer for the agentic age. Self-sovereign DIDs with zero-knowledge proofs mean you control your identity, agents get delegated credentials, and services verify everything without seeing your private data."
+> "Meet AgenticDID,the identity layer for the agentic age. Self-sovereign DIDs with zero-knowledge proofs mean you control your identity, agents get delegated credentials, and services verify everything without seeing your private data."
 
 **[16-25s] THE MAGIC**
 > "No KYC to start. Progressive trust tiers unlock features as you need them. Privacy-first. Built on Midnight Network with real ZK-SNARKs."

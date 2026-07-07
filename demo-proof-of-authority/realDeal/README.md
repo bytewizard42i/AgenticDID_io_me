@@ -1,4 +1,4 @@
-# realDeal — coming next
+# realDeal, coming next
 
 This side runs the same `shared/scenario.js` against a live Midnight localnet
 (node + proof server + indexer) with real ZK proof generation.

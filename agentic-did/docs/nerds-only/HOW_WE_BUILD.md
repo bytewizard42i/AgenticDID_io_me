@@ -708,7 +708,7 @@ We'll know we're done when:
 **Remember:** 
 
 > "Weeks of coding can save you hours of planning."  
-> — Anonymous Programmer
+>, Anonymous Programmer
 
 We choose to spend the hours planning. 🎯
 

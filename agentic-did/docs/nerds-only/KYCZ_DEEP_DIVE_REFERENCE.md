@@ -1,4 +1,4 @@
-# 🧠 KYCz Deep Dive Reference — Dual Binding Model & Assertion Schema
+# 🧠 KYCz Deep Dive Reference, Dual Binding Model & Assertion Schema
 
 **Date**: February 20, 2026  
 **Contributors**: Alice 🌟 (The Architect) + Penny 🎀 + John  
@@ -8,7 +8,7 @@
 
 ## What's New
 
-Alice contributed a major architecture upgrade — the **dual binding model** (biometric + cryptographic).
+Alice contributed a major architecture upgrade, the **dual binding model** (biometric + cryptographic).
 
 ### The Two Bindings
 

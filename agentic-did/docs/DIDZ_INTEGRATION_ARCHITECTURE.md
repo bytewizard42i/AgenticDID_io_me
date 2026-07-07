@@ -1,8 +1,8 @@
-# AgenticDID × DIDz.io — Integration Architecture
+# AgenticDID × DIDz.io, Integration Architecture
 
 **Author**: Penny 🎀  
 **Date**: March 21, 2026  
-**Status**: Architecture — Cross-Pollination  
+**Status**: Architecture, Cross-Pollination  
 **Related**: [DIDz-io mirror doc](../../../DIDz-io/docs/TRUSTED_ISSUER_AGENT_ARCHITECTURE.md)
 
 ---
@@ -40,31 +40,31 @@ DIDz.io Trust Triangle                AgenticDID Agentic Layer
 The on-chain registry for agent identity, credentials, delegation, and revocation. DIDz.io's Trust Triangle needs this to manage agents that act on behalf of Trusted Issuers.
 
 **Circuits available**:
-- `registerAgent()` — Issuer creates an agent with DID, role, scopes, expiration
-- `verifyAgent()` — Check if agent is valid, active, and not expired
-- `getAgentPublicKey()` — Retrieve agent's public key for ZK verification
-- `createDelegation()` — User authorizes agent to act with scoped permissions
-- `checkDelegation()` — Verify delegation is valid and not expired/revoked
-- `revokeDelegation()` — User revokes agent authorization
-- `revokeAgent()` — Issuer or admin deactivates an agent
+- `registerAgent()`, Issuer creates an agent with DID, role, scopes, expiration
+- `verifyAgent()`, Check if agent is valid, active, and not expired
+- `getAgentPublicKey()`, Retrieve agent's public key for ZK verification
+- `createDelegation()`, User authorizes agent to act with scoped permissions
+- `checkDelegation()`, Verify delegation is valid and not expired/revoked
+- `revokeDelegation()`, User revokes agent authorization
+- `revokeAgent()`, Issuer or admin deactivates an agent
 
 ### 2. CredentialVerifier Contract
-Verification engine with **spoof transaction privacy** — a novel defense against timing analysis that should be adopted across ALL DIDz verification flows.
+Verification engine with **spoof transaction privacy**, a novel defense against timing analysis that should be adopted across ALL DIDz verification flows.
 
 **Circuits available**:
-- `verifyCredential()` — Verify + generate spoof transactions
-- `verifyDelegation()` — Check delegation + spoof
-- `batchVerify()` — Multi-agent verification
-- `getStats()` — Public verification statistics
-- `updateSpoofRatio()` — Tune privacy vs. performance
+- `verifyCredential()`, Verify + generate spoof transactions
+- `verifyDelegation()`, Check delegation + spoof
+- `batchVerify()`, Multi-agent verification
+- `getStats()`, Public verification statistics
+- `updateSpoofRatio()`, Tune privacy vs. performance
 
 ### 3. Three-Axis Issuer Model
 Composable classification that eliminates category explosion:
 
 ```
-Axis 1: issuerType    — INDIVIDUAL | CORPORATION | GOVERNMENT_ENTITY | INSTITUTION | COOPERATIVE
-Axis 2: domains[]     — FINANCIAL | MEDICAL | EDUCATION | VETERINARY | EQUINE | LEGAL | ...
-Axis 3: assuranceLevel — SELF_DECLARED | PEER_REVIEWED | REGULATED_ENTITY | SYSTEM_CRITICAL
+Axis 1: issuerType   , INDIVIDUAL | CORPORATION | GOVERNMENT_ENTITY | INSTITUTION | COOPERATIVE
+Axis 2: domains[]    , FINANCIAL | MEDICAL | EDUCATION | VETERINARY | EQUINE | LEGAL | ...
+Axis 3: assuranceLevel, SELF_DECLARED | PEER_REVIEWED | REGULATED_ENTITY | SYSTEM_CRITICAL
 ```
 
 This model should become the **standard for DIDz.io's TrustedIssuerRegistry**.
@@ -101,7 +101,7 @@ The full workflow: User proves identity to Agent, Agent proves identity to User,
 ## What DIDz.io Has (That AgenticDID Needs)
 
 ### 1. Trust Triangle Framework
-The foundational three-party model that defines how identity verification works. AgenticDID's agents operate **within** this triangle — they are never independent of it.
+The foundational three-party model that defines how identity verification works. AgenticDID's agents operate **within** this triangle, they are never independent of it.
 
 ### 2. KYCz Anchor Contract (7 Compiling Circuits)
 The proven ZK proof engine. When an agent needs to prove a fact about a holder (age, residency, KYC status, sanctions), it calls KYCz circuits. This is the **only contract in the ecosystem that currently compiles and generates real ZK proofs**.
@@ -120,7 +120,7 @@ The standard interface for external services to submit ZKQueries. AgenticDID's s
 
 ---
 
-## The Trusted Issuer DApp — Shared Architecture
+## The Trusted Issuer DApp, Shared Architecture
 
 This is the DApp both repos are building toward. It has three main screens:
 
@@ -148,21 +148,21 @@ For demoLand, the Trusted Issuer DApp simulates the full flow with mock data:
 
 ```
 demoLand Trusted Issuers:
-  ├── AgenticDID Foundation (root)     — issues KYC_TIER_1, KYC_TIER_2
-  ├── Demo Bank                        — issues FINANCIAL_ACCOUNT, CREDIT_SCORE
-  ├── Demo Hospital                    — issues HEALTH_RECORD, VACCINATION_RECORD
-  ├── Demo Vet Clinic                  — issues PET_HEALTH_RECORD
-  ├── Demo Equine Registry             — issues EQUINE_OWNERSHIP, EQUINE_HEALTH_RECORD
-  └── Demo University                  — issues DEGREE, CERTIFICATION
+  ├── AgenticDID Foundation (root)    , issues KYC_TIER_1, KYC_TIER_2
+  ├── Demo Bank                       , issues FINANCIAL_ACCOUNT, CREDIT_SCORE
+  ├── Demo Hospital                   , issues HEALTH_RECORD, VACCINATION_RECORD
+  ├── Demo Vet Clinic                 , issues PET_HEALTH_RECORD
+  ├── Demo Equine Registry            , issues EQUINE_OWNERSHIP, EQUINE_HEALTH_RECORD
+  └── Demo University                 , issues DEGREE, CERTIFICATION
 
 demoLand Agents:
-  ├── Comet (local)                    — user's personal agent
-  ├── AgenticDID Issuer Agent          — KYC workflows
-  ├── Bank Agent                       — account operations
-  ├── Hospital Agent                   — health record access
-  ├── Vet Agent                        — pet health workflows
-  ├── Registry Agent                   — equine registration
-  └── University Agent                 — credential verification
+  ├── Comet (local)                   , user's personal agent
+  ├── AgenticDID Issuer Agent         , KYC workflows
+  ├── Bank Agent                      , account operations
+  ├── Hospital Agent                  , health record access
+  ├── Vet Agent                       , pet health workflows
+  ├── Registry Agent                  , equine registration
+  └── University Agent                , credential verification
 ```
 
 ---
@@ -183,11 +183,11 @@ AgenticDID contracts were written for Compact v0.26.0 (compiler has bugs). They 
 3. **Compilation verification**: Test against compactc v0.25.0
 
 ### New: TrustedIssuerRegistry.compact (DIDz-io)
-1. **`registerIssuer()`** — Admin-approved issuer onboarding
-2. **`getIssuerStatus()`** — Is this issuer active/trusted?
-3. **`revokeIssuer()`** — Remove a bad issuer
-4. **`getIssuerDomains()`** — What domains can this issuer attest to?
-5. **`trustedIssuers: Set<Bytes<32>>`** — On-chain issuer registry
+1. **`registerIssuer()`**, Admin-approved issuer onboarding
+2. **`getIssuerStatus()`**, Is this issuer active/trusted?
+3. **`revokeIssuer()`**, Remove a bad issuer
+4. **`getIssuerDomains()`**, What domains can this issuer attest to?
+5. **`trustedIssuers: Set<Bytes<32>>`**, On-chain issuer registry
 
 ---
 
@@ -224,9 +224,9 @@ Every row follows the same pattern:
 
 1. **Update AgenticDID contracts** to Compact ≥0.25.0 stable
 2. **Build TrustedIssuerRegistry.compact** in DIDz-io
-3. **Wire the contracts** — agents can only be created by registered issuers
-4. **Build `@didz/core` shared SDK** — one package for the whole ecosystem
-5. **Implement agent_0 canonical flow** — the one perfect check
+3. **Wire the contracts**, agents can only be created by registered issuers
+4. **Build `@didz/core` shared SDK**, one package for the whole ecosystem
+5. **Implement agent_0 canonical flow**, the one perfect check
 6. **Build Trusted Issuer DApp frontend** (demoLand first)
 7. **Extend credential types** for PetProData, EquineProData, safeHealthData
 

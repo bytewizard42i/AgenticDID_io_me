@@ -430,7 +430,7 @@ Building global scientific conversation with:
 - @OpenZeppelin, @SundaeSwap, @nmkr_io, @eddalabs_io, @BrickTowers
 - Midnight Foundation (@MidnightNtwrk, @midnightfdn)
 
-> *"One day there will just be 'Fi'."* — Charles Hoskinson
+> *"One day there will just be 'Fi'."*, Charles Hoskinson
 
 ---
 

@@ -1,4 +1,4 @@
-# AgenticDID — Proof of Authority Demo
+# AgenticDID, Proof of Authority Demo
 
 > **"Prove the mandate, not the man."**
 
@@ -11,7 +11,7 @@ This is proposal artifact #3 in the [DIF standardization plan](../docs/DIF_STAND
 alongside the [protocol spec](../spec/AGENTICDID_SPEC.md) and the
 [reference implementation](../../midnight-modules/modules/scoped-grant/).
 
-## Quick start (demoLand — zero setup)
+## Quick start (demoLand, zero setup)
 
 ```bash
 npm install
@@ -20,7 +20,7 @@ npm run demoland
 
 No Docker, no network, deterministic. Runs in seconds.
 
-## Quick start (realDeal — real ZK proofs on a live localnet)
+## Quick start (realDeal, real ZK proofs on a live localnet)
 
 ```bash
 npm install
@@ -48,14 +48,14 @@ orchestrators over it.
 ## Layout
 
 ```
-shared/     scenario.js (the 3 acts) + narrator.js — written once
+shared/     scenario.js (the 3 acts) + narrator.js, written once
 demoLand/   simulator.js (compact-runtime adapter) + run.js
 realDeal/   wallet.js + adapter.js (midnight-js localnet) + run.js + infra/ (compose)
-contract/   managed/ — skip-zk output (in git); managed-zk/ — full ZK output (not in git)
+contract/   managed/, skip-zk output (in git); managed-zk/, full ZK output (not in git)
 docs/       DEMOLAND_VS_REALDEAL.md
 ```
 
-**WSL note:** the compose file uses a bridge network with published ports —
+**WSL note:** the compose file uses a bridge network with published ports ,
 `network_mode: host` containers are unreachable from WSL under Docker Desktop.
 
 To regenerate the compiled contract after editing the module:

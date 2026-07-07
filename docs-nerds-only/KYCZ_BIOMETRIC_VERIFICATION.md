@@ -1,4 +1,4 @@
-# 🧬 KYCz — Zero-Knowledge KYC with Biometric Liveness
+# 🧬 KYCz, Zero-Knowledge KYC with Biometric Liveness
 
 **The Human Identity Verification Layer for the AgenticDID Ecosystem**
 
@@ -9,22 +9,22 @@
 
 ## What Is KYCz?
 
-**KYC + zkProofs = KYCz** — Privacy-preserving identity verification powered by the Midnight blockchain.
+**KYC + zkProofs = KYCz**, Privacy-preserving identity verification powered by the Midnight blockchain.
 
-KYCz takes traditional Know Your Customer (KYC) data, stores it in Midnight's **private state**, and uses **zero-knowledge proofs** to make assertions about that data — **without ever revealing the underlying information**.
+KYCz takes traditional Know Your Customer (KYC) data, stores it in Midnight's **private state**, and uses **zero-knowledge proofs** to make assertions about that data, **without ever revealing the underlying information**.
 
-Identity is verified through **multi-factor biometric liveness detection**, ensuring a real human is behind every verification — not a deepfake, bot, or synthetic identity.
+Identity is verified through **multi-factor biometric liveness detection**, ensuring a real human is behind every verification, not a deepfake, bot, or synthetic identity.
 
 ---
 
 ## How KYCz Fits into AgenticDID
 
-AgenticDID enables AI agents to have verifiable digital identities. But agents act on behalf of **humans** — and those humans need to be verified first. KYCz is the **human verification backbone** that:
+AgenticDID enables AI agents to have verifiable digital identities. But agents act on behalf of **humans**, and those humans need to be verified first. KYCz is the **human verification backbone** that:
 
 1. **Verifies the human** behind an agent via 8-factor biometric liveness
 2. **Stores KYC data** in Midnight's private state (not a centralized DB)
 3. **Issues zk-proofs** that the agent can carry as verifiable credentials
-4. **Enables re-verification** — biometrics confirm the same human returns
+4. **Enables re-verification**, biometrics confirm the same human returns
 
 ```
 ┌──────────────────┐     ┌────────────────────┐     ┌──────────────────────┐
@@ -45,8 +45,8 @@ AgenticDID enables AI agents to have verifiable digital identities. But agents a
 
 | Component | KYCz Role |
 |-----------|----------|
-| **KYC Oracles** | KYCz IS the KYC oracle — biometric verification + zk-proof storage |
-| **Trust Triangle — Trusted Issuers** | KYCz verifies the human, then feeds into credential issuance |
+| **KYC Oracles** | KYCz IS the KYC oracle, biometric verification + zk-proof storage |
+| **Trust Triangle, Trusted Issuers** | KYCz verifies the human, then feeds into credential issuance |
 | **Biometric proof without data exposure** | KYCz's 8-factor liveness detection provides this |
 | **Progressive Disclosure** | KYCz private state enables selective reveal over time |
 | **Credential Issuance** | KYCz-verified data becomes the source for DIDz credentials |
@@ -62,7 +62,7 @@ Gleaned from the BlockSign Verify reference deck ([PDF in KYCz repo](https://git
 
 | Factor | Weight | Technique |
 |--------|--------|----------|
-| **3D Parallax** | 17% | Depth variation detection — defeats flat screen/photo spoofs |
+| **3D Parallax** | 17% | Depth variation detection, defeats flat screen/photo spoofs |
 | **Eye Blink Rate** | 15% | Eye Aspect Ratio (EAR) via 68-point facial landmarks |
 | **Face Micro-Movements** | 15% | Involuntary movement signatures, frame-to-frame landmark drift |
 | **Face Movement Challenge** | 15% | Random head-turn/nod/blink-on-command prompts |
@@ -71,7 +71,7 @@ Gleaned from the BlockSign Verify reference deck ([PDF in KYCz repo](https://git
 | **Prominence** | 10% | Frequency peak strength in cardiac signal |
 | **Consistency** | 8% | BPM stability across time windows |
 
-**Behavioral factors** (blink, parallax, micro-movement, challenge) account for **62%** of the total score — making spoofing extremely difficult.
+**Behavioral factors** (blink, parallax, micro-movement, challenge) account for **62%** of the total score, making spoofing extremely difficult.
 
 ### Voice & Speech Liveness (Additional Layer)
 
@@ -94,7 +94,7 @@ Gleaned from the BlockSign Verify reference deck ([PDF in KYCz repo](https://git
 
 | Traditional KYC | BlockSign-style (Privacy-first) | **KYCz (Ours)** |
 |-----------------|-------------------------------|------------------|
-| Data stored in centralized DBs | Zero storage — ephemeral only | Data in Midnight private state |
+| Data stored in centralized DBs | Zero storage, ephemeral only | Data in Midnight private state |
 | Honeypot for hackers | Can't prove anything later | zk-proofs for ongoing assertions |
 | Full data exposed to verifiers | Privacy-preserving but one-shot | Privacy-preserving AND provable |
 | Regulatory burden on data holders | Limited audit trail | On-chain audit trail, no data exposure |
@@ -102,7 +102,7 @@ Gleaned from the BlockSign Verify reference deck ([PDF in KYCz repo](https://git
 
 ### The KYCz Differentiator
 
-BlockSign's approach is **privacy-first but ephemeral** — they verify and discard everything. They can't prove anything after the fact.
+BlockSign's approach is **privacy-first but ephemeral**, they verify and discard everything. They can't prove anything after the fact.
 
 KYCz stores verified KYC data in Midnight's **private (shielded) state**, enabling:
 - **Ongoing zk-proof assertions** without re-exposing data
@@ -131,11 +131,11 @@ Example assertions KYCz can make via Midnight Compact contracts:
 
 ### 5-Step KYCz Workflow
 
-1. **System Check** — Camera access, video quality, face detection, lighting, FPS validation
-2. **ID Document Scan** — Front/back capture, OCR extraction, AI field validation
-3. **Biometric Liveness Detection** — All 8 factors + voice/speech run simultaneously
-4. **Chat Verification** — AI chatbot cross-references document data with live responses
-5. **Midnight Commitment** — Verified KYC data committed to Midnight private state, credential issued
+1. **System Check**, Camera access, video quality, face detection, lighting, FPS validation
+2. **ID Document Scan**, Front/back capture, OCR extraction, AI field validation
+3. **Biometric Liveness Detection**, All 8 factors + voice/speech run simultaneously
+4. **Chat Verification**, AI chatbot cross-references document data with live responses
+5. **Midnight Commitment**, Verified KYC data committed to Midnight private state, credential issued
 
 ### Re-Verification (Returning Users)
 
@@ -160,15 +160,15 @@ No need to re-submit documents. Biometrics confirm it's the same person.
 
 ## References
 
-- **BlockSign Verify pitch deck** — [PDF in KYCz repo docs](https://github.com/bytewizard42i/KYCz_us_app/tree/main/docs)
-- **KYCz App Repo** — [bytewizard42i/KYCz_us_app](https://github.com/bytewizard42i/KYCz_us_app)
-- **DIDz DApp System** — [bytewizard42i/didz-dapp-system](https://github.com/bytewizard42i/didz-dapp-system)
-- **Fi Standards** — [docs-nerds-only/Fi_Standards](https://github.com/bytewizard42i/AgenticDID_io_me_MAIN/tree/main/docs-nerds-only/Fi%20_Standards-AKA-FIST)
-- **Midnight Documentation** — [docs.midnight.network](https://docs.midnight.network)
+- **BlockSign Verify pitch deck**, [PDF in KYCz repo docs](https://github.com/bytewizard42i/KYCz_us_app/tree/main/docs)
+- **KYCz App Repo**, [bytewizard42i/KYCz_us_app](https://github.com/bytewizard42i/KYCz_us_app)
+- **DIDz DApp System**, [bytewizard42i/didz-dapp-system](https://github.com/bytewizard42i/didz-dapp-system)
+- **Fi Standards**, [docs-nerds-only/Fi_Standards](https://github.com/bytewizard42i/AgenticDID_io_me_MAIN/tree/main/docs-nerds-only/Fi%20_Standards-AKA-FIST)
+- **Midnight Documentation**, [docs.midnight.network](https://docs.midnight.network)
 
 ---
 
-**Status**: 🚧 Early concept phase — Architecture and biometric approach being defined.
+**Status**: 🚧 Early concept phase, Architecture and biometric approach being defined.
 
 **Last Updated**: February 20, 2026  
 **Author**: John (bytewizard42i)
