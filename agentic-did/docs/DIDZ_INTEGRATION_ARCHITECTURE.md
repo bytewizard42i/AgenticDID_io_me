@@ -205,7 +205,7 @@ How the Trusted Issuer → Agent → Credential flow connects to every DIDz prod
 | **GeoZ** | Government | Location Agent | RESIDENCY_PROOF |
 | **AutoDiscovery** | Law Firm, Court | Legal Agent | LEGAL_CREDENTIAL |
 | **SilentLedger** | Exchange, Custodian | Finance Agent | ASSET_OWNERSHIP |
-| **DownMan** | Estate Attorney | Estate Agent | INHERITANCE_CREDENTIAL |
+| **LegacyKey** | Estate Attorney | Estate Agent | INHERITANCE_CREDENTIAL |
 | **HuddleBridge** | Platform, Peer | Social Agent | SOCIAL_ATTESTATION |
 | **SouLink** | Platform, Peer | Identity Agent | CROSS_PLATFORM_LINK |
 | **PopCork** | Platform | Content Agent | CONTENT_CREATOR_CREDENTIAL |
