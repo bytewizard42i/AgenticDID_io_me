@@ -1,6 +1,6 @@
 # AgenticDID Contracts, superseded by the DIDz engine
 
-> Re-scoped July 13, 2026 under the DIDzM four-engine architecture. See
+> Re-scoped July 5, 2026 under the three-pillar architecture. See
 > `docs/DIDZ_AGENTICDID_IMPLEMENTATION_PLAN.md` (§2, §6) for the model.
 
 ## Where the real contracts live now

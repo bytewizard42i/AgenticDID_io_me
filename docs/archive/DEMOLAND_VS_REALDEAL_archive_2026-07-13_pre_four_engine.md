@@ -9,7 +9,7 @@
 - **Port**: 3014
 - **Server**: Express static server (`node server.js`)
 - **No Docker, no network**, pure HTML/CSS/JS simulation
-- **What it shows**: an older three-component identity model, two machines, and the scoped-grant lifecycle. It predates the root-governed four-engine model.
+- **What it shows**: Three-pillar model, two machines, scoped-grant lifecycle
   (issue → delegate → prove → revoke with cascade), ZK proof simulation,
   constitution alignment, 2026 glassmorphism + 3D tilt design
 - **Start**: `cd frontend-demoland && npm install && npm start`
@@ -44,5 +44,5 @@
 ## Note
 
 The current Docker demo reflects the **old hackathon-era architecture** (monolithic
-registry). It needs to be rebuilt to show AgenticDID in the four-engine model with engine
+registry). It needs to be rebuilt to show the three-pillar model with engine
 integration. See `PUNCHLIST.md`.
