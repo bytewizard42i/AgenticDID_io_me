@@ -1,20 +1,10 @@
-# DIDz and AgenticDID Full Architecture
-
-> **Midnight technical rule:** Validate Compact and SDK statements against the [DIDzM technical reference policy](../DIDzMonolith-docs/midnight/MIDNIGHT_TECHNICAL_REFERENCE_POLICY.md).
-
-> **Canonical alignment, July 13, 2026:** This document preserves a detailed
-> AgenticDID design history. The DIDzM root governs system boundaries. DIDz owns
-> root identity primitives; AgenticDID is the separate agent-authority engine;
-> RWAz owns asset ownership and provenance; HelixCTW is the data-layer engine.
-> References below to a universal DIDZ layer mean identity coverage across subject
-> types, not ownership of every engine responsibility. Proposed structures are not
-> production claims unless accompanied by reproducible implementation evidence.
+# DIDZ and AgenticDID Full Architecture
 
 ## Purpose
 
-DIDz is the root identity engine for human, agent, organization, animal, object, and real-world-asset subjects.
+DIDZ is a proposed universal identity layer for humans, AI agents, organizations, governments, government agencies, objects, and real-world assets.
 
-AgenticDID is the separate DIDzM engine focused on autonomous-agent identity, authority, and delegation.
+AgenticDID is a specialized branch of DIDZ focused on autonomous agents.
 
 The purpose of DIDZ is to answer:
 
@@ -85,7 +75,7 @@ DeathCredential = this human has been verified as deceased
 
 The existence of a DIDZ alone should not authorize sensitive actions.
 
-## DIDz Root Identity Engine
+## Universal DIDZ Layer
 
 The DIDZ root layer should be able to identify multiple types of entities.
 
@@ -546,7 +536,7 @@ The title changes when the car is sold.
 
 ## AgenticDID
 
-AgenticDID is the DIDzM engine responsible for autonomous-agent authority.
+AgenticDID is a specialized branch under DIDZ for autonomous agents.
 
 An AgenticDID may include:
 
@@ -942,7 +932,7 @@ The following rules summarize the DIDZ architecture:
 9. Voting requires proof of life, eligibility, jurisdiction, election-specific authorization, and one-time use.
 10. Objects and RWAs keep the same identity while ownership credentials change.
 11. Trusted issuers are entities with scoped issuer credentials.
-12. AgenticDID is the autonomous-agent identity and authority engine.
+12. AgenticDID is a specialized branch for autonomous agents.
 13. Agents may delegate only narrower authority.
 14. Revocation removes authority, not historical identity.
 15. Fraud may require burning or superseding a DIDZ under strict governance.
@@ -950,7 +940,7 @@ The following rules summarize the DIDZ architecture:
 
 ## Final Summary
 
-DIDz is the root identity engine across supported subject types.
+DIDZ is the universal identity layer.
 
 AgenticDID is the agent-specific identity and authority layer.
 

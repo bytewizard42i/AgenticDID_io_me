@@ -4,18 +4,16 @@
 
 ### *The Identity Layer for the Agentic Web*
 
-**Privacy-preserving identity, authority, and bounded delegation for Ai agents, powered by zero-knowledge proofs on [Midnight Network](https://midnight.network).**
+**Privacy-preserving decentralized identity for humans, AI agents, and objects, powered by zero-knowledge proofs on [Midnight Network](https://midnight.network).**
 
 [![Built on Midnight](https://img.shields.io/badge/Built_on-Midnight_Network-6C3FC5?style=for-the-badge)](https://midnight.network)
 [![Powered by DIDz](https://img.shields.io/badge/Powered_by-DIDz.io-3B82F6?style=for-the-badge)]()
-[![Status](https://img.shields.io/badge/Status-Prototype_and_Architecture-D97706?style=for-the-badge)]()
+[![Status](https://img.shields.io/badge/Status-Phase_1_Complete-10B981?style=for-the-badge)]()
 [![License](https://img.shields.io/badge/License-Apache_2.0-D97706?style=for-the-badge)](./LICENSE)
 
 **Domains**: AgenticDID.io · AgenticDID.me
 
 </div>
-
-> **Midnight technical rule:** Follow the [DIDzM technical reference policy](../DIDzMonolith-docs/midnight/MIDNIGHT_TECHNICAL_REFERENCE_POLICY.md) for version-matched Compact syntax, SDK behavior, and evidence labels.
 
 ---
 
@@ -35,12 +33,9 @@ AgenticDID gives every participant, human, AI agent, or smart object, a **crypto
 - **Spoof transaction system**, 80% noise queries make it impossible for adversaries to distinguish real verifications
 - **Listen In Mode**, toggle transparency to hear agent-to-agent communications in real-time
 
-## Position in the Four-Engine DIDzM System
+## Position in the DIDz Substrate
 
-AgenticDID is the agent-authority engine in DIDzM. It consumes root identity and
-issuer primitives from DIDz, then owns scoped grants, delegation, attenuation,
-revocation, and proof of authority for autonomous agents. It does not redefine
-the DIDz root, RWAz ownership semantics, or HelixCTW data-layer behavior.
+AgenticDID is the **Agent tier** of the [DIDz](https://github.com/bytewizard42i/didz-dapp-system) polymorphic identity substrate. DIDz is the universal foundation; each subject type plugs in as a tier on the same registry and trusted-issuer machinery.
 
 | Tier | Subject | Vertical |
 |------|---------|----------|
@@ -52,16 +47,11 @@ the DIDz root, RWAz ownership semantics, or HelixCTW data-layer behavior.
 
 The Trust Triangle (Holder ↔ Trusted Issuer ↔ Verifier) is identical across all tiers. What changes per tier is the **binding primitive** (biometrics for humans, microchip/RFID for animals, serial number or cryptographic anchor for objects, delegation credentials chained from a principal for agents) and the **assertion vocabulary** (age and residency for humans, lineage and provenance for animals, capability and authority for agents). AgenticDID inherits trust from a DIDz human or organization principal via ZK delegation proofs, so an agent's authority is provably bounded by what its principal granted.
 
-> One system, four engines. AgenticDID owns agent identity and authority.
-> Shipping and implementation claims below refer to repository prototypes unless
-> a reproducible build, test, and deployment record is linked.
+> One protocol, every entity type. AgenticDID ships the agent tier today.
 
 See [DIDz Subjects table](https://github.com/bytewizard42i/didz-dapp-system#subjects-of-didz--who-or-what-can-have-an-identity) for the canonical tier definitions.
 
 ## What Makes AgenticDID Unique
-
-The status labels in this table describe repository feature implementations and
-demos. They are not, by themselves, evidence of audited or production deployment.
 
 | Feature | Description | Status |
 |---------|-------------|--------|
@@ -180,7 +170,7 @@ The convergence of autonomous Ai, mass surveillance, and centralized identity da
 | **DIDz** | Root identity layer | Who you are, without revealing who you are |
 | **AgenticDID** | Agent authority layer | That an Ai agent is authorized, without revealing by whom |
 | **RWAz** | Object/asset identity layer | What an asset is and who owns it, without exposing ownership data |
-| **HelixCTW** | Data-layer engine | Query and manage private data, without exposing raw facts |
+| **HelixCTW** | Privacy-preserving data plane | Query and manage private data, without exposing raw facts |
 
 **This project** is part of the DIDzMonolith ecosystem, built on these four engines. The existential threat is real. The architecture is ready.
 
@@ -192,8 +182,8 @@ This project is part of the DIDzMonolith ecosystem and inherits the four-engine 
 
 **Applicable frameworks**: SOC 2, ISO 27001, PCI DSS, HIPAA, MiCA — depending on product function and jurisdiction.
 
-**Full compliance deep dive**: [`DIDzMonolith-docs/compliance/REGULATORY_COMPLIANCE_DEEP_DIVE.md`](../DIDzMonolith-docs/compliance/REGULATORY_COMPLIANCE_DEEP_DIVE.md) — engine-by-engine control mappings, product compliance matrix, and implementation roadmap.
+**Full compliance deep dive**: [`DIDzMonolith-docs/compliance/REGULATORY_COMPLIANCE_DEEP_DIVE.md`](../../DIDzMonolith-docs/compliance/REGULATORY_COMPLIANCE_DEEP_DIVE.md) — engine-by-engine control mappings, product compliance matrix, and implementation roadmap.
 
-**MiCA regulatory notes**: [`DIDzMonolith-docs/compliance/MICA_REGULATORY_NOTES.md`](../DIDzMonolith-docs/compliance/MICA_REGULATORY_NOTES.md) — EU crypto-asset regulation product-by-product matrix.
+**MiCA regulatory notes**: [`DIDzMonolith-docs/compliance/MICA_REGULATORY_NOTES.md`](../../DIDzMonolith-docs/compliance/MICA_REGULATORY_NOTES.md) — EU crypto-asset regulation product-by-product matrix.
 
 ---
