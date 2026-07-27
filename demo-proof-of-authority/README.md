@@ -8,7 +8,7 @@ transacts and delegates a narrower grant to a sub-agent; the principal revokes
 once and the whole delegation tree dies. Verifiers learn exactly **one bit**.
 
 This is proposal artifact #3 in the [DIF standardization plan](../docs/DIF_STANDARDIZATION_PLAN.md),
-alongside the [protocol spec](../spec/AGENTICDID_SPEC.md) and the
+alongside the [protocol spec](../FORMAL_SPECS_W3C_DIF/AGENTICDID_SPEC.md) and the
 [reference implementation](../../midnight-modules/modules/scoped-grant/).
 
 ## Quick start (demoLand, zero setup)

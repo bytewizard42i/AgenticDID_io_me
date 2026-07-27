@@ -36,7 +36,7 @@ first and proposing it to DIF as the privacy-preserving delegation profile of
 the agentic stack (the Vouched/KYA-OS playbook). See:
 
 - **The plan**: [`DIF_STANDARDIZATION_PLAN.md`](./DIF_STANDARDIZATION_PLAN.md)
-- **The spec**: [`../spec/AGENTICDID_SPEC.md`](../spec/AGENTICDID_SPEC.md)
+- **The spec**: [`../FORMAL_SPECS_W3C_DIF/AGENTICDID_SPEC.md`](../FORMAL_SPECS_W3C_DIF/AGENTICDID_SPEC.md)
 - **The reference implementation**: `midnight-modules/modules/scoped-grant/`
   (compiled, Compact 0.31.1)
 

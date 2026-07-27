@@ -8,7 +8,7 @@
 > - `docs/dynamic-intent-scoped-permissions.md` (runtime intent model)
 > - `docs/agenticdid-investor-overview.md` (investor pitch, AgenticDID repo)
 > - `docs/ALICE_DIDZ_AGENTICDID_MASTERPLAN_VERBATIM_2026-07-05.md` (verbatim source, DIDz repo)
-> - Existing specs this must reconcile with: `spec/AGENTICDID_SPEC.md` (AgenticDID
+> - Existing specs this must reconcile with: `FORMAL_SPECS_W3C_DIF/AGENTICDID_SPEC.md` (AgenticDID
 >   repo) and `docs/DIDZ_DID_FOUNDATION_ARCHITECTURE.md` (DIDz repo)
 >
 > **This exact file lives in the DIDz-io, AgenticDID, and RWAz repos.**

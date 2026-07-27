@@ -32,7 +32,7 @@ DIF adopts artifacts, not ideas. The proposal package is:
 | # | Artifact | Where it lives | Status |
 |---|---|---|---|
 | 1 | **Reference implementation**, `scoped-grant` Compact module (grant graph, attenuated delegation, cascade revocation) + the seven supporting modules | `midnight-modules/modules/scoped-grant/` | building |
-| 2 | **Protocol specification**, normative spec (MUST/SHOULD language, KYA-OS-native vocabulary) | `AgenticDID/spec/AGENTICDID_SPEC.md` | drafting |
+| 2 | **Protocol specification**, normative spec (MUST/SHOULD language, KYA-OS-native vocabulary) | `AgenticDID/FORMAL_SPECS_W3C_DIF/AGENTICDID_SPEC.md` | drafting |
 | 3 | **Killer demo**, agent completes a task with a ZK proof that "a verified human authorized me, in scope, unexpired" while revealing nothing about the human | script in §5 below | scripted |
 
 ## 3. Positioning: conform at the interface, differentiate underneath
@@ -122,7 +122,7 @@ DIF adopts artifacts, not ideas. The proposal package is:
 
 ---
 
-*Related docs: `AgenticDID/spec/AGENTICDID_SPEC.md` (the spec),
+*Related docs: `AgenticDID/FORMAL_SPECS_W3C_DIF/AGENTICDID_SPEC.md` (the spec),
 `AgenticDID/docs/DIF_RELEVANCE.md` (pointer),
 `monolith-docs/DIF_KNOWLEDGE_BASE.md` (canonical DIF landscape),
 `midnight-modules/docs/MODULES_CATALOG.md` (implementation modules).*
