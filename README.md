@@ -130,6 +130,10 @@ demos. They are not, by themselves, evidence of audited or production deployment
 > Identical mechanics either way: agent-tier DIDz (non-transferable),
 > custodian anchor, scoped grants with per-action + cumulative caps,
 > attenuation-only delegation with budget reservation, cascade revocation.
+>
+> Marketplace/payments integration for both paths (Masumi Network):
+> `docs/MASUMI_INTEGRATION_ARCHITECTURE.md` — identity + leash on Midnight,
+> discovery + escrow on Cardano, bound by the didzAgentBinding hash.
 
 ## Architecture
 
