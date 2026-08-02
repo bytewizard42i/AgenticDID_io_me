@@ -114,6 +114,23 @@ demos. They are not, by themselves, evidence of audited or production deployment
 > midnight-modules (`scoped-grant`), consumed by the didz-kernel
 > AuthorityProvider seam (adapter planned).
 
+## The Two Agent Paths (canonical — do not document agents as an issuer privilege)
+
+> Per `DIDzMonolith-docs/standards/LIFECYCLE_PHASES.md` (Aug 2, 2026):
+> agents are ONE tier with ONE leash mechanism, born on BOTH sides of the
+> counter.
+>
+> | | **Personal agents** | **Service agents** |
+> |---|---|---|
+> | Custodian | a PERSON's DIDz | an ORGANIZATION's DIDz |
+> | Example | Rosa's shopping agent | "the Amazon agent", a hospital's intake agent |
+> | Who grants authority | the person | the organization |
+> | Requires trusted-issuer status? | **No — permissionless**, like identity itself | No for existence; issuer approval gates ATTESTING, never agent creation |
+>
+> Identical mechanics either way: agent-tier DIDz (non-transferable),
+> custodian anchor, scoped grants with per-action + cumulative caps,
+> attenuation-only delegation with budget reservation, cascade revocation.
+
 ## Architecture
 
 ```
