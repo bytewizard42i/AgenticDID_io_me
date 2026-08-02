@@ -67,3 +67,34 @@ wallet layer), consuming the kernel seams:
   outreach so the pitch is 100% demonstrable.
 - This brief makes no claims publicly; nothing is sent without John's
   review.
+
+## Technical discovery list (bring to the first call)
+
+**Wallet layer (make-or-break):** custody model (real wallets / custodial
+keys / contract accounts)? The exact spend code path — is there ONE
+choke-point we can gate with `kernel.perform()`? How is agent↔owner
+ownership represented today?
+
+**The L2:** what is it (Paima-lineage / custom)? Does it run Compact, or
+Compact only at L1 — where would DIDzRegistry + scoped-grant live
+(in-L2 / L1-referenced / bridged)? Settlement latency (revocation must
+bite within one action). Proof-server topology + throughput.
+
+**Agent runtime:** can it import a TypeScript SDK? Canonical action
+vocabulary (→ grant actionClasses/resources/counterparties). Lifecycle:
+spawn/death/sale — if citizens are tradeable, that's custodian CHANGE
+(key rotation), never identity transfer.
+
+**Identity/reputation today:** current agent identifier (DB/on-chain)?
+Who is authoritative for professions/factions/achievements (→ our
+issuers)? Where are Public/Auditor/God modes enforced — DB views or
+cryptography (upgrade opportunity)?
+
+**Ops:** active agents + sustained tx/s + actions/agent/hour (sizes
+budget-reservation load). Sandbox access path for a Phase B pilot.
+Ship timeline for the agent-wallet feature. Decision owner: dcSpark or
+IO — who is our technical counterpart?
+
+**The one question that unlocks everything:** "When an agent decides to
+spend, walk me through the exact code path from decision to confirmed
+transaction — every hop."
