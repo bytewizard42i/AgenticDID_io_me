@@ -99,13 +99,20 @@ See [DIDz Subjects table](https://github.com/bytewizard42i/didz-dapp-system#subj
 The status labels in this table describe repository feature implementations and
 demos. They are not, by themselves, evidence of audited or production deployment.
 
-| Feature | Description | Status |
+| Feature | Description | Status (evidence label) |
 |---------|-------------|--------|
-| **Spoof Transactions** | 80% fake verification queries mask real activity, no other DID system has this | ✅ Implemented |
-| **Listen In Mode** | Toggle real-time TTS of agent communications for full transparency | ✅ Implemented |
-| **Results-Focused UX** | Users state goals ("Send $50"), system auto-selects the right agent | ✅ Implemented |
-| **Mutual Authentication** | Bidirectional trust chains: User ↔ Agent ↔ Service | ✅ Implemented |
-| **ZK Delegation Proofs** | Prove agent authority without revealing the delegator | 🔄 Phase 2 |
+| **Spoof Transactions** | 80% fake verification queries mask real activity, no other DID system has this | 🎭 DemoLand (MOCK) — UI demo, simulated crypto |
+| **Listen In Mode** | Toggle real-time TTS of agent communications for full transparency | 🎭 DemoLand (MOCK) — UI demo |
+| **Results-Focused UX** | Users state goals ("Send $50"), system auto-selects the right agent | 🎭 DemoLand (MOCK) — UI demo |
+| **Mutual Authentication** | Bidirectional trust chains: User ↔ Agent ↔ Service | 🎭 DemoLand (MOCK) — string-matching mock adapter, not cryptographic |
+| **ZK Delegation Proofs** | Prove agent authority without revealing the delegator | ✅ TestWired via `demo-proof-of-authority` (real scoped-grant circuits in-process) + midnight-modules `scoped-grant` on compactc 0.31.1 |
+
+> **Honesty note (Aug 2, 2026):** statuses above use the DIDzM build-stage
+> convention (`DIDzMonolith-docs/standards/BUILD_STAGES.md`). The
+> `packages/midnight-adapter` in this repo is an explicit MOCK; nothing in
+> the web demo generates real proofs. Real agent-authority circuits live in
+> midnight-modules (`scoped-grant`), consumed by the didz-kernel
+> AuthorityProvider seam (adapter planned).
 
 ## Architecture
 
@@ -133,7 +140,14 @@ AgenticDID
 
 ## Smart Contracts (Compact)
 
-Three Midnight smart contracts form the on-chain identity layer:
+> **⚠️ SUPERSEDED (see `contracts/README.md`):** the three monolithic
+> contracts below are hackathon-era (Compact v0.26 pragmas, cross-contract
+> calls TODO'd) and do NOT compile on the current toolchain. The live
+> architecture anchors agent identity in DIDz-io's `DIDzRegistry`
+> (agent = EntityType 1) with authority via midnight-modules
+> `scoped-grant` — both verified on compactc 0.31.1.
+
+Historical monolithic contracts (archived):
 
 - **AgenticDIDRegistry**, Register and manage DIDs for humans, agents, and objects
 - **CredentialVerifier**, Verify delegation credentials with ZK proofs
@@ -159,8 +173,8 @@ cd AgenticDID/agentic-did
 
 | Phase | What | When | Status |
 |-------|------|------|--------|
-| **Phase 1** | AI agent identity, spoof transactions, Listen In Mode | Q3 2025 | ✅ Complete |
-| **Phase 2** | Human identity via DIDz, biometric ZK proofs, QR verification | Q1 2026 | 🔄 In Progress |
+| **Phase 1** | AI agent identity, spoof transactions, Listen In Mode | Q3 2025 | ✅ Complete (DemoLand/MOCK) |
+| **Phase 2** | Human identity via DIDz, biometric ZK proofs, QR verification | 2026 (rescoped) | 🔄 In Progress — human identity now TestWired via DIDz-io + didz-kernel (localnet, real proofs) |
 | **Phase 3** | Agentic commerce, declarative intents, agent marketplace | Q2 2026 | 📋 Planned |
 | **Phase 4** | Cross-chain universal identity layer | Q3 2026 | 📋 Planned |
 | **Phase 5** | Complete Fi ecosystem infrastructure | 2027+ | 🔮 Vision |
