@@ -211,6 +211,14 @@ AgenticDID is part of the **DIDz ecosystem**, 22 privacy-preserving products on 
 | **[realVote](https://github.com/bytewizard42i/realVote)** | Agents can vote on behalf of humans with delegation proofs |
 | **[SelectConnect](https://github.com/bytewizard42i/selectConnect_app_pro)** | Safe contact sharing between agents and humans |
 | **[DIDzMonolith](https://github.com/bytewizard42i/DIDzMonolith)** | Master orchestration repo for the full ecosystem |
+| **NIGHTGATE** | Planned CAP/OData service edge that transports operations after AgenticDID authority has been established |
+| **NIGHTGATE-MCP** | Planned Ai tool bridge to NIGHTGATE; its bearer grant is a transport credential, not an AgenticDID scoped grant or ZK delegation proof |
+
+Neither component becomes a fifth DIDzM engine or an authority source.
+AgenticDID remains authoritative for agent identity, scoped grants,
+attenuation, delegation lineage, and revocation. The planned bridge must not
+store or log wallet seeds, bearer tokens, private documents, private claims, or
+ZK witnesses.
 
 ## Documentation
 
@@ -219,6 +227,7 @@ AgenticDID is part of the **DIDz ecosystem**, 22 privacy-preserving products on 
 - **[Midnight Integration Plan](./agentic-did/docs/MIDNIGHT_INTEGRATION_PLAN.md)**, Real Midnight SDK integration
 - **[Current Scope](./agentic-did/docs/CURRENT_SCOPE.md)**, What works now vs. what's coming
 - **[KYCz Biometric Verification](./KYCZ_BIOMETRIC_VERIFICATION.md)**, Biometric ZK proof design for human-agent binding
+- **[Authority-Tiered Data Access](docs/AUTHORITY_TIERS_DATA_ACCESS.md)**, Authority sources and the planned NIGHTGATE transport boundary
 
 ---
 

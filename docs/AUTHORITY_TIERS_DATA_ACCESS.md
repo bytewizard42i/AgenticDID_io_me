@@ -30,5 +30,24 @@ and 3.
 supports scope, caps, expiry, and counterparty binding. Tiered access is a
 gateway GATE-step refinement that reads grant scope, not a contract change.
 
+## NIGHTGATE transport boundary
+
+NIGHTGATE and NIGHTGATE-MCP are planned transport components, not a fourth
+authority source. An `ngat_` bearer grant may authorize and budget a request at
+the NIGHTGATE edge, but it does not prove control of a principal DIDz and does
+not provide AgenticDID scope, counterparty binding, attenuation lineage,
+cascade revocation, or a ZK delegation proof. The MCP server is a
+credential-bearing proxy under the same boundary.
+
+Before a NIGHTGATE request is treated as agent-authorized, AgenticDID must
+independently resolve and verify the applicable scoped grant. Transport success
+must not be promoted to `REALDEAL` authority evidence.
+
+Never put wallet seeds, private keys, bearer tokens, private documents,
+private claims, or ZK witnesses in repository files, examples, fixtures, logs,
+telemetry, or MCP prompts. Any future runtime handoff of sensitive material
+requires an approved ephemeral channel, least-privilege scope, redacted
+observability, and a documented retention policy.
+
 **Canonical specification:**
 `helixctw/docs/AUTHORITY_TIERS_DATA_ACCESS.md`
