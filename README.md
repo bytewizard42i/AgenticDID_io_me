@@ -15,6 +15,10 @@
 
 </div>
 
+> **🏛️ DIDzM Pillar Repo** — This repository stands alone, but it is one of the three pillars of the [DIDzMonolith](https://github.com/bytewizard42i/DIDzMonolith) ecosystem — **[DIDz](https://github.com/bytewizard42i/didz-dapp-system)** (root identity) · **AgenticDID** (agent authority, this repo) · **[RWAz](https://github.com/bytewizard42i/RWAz)** (asset identity) — sharing one kernel (didz-kernel), one conformance suite, and one philosophy: *prove without revealing*, on Midnight.
+>
+> **Already real at the kernel seam:** the didz-kernel's Midnight adapter backs its `AuthorityProvider` with compiled **scoped-grant v2 circuits** — two-cap spend budgets, attenuation-only delegation (a delegate can never hold more authority than its delegator), on-chain budget reservation, and cascade revocation — passing the same conformance suite the identity seam passes.
+
 > **Midnight technical rule:** Follow the [DIDzM technical reference policy](../DIDzMonolith-docs/midnight/MIDNIGHT_TECHNICAL_REFERENCE_POLICY.md) for version-matched Compact syntax, SDK behavior, and evidence labels.
 
 ---
