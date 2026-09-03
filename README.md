@@ -63,6 +63,13 @@ answer itself. AgenticDID extends this same principle to **AI agents**: an agent
 can prove it is authorized to act, without revealing by whom, for what, or how
 much.
 
+**Design principle — authority is a receipt, not a session.** An agent is never
+"logged in as" its principal. Each action carries its own scoped-grant proof
+(`per_action_cap`, `cumulative_cap`), and each action — allowed or denied —
+leaves a signed receipt an auditor can replay. The leash is only trustworthy if
+every tug leaves a receipt. Canon:
+[AUTHORITY_IS_A_RECEIPT.md](https://github.com/bytewizard42i/DIDzMonolith/blob/main/DIDzMonolith-docs/standards/AUTHORITY_IS_A_RECEIPT.md).
+
 ---
 
 ## The Solution
