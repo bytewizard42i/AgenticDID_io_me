@@ -1,15 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-
-  "//": "AgenticDID demoLand on Vercel. The demo is a single self-contained public/index.html; server.js is only for running it locally on port 3014. On Vercel we skip the build step entirely and serve public/ as static files.",
-
   "framework": null,
   "buildCommand": "",
   "installCommand": "",
   "outputDirectory": "public",
-
   "cleanUrls": true,
-
   "headers": [
     {
       "source": "/(.*)",
