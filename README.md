@@ -18,6 +18,8 @@
 > **🏛️ DIDzM Pillar Repo** — This repository stands alone, but it is one of the three pillars of the [DIDzMonolith](https://github.com/bytewizard42i/DIDzMonolith) ecosystem — **[DIDz](https://github.com/bytewizard42i/didz-dapp-system)** (root identity) · **AgenticDID** (agent authority, this repo) · **[RWAz](https://github.com/bytewizard42i/RWAz)** (asset identity) — sharing one kernel (didz-kernel), one conformance suite, and one philosophy: *prove without revealing*, on Midnight.
 >
 > **Already real at the kernel seam:** the didz-kernel's Midnight adapter backs its `AuthorityProvider` with compiled **scoped-grant v2 circuits** — two-cap spend budgets, attenuation-only delegation (a delegate can never hold more authority than its delegator), on-chain budget reservation, and cascade revocation — passing the same conformance suite the identity seam passes.
+>
+> **Repo history note (Sept 15, 2026):** The predecessor repo `AgenticDID_io_me_MAIN` (the Google Cloud Run hackathon build) was deleted from GitHub by John. Its content was already merged into this repo in May 2026 (commit `659c7d4`). The `agentic-did/` subdirectory here is the salvaged code from that merge — it carries the older "Fi ecosystem" / Google ADK framing and is not the canonical DIDzM-aligned codebase. The canonical AgenticDID code is in `protocol/` + `demo-proof-of-authority/` + the didz-kernel's AuthorityProvider seam.
 
 > **Midnight technical rule:** Follow the [DIDzM technical reference policy](../DIDzMonolith-docs/midnight/MIDNIGHT_TECHNICAL_REFERENCE_POLICY.md) for version-matched Compact syntax, SDK behavior, and evidence labels.
 
